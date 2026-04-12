@@ -14,7 +14,7 @@ import soundfile as sf
 import numpy as np
 
 # ----- CONFIGURATION -----
-BASE_PATH = "/mnt/d/CS PROJECTS/467_Assignments/"
+BASE_PATH = "./"
 INPUT_DIR = os.path.join(BASE_PATH, "Data/distributed_dataset")
 OUTPUT_DIR = os.path.join(BASE_PATH, "Data/segmented_dataset")
 

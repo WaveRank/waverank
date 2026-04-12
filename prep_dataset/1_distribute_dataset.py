@@ -5,7 +5,7 @@ import os
 import shutil
 
 # ----- CONFIGURATION -----
-BASE_PATH = "/mnt/d/CS PROJECTS/467_Assignments/"
+BASE_PATH = "./"
 INPUT_DIR = os.path.join(BASE_PATH, "Data/genres_original")
 OUTPUT_DIR = os.path.join(BASE_PATH, "Data/distributed_dataset")
 

@@ -6,6 +6,7 @@ dataset/
 tf-gpu/
 .venv/
 venv/
+env/
 
 # Outputs
 accuracy_curve.png
