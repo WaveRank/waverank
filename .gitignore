@@ -1,0 +1,8 @@
+# Datasets
+Data/
+dataset/
+
+# Virtual environments
+tf-gpu/
+.venv/
+venv/
