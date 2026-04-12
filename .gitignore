@@ -1,0 +1,13 @@
+# Datasets
+Data/
+dataset/
+
+# Virtual environments
+tf-gpu/
+.venv/
+venv/
+
+# Outputs
+accuracy_curve.png
+loss_curve.png
+embeddings.csv
