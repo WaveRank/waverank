@@ -34,7 +34,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # ----- CONFIGURATION -----
-DATASET_PATH = "/mnt/d/CS PROJECTS/467_Assignments/dataset/"
+DATASET_PATH = "dataset/"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
 TRAINING_EPOCHS = 10
