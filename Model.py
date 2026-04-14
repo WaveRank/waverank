@@ -220,3 +220,37 @@ df["pred_name"] = [class_names[i] for i in y_pred]
 # Save to CSV
 df.to_csv("embeddings.csv", index=False)
 print("Saved embeddings.csv")
+
+# Extract prediction confidence for each song per genre
+def extract_confidences(dataset, clf_model):
+    """Extracts all genre confidence scores from dataset for each song."""
+    labels = []
+    confidences = []
+
+    for images, y in dataset:
+        # Class probabilities
+        prob = clf_model.predict(images, verbose=0)
+        labels.append(y.numpy())
+        confidences.append(prob)
+
+    # Combine into single arrays
+    return (
+        np.hstack(labels),
+        np.vstack(confidences)
+    )
+
+# Run embedding extraction on test set
+y_true, confidences = extract_confidences(
+    test_ds,
+    model
+)
+df = pd.DataFrame(confidences)
+
+# Add metadata columns
+df.columns = class_names
+df["label"] = y_true
+df["label_name"] = [class_names[i] for i in y_true]
+
+# Save to CSV
+df.to_csv("confidences.csv", index=False)
+print("Saved confidences.csv")
