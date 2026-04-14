@@ -12,6 +12,7 @@ env/
 accuracy_curve.png
 loss_curve.png
 embeddings.csv
+confidences.csv
 
 # Custom settings
 .vscode/
