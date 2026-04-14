@@ -32,6 +32,8 @@ def generate_roc_auc():
     # Binarize genre labels for 1 vs all fashion
     bin_labels = preprocessing.label_binarize(label, classes=[0,1, 2, 3, 4, 5, 6, 7, 8, 9])
     
+    plt.figure(figsize=(15, 6))
+
     # Loop through each genre by index
     for genre in range(10):
 
