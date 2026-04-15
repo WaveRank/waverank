@@ -13,6 +13,7 @@ accuracy_curve.png
 loss_curve.png
 embeddings.csv
 confidences.csv
+roc_auc.png
 
 # Custom settings
 .vscode/
