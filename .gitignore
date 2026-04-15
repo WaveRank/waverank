@@ -12,3 +12,4 @@ env/
 accuracy_curve.png
 loss_curve.png
 embeddings.csv
+umap.png
