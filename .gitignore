@@ -12,4 +12,10 @@ env/
 accuracy_curve.png
 loss_curve.png
 embeddings.csv
+confidences.csv
+roc_auc.png
+confusion_matrix.png
 umap.png
+
+# Custom settings
+.vscode/
