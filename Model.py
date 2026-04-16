@@ -32,6 +32,7 @@ from tensorflow.keras.applications.resnet50 import preprocess_input
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import json
 
 # ----- CONFIGURATION -----
 DATASET_PATH = "dataset/"
@@ -70,9 +71,11 @@ test_ds = tf.keras.utils.image_dataset_from_directory(
     shuffle=False   
 )
 
-# Extract class (genre) names
+# Extract class (genre) names, save for reference
 class_names = train_ds.class_names
 print("Classes:", class_names)
+with open("class_names.json", "w") as f:
+    json.dump(class_names, f)
 
 # ----- PREPROCESSING -----
 train_ds = train_ds.map(lambda x, y: (preprocess_input(x), y))
