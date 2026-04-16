@@ -8,38 +8,55 @@ Expected CSV columns:
 Uses GENRE_NAMES to label axes, outputs a PNG image.
 """
 import pandas as pd
+import json
 import matplotlib.pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay
 
 
+# Default input and output paths
 PREDICTIONS_PATH = "../../embeddings.csv"
+CLASS_NAMES_PATH = "../../class_names.json"
 OUTPUT_PATH = "confusion_matrix.png"
 
-# Order of genre names must match CNN model
-GENRE_NAMES = ["blues", "classical", "country", "disco", "hiphop", "jazz", "metal", "pop", "reggae", "rock"]
 
-
-def generate_confusion_matrix():
+def generate_confusion_matrix(predictions_path, class_names_path, output_path):
     """
     Load predictions from CSV and generate a labeled confusion matrix plot.
 
     Side effects:
-    - Reads from PREDICTIONS_PATH
-    - Writes image to OUTPUT_PATH
+    - Reads from predictions_path and class_names_path
+    - Writes image to output_path
     """
-    df = pd.read_csv(PREDICTIONS_PATH)
+    # Read genre names
+    with open(class_names_path) as f:
+        genre_names = json.load(f)
 
-    label = df["label"].values
-    pred = df["pred"].values
+    # Read true and predicted values
+    pred_df = pd.read_csv(predictions_path)
+    y_true = pred_df["label"].values
+    y_pred = pred_df["pred"].values
 
     # Plot confusion matrix
     fig, ax = plt.subplots()
-    ConfusionMatrixDisplay.from_predictions(y_true=label, y_pred=pred, display_labels=GENRE_NAMES, ax=ax)
     ax.set_title("Confusion Matrix")
-    plt.setp(ax.get_xticklabels(), rotation=45)
-    fig.tight_layout()
-    plt.savefig(OUTPUT_PATH)
-    
 
+    ConfusionMatrixDisplay.from_predictions(
+        y_true=y_true, 
+        y_pred=y_pred, 
+        display_labels=genre_names, 
+        ax=ax
+    )
+    
+    plt.setp(ax.get_xticklabels(), rotation=45)
+    plt.tight_layout()
+    plt.savefig(output_path)
+    plt.close(fig)
+    
+    
+# Runnable with default paths
 if __name__ == "__main__":
-    generate_confusion_matrix()
+    generate_confusion_matrix(
+        predictions_path=PREDICTIONS_PATH,
+        class_names_path=CLASS_NAMES_PATH,
+        output_path=OUTPUT_PATH
+)
