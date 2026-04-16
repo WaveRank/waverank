@@ -6,29 +6,19 @@ Expected CSV columns:
 - label (int): true class index 
 - confidence genre predictions per song
 
-Uses GENRE_NAMES to grab probability values per genre.
+Uses CLASS_NAMES_PATH to extract genre_names that grab 
+probability values per genre.
 """
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import json
+
 
 CONFIDENCES_PATH = "../../confidences.csv"
+CLASS_NAMES_PATH = "../../class_names.json"
 OUTPUT_PATH = "top_k.png"
-
-# Order of genre names must match CNN model
-GENRE_NAMES = [
-    "blues", 
-    "classical", 
-    "country", 
-    "disco", 
-    "hiphop", 
-    "jazz", 
-    "metal", 
-    "pop", 
-    "reggae", 
-    "rock"
-]
 
 
 def top_k_acc(k, labels, confidences):
@@ -44,7 +34,7 @@ def top_k_acc(k, labels, confidences):
     return accuracy
 
 
-def generate_topk():
+def generate_topk(conf_path, class_names_path, output_path):
     """
     Loads the confidences CSV and generates a top k accuracy
     visualization.
@@ -54,12 +44,16 @@ def generate_topk():
     - Writes image to OUTPUT_PATH
     """
 
+    # Get the genre names
+    with open(class_names_path) as f:
+        genre_names = json.load(f)
+
     # Read the CSV file
-    df = pd.read_csv(CONFIDENCES_PATH)
+    df = pd.read_csv(conf_path)
 
     # Generates the label values and confidences values per song
     labels = df['label'].values
-    confidences = df[GENRE_NAMES].values
+    confidences = df[genre_names].values
 
     k_val = [1, 2, 3, 5, 10]
 
@@ -73,8 +67,12 @@ def generate_topk():
     plt.ylabel("Accuracy")
     plt.xticks(k_val)
     plt.yticks(np.arange(0.6, 1.02, 0.02))
-    plt.savefig(OUTPUT_PATH)
+    plt.savefig(output_path)
 
 
 if __name__ == "__main__":
-    generate_topk()
+    generate_topk(
+        conf_path=CONFIDENCES_PATH,
+        class_names_path=CLASS_NAMES_PATH,
+        output_path=OUTPUT_PATH
+    )
