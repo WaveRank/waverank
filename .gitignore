@@ -16,6 +16,7 @@ confidences.csv
 roc_auc.png
 confusion_matrix.png
 umap.png
+top_k.png
 
 # Custom settings
 .vscode/
