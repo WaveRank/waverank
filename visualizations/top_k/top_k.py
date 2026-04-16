@@ -8,8 +8,12 @@ Expected CSV columns:
 
 Uses CLASS_NAMES_PATH to extract genre_names that grab 
 probability values per genre.
+
+Citations:
+https://scikit-learn.org/stable/modules/generated/sklearn.metrics.top_k_accuracy_score.html
 """
 
+from sklearn.metrics import top_k_accuracy_score
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -19,19 +23,6 @@ import json
 CONFIDENCES_PATH = "../../confidences.csv"
 CLASS_NAMES_PATH = "../../class_names.json"
 OUTPUT_PATH = "top_k.png"
-
-
-def top_k_acc(k, labels, confidences):
-    """
-    Uses k values, labels, and probability values to sort confidence values as
-    indices and returns the mean of correct genre predictions.
-    """
-
-    total_labels = len(labels)
-    top_k_pred = np.argsort(confidences, axis=1)[:, -k:]
-    accuracy = np.mean([labels[i] in top_k_pred[i] for i in range(total_labels)])
-
-    return accuracy
 
 
 def generate_topk(conf_path, class_names_path, output_path):
@@ -55,10 +46,10 @@ def generate_topk(conf_path, class_names_path, output_path):
     labels = df['label'].values
     confidences = df[genre_names].values
 
-    k_val = [1, 2, 3, 5, 10]
+    k_val = [1, 2, 3, 5, 7, 9]
 
     # Generate the prediction scores for each k value
-    scores = [top_k_acc(k, labels, confidences) for k in k_val]
+    scores = [top_k_accuracy_score(labels, confidences, k=k) for k in k_val]
 
     plt.figure()
     plt.plot(k_val, scores, marker='o')
