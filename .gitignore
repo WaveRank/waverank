@@ -15,6 +15,7 @@ embeddings.csv
 confidences.csv
 roc_auc.png
 confusion_matrix.png
+visualizations/*/output/
 
 # Custom settings
 .vscode/
