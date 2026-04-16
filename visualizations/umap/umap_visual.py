@@ -16,6 +16,8 @@ import umap
 EMBEDDINGS_PATH = "../../embeddings.csv"
 OUTPUT_PATH = "umap.png"
 
+RANDOM_STATE = 42
+
 # Order of genre names must match CNN model
 GENRE_NAMES = [
     "blues", 
@@ -46,7 +48,7 @@ def generate_umap():
     y = df['label'].values
 
     # Convert embeddings to 2D for plotting
-    reducer = umap.UMAP(metric='cosine')
+    reducer = umap.UMAP(metric='cosine', random_state=RANDOM_STATE)
     embeddings = reducer.fit_transform(X)
 
     # Plot UMAP
@@ -64,7 +66,7 @@ def generate_umap():
         GENRE_NAMES, 
         title="Genres", 
         ncol=2, 
-        loc="upper left", 
+        loc="lower left", 
         fontsize=7
     )
     plt.title("UMAP")
