@@ -130,4 +130,5 @@ def generate_comparison_roc(base_path, output_path, models=None):
 
 if __name__ == "__main__":
     BASE_OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "../../visualizations_output")
-    generate_comparison_roc(BASE_OUTPUT_PATH, BASE_OUTPUT_PATH, ["run_1", "run_2"])
+    requested = sys.argv[1:] or None
+    generate_comparison_roc(BASE_OUTPUT_PATH, BASE_OUTPUT_PATH, models=requested)
