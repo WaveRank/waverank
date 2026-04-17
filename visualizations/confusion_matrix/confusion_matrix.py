@@ -7,16 +7,11 @@ Expected CSV columns:
 
 Uses GENRE_NAMES to label axes, outputs a PNG image.
 """
+import os
 import pandas as pd
 import json
 import matplotlib.pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay
-
-
-# Default input and output paths
-PREDICTIONS_PATH = "../../embeddings.csv"
-CLASS_NAMES_PATH = "../../class_names.json"
-OUTPUT_PATH = "confusion_matrix.png"
 
 
 def generate_confusion_matrix(predictions_path, class_names_path, output_path):
@@ -27,6 +22,7 @@ def generate_confusion_matrix(predictions_path, class_names_path, output_path):
     - Reads from predictions_path and class_names_path
     - Writes image to output_path
     """
+
     # Read genre names
     with open(class_names_path) as f:
         genre_names = json.load(f)
@@ -49,14 +45,10 @@ def generate_confusion_matrix(predictions_path, class_names_path, output_path):
     
     plt.setp(ax.get_xticklabels(), rotation=45)
     plt.tight_layout()
-    plt.savefig(output_path)
+    plt.savefig(os.path.join(output_path, f"confusion_matrix.png"))
     plt.close(fig)
     
     
 # Runnable with default paths
 if __name__ == "__main__":
-    generate_confusion_matrix(
-        predictions_path=PREDICTIONS_PATH,
-        class_names_path=CLASS_NAMES_PATH,
-        output_path=OUTPUT_PATH
-)
+    generate_confusion_matrix()
