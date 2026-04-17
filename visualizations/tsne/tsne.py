@@ -14,9 +14,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
+import json
 
 # ----- CONFIGURATION -----
-CSV_PATH = "../../embeddings.csv"
 N_EMBEDDINGS = 128
 N_COMPONENTS_PCA = 50
 N_COMPONENTS_TSNE = 2
@@ -24,13 +24,8 @@ PERPLEXITY = 30
 LEARNING_RATE = 200
 RANDOM_STATE = 42
 
-GENRES = [
-    "blues", "classical", "country", "disco", "hiphop",
-    "jazz", "metal", "pop", "reggae", "rock"
-]
-
 # ----- HELPER FUNCTIONS -----
-def plot_tsne(data_tsne, values, mode):
+def plot_tsne(data_tsne, values, mode, output_path, genre_names=None):
     """Generates and saves a t-SNE scatter plot."""
     plt.figure(figsize=(8, 6))
     scatter = plt.scatter(
@@ -47,9 +42,9 @@ def plot_tsne(data_tsne, values, mode):
 
     # Genre visualization
     if mode == "genre":
-        plot_title = "t-SNE: Genre"
+        plt.title("t-SNE: Genre")
         handles, _ = scatter.legend_elements()
-        plt.legend(handles, GENRES,
+        plt.legend(handles, genre_names,
                    title="Genres",
                    loc="upper left",
                    bbox_to_anchor=(1.02, 1))
@@ -57,7 +52,7 @@ def plot_tsne(data_tsne, values, mode):
 
     # Accuracy visualization
     elif mode == "accuracy":
-        plot_title = "t-SNE: Accuracy"
+        plt.title("t-SNE: Accuracy")
         handles, _ = scatter.legend_elements()
         plt.legend(handles, ["Incorrect", "Correct"],
                    title="Prediction",
@@ -67,40 +62,48 @@ def plot_tsne(data_tsne, values, mode):
 
     # Confidence visualization
     elif mode == "confidence":
-        plot_title = "t-SNE: Confidence"
+        plt.title("t-SNE: Confidence")
         plt.colorbar(scatter, label="Confidence")
 
     # Save plot
-    plt.title(plot_title)
-    plt.savefig(f"output/tsne_{mode}.jpeg", dpi=100)
+    plt.savefig(os.path.join(output_path, f"tsne_{mode}.jpeg"), dpi=100)
     plt.close()
 
-# ----- PREP DATA -----
-os.makedirs("output", exist_ok=True)
-df = pd.read_csv(CSV_PATH)
 
-# Split embeddings from metadata
-data = df.iloc[:, :N_EMBEDDINGS].values
-labels = df["label"]
-preds = df["pred"]
-label_names = df["label_name"]
-pred_names = df["pred_name"]
-confidence = df["confidence"]
+# ----- MAIN PIPELINE -----
+def generate_tsne(predictions_path, class_names_path, output_path):
 
-# ----- PCA & T-SNE -----
-data_pca = PCA(n_components=N_COMPONENTS_PCA).fit_transform(data)
+    # ----- PREP DATA -----
+    df = pd.read_csv(predictions_path)
 
-tsne = TSNE(
-    n_components=N_COMPONENTS_TSNE,
-    perplexity=PERPLEXITY,
-    learning_rate=LEARNING_RATE,
-    random_state=RANDOM_STATE
-)
+    # Split embeddings from metadata
+    data = df.iloc[:, :N_EMBEDDINGS].values
+    labels = df["label"]
+    preds = df["pred"]
+    label_names = df["label_name"]
+    pred_names = df["pred_name"]
+    confidence = df["confidence"]
 
-data_tsne = tsne.fit_transform(data_pca)
+    # Get class names
+    with open(class_names_path) as f:
+        genre_names = json.load(f)
 
-# ----- PLOT AND SAVE AS JPEG -----
-print("It may take a while for the images to save to the output folder. Give it a minute! :)")
-plot_tsne(data_tsne, labels, "genre")
-plot_tsne(data_tsne, (labels == preds), "accuracy")
-plot_tsne(data_tsne, confidence, "confidence")
+    # ----- PCA & T-SNE -----
+    data_pca = PCA(n_components=N_COMPONENTS_PCA).fit_transform(data)
+
+    tsne = TSNE(
+        n_components=N_COMPONENTS_TSNE,
+        perplexity=PERPLEXITY,
+        learning_rate=LEARNING_RATE,
+        random_state=RANDOM_STATE
+    )
+
+    data_tsne = tsne.fit_transform(data_pca)
+
+    # ----- PLOT AND SAVE AS JPEG -----
+    plot_tsne(data_tsne, labels, "genre", output_path, genre_names)
+    plot_tsne(data_tsne, (labels == preds), "accuracy", output_path)
+    plot_tsne(data_tsne, confidence, "confidence", output_path)
+
+if __name__ == "__main__":
+    generate_tsne()

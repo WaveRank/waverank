@@ -18,6 +18,8 @@ confusion_matrix.png
 umap.png
 top_k.png
 visualizations/*/output/
+visualizations_output/
 
 # Custom settings
 .vscode/
+__pycache__
