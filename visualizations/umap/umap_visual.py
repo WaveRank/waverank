@@ -10,20 +10,21 @@ Uses CLASS_NAMES_PATH to extract genre_names that label colors, outputs
 a PNG image representing the UMAP
 """
 
+import os
 import matplotlib.pyplot as plt
 import pandas as pd
 import umap
 import json
+import warnings
 
-
-EMBEDDINGS_PATH = "../../embeddings.csv"
-CLASS_NAMES_PATH = "../../class_names.json"
-OUTPUT_PATH = "umap.png"
-
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    module="umap"
+)
 RANDOM_STATE = 42
 
-
-def generate_umap(embeddings_path, class_names_path, output_path, random_state):
+def generate_umap(embeddings_path, class_names_path, output_path):
     """
     Loads the embeddings CSV and generates a UMAP visualization
 
@@ -43,7 +44,7 @@ def generate_umap(embeddings_path, class_names_path, output_path, random_state):
     y = df['label'].values
 
     # Convert embeddings to 2D for plotting
-    reducer = umap.UMAP(metric='cosine', random_state=random_state)
+    reducer = umap.UMAP(metric='cosine', random_state=RANDOM_STATE)
     embeddings = reducer.fit_transform(X)
 
     # Plot UMAP
@@ -65,13 +66,9 @@ def generate_umap(embeddings_path, class_names_path, output_path, random_state):
         fontsize=7
     )
     plt.title("UMAP")
-    plt.savefig(output_path)
+    plt.savefig(os.path.join(output_path, f"umap.png"))
+    plt.close()
 
 
 if __name__ == "__main__":
-    generate_umap(
-        embeddings_path=EMBEDDINGS_PATH,
-        class_names_path=CLASS_NAMES_PATH,
-        output_path=OUTPUT_PATH,
-        random_state=RANDOM_STATE
-    )
+    generate_umap()

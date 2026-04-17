@@ -16,6 +16,8 @@ Uses GENRE_NAMES to label curves, outputs a PNG image with ROC and AUC for each
 genre.
 """
 
+import os
+import json
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -25,25 +27,8 @@ from sklearn import (
     metrics,
 )
 
-CONFIDENCES_PATH = "../../confidences.csv"
-OUTPUT_PATH = "roc_auc.png"
 
-# Order of genre names must match CNN model
-GENRE_NAMES = [
-    "blues",
-    "classical",
-    "country",
-    "disco",
-    "hiphop",
-    "jazz",
-    "metal",
-    "pop",
-    "reggae",
-    "rock",
-]
-
-
-def generate_roc_auc():
+def generate_roc_auc(confidences_path, class_names_path, output_path):
     """
     Load prediction confidences from CSV and generate labeled ROC/AUC curves
     per genre.
@@ -53,8 +38,12 @@ def generate_roc_auc():
     - Writes image to OUTPUT_PATH
     """
 
+    # Read genre names
+    with open(class_names_path) as f:
+        genre_names = json.load(f)
+
     # Read CSV into pandas dataframe
-    df = pd.read_csv(CONFIDENCES_PATH)
+    df = pd.read_csv(confidences_path)
     label = df["label"].values
 
     # Binarize genre labels for one vs all
@@ -67,7 +56,7 @@ def generate_roc_auc():
     plt.suptitle("WaveRank ROC Curves by Genre", fontsize=20)
     for genre in range(10):
         true_binary = bin_labels[:, genre]
-        scores = df[GENRE_NAMES[genre]]
+        scores = df[genre_names[genre]]
         (fpr, tpr, thresholds) = metrics.roc_curve(true_binary, scores)
         auc_score = metrics.roc_auc_score(true_binary, scores)
 
@@ -81,10 +70,11 @@ def generate_roc_auc():
         ax.yaxis.set_major_locator(tck.MultipleLocator(0.5))
         plt.xlabel("FPR")
         plt.ylabel("TPR")
-        plt.title(f"{GENRE_NAMES[genre]}; AUC={auc_score:.2f}")
+        plt.title(f"{genre_names[genre]}; AUC={auc_score:.2f}")
 
     plt.tight_layout(pad=1.5, h_pad=1.5)
-    plt.savefig(OUTPUT_PATH, dpi=300)
+    plt.savefig(os.path.join(output_path, f"roc_auc.png"), dpi=300)
+    plt.close()
 
 
 if __name__ == "__main__":
