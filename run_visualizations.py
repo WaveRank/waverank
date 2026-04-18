@@ -56,24 +56,11 @@ print("\033[32mGenerating visualizations...\n\033[0m")
 OUTPUT_PATH = get_output_dir(BASE_OUTPUT_PATH)
 
 # Generate and save visualizations
-run_visualization(
-    lambda: generate_confusion_matrix(
-        PREDICTIONS_PATH, CLASS_NAMES_PATH, OUTPUT_PATH
-    ),
-    "Confusion Matrix",
-)
-run_visualization(
-    lambda: generate_roc_auc(CONFIDENCES_PATH, CLASS_NAMES_PATH, OUTPUT_PATH),
-    "ROC and AUC Curves",
-)
-run_visualization(
-    lambda: generate_topk(CONFIDENCES_PATH, CLASS_NAMES_PATH, OUTPUT_PATH),
-    "Top-k Accuracy Score",
-)
-run_visualization(
-    lambda: generate_tsne(PREDICTIONS_PATH, CLASS_NAMES_PATH, OUTPUT_PATH),
-    "t-SNE Plot",
-)
+run_visualization(lambda: generate_confusion_matrix(PREDICTIONS_PATH, CLASS_NAMES_PATH, OUTPUT_PATH),"Confusion Matrix")
+run_visualization(lambda: generate_roc_auc(CONFIDENCES_PATH, CLASS_NAMES_PATH, OUTPUT_PATH),"ROC and AUC Curves")
+run_visualization(lambda: generate_topk(CONFIDENCES_PATH, CLASS_NAMES_PATH, OUTPUT_PATH),"Top-k Accuracy Score")
+run_visualization(lambda: generate_tsne(PREDICTIONS_PATH, CLASS_NAMES_PATH, OUTPUT_PATH), "t-SNE Plot")
+
 run_visualization(
     lambda: generate_umap(PREDICTIONS_PATH, CLASS_NAMES_PATH, OUTPUT_PATH),
     "UMAP Plot",
