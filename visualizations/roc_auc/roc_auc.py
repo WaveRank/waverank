@@ -14,6 +14,10 @@ Axes are:
 
 Uses GENRE_NAMES to label curves, outputs a PNG image with ROC and AUC for each
 genre.
+
+Citations:
+https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html
+https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html
 """
 
 import os
