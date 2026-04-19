@@ -38,8 +38,14 @@ import json
 DATASET_PATH = "dataset/"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
-TRAINING_EPOCHS = 10
-FINE_TUNE_EPOCHS = 5
+TRAINING_EPOCHS = 50
+FINE_TUNE_EPOCHS = 25
+
+# Vary these for DoE partial factorial tests
+INITIAL_LEARNING_RATE = 5e-5
+FINE_LEARNING_RATE = 1e-5
+DEPTH = 175
+DROPOUT_RATE = 0.5
 
 # Set global random seed for reproducibility
 SEED = 42
@@ -102,23 +108,33 @@ x = layers.GlobalAveragePooling2D()(x)
 
 # Embedding layer
 embedding = layers.Dense(128, activation='relu', name="embedding")(x)
-x = layers.Dropout(0.5)(embedding)
+x = layers.BatchNormalization()(embedding)
+x = layers.Dropout(DROPOUT_RATE)(embedding)
 outputs = layers.Dense(len(class_names), activation='softmax')(x)
 
 # Build and compile model
 model = tf.keras.Model(inputs=base_model.input, outputs=outputs)
 model.compile(
-    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
+    optimizer=tf.keras.optimizers.Adam(learning_rate=INITIAL_LEARNING_RATE),
     loss='sparse_categorical_crossentropy',
     metrics=['accuracy']
 )
+
+# Set early stopping for when val_loss stops improving after 5 epochs
+early_stopping = tf.keras.callbacks.EarlyStopping(
+    monitor='val_loss',
+    patience=5,
+    restore_best_weights=True
+)
+
 # model.summary()  # Optional, prints architecture of the model
 
 # ----- TRAIN MODEL -----
 history = model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=TRAINING_EPOCHS
+    epochs=TRAINING_EPOCHS,
+    callbacks=[early_stopping]
 )
 
 # Plot and save training curves
@@ -148,21 +164,29 @@ print("Test accuracy:", test_acc)
 base_model.trainable = True
 
 # Fine-tune only last layers
-for layer in base_model.layers[:-50]:
+for layer in base_model.layers[:-DEPTH]:
     layer.trainable = False
 
 # Recompile with lower learning rate
 model.compile(
-    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5),
+    optimizer=tf.keras.optimizers.Adam(FINE_LEARNING_RATE),
     loss='sparse_categorical_crossentropy',
     metrics=['accuracy']
+)
+
+# Fine-tuning
+early_stopping_finetune = tf.keras.callbacks.EarlyStopping(
+    monitor='val_loss',
+    patience=5,
+    restore_best_weights=True
 )
 
 # Train again
 model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=FINE_TUNE_EPOCHS
+    epochs=FINE_TUNE_EPOCHS,
+    callbacks=[early_stopping_finetune]
 )
 
 # Evaluate
