@@ -38,14 +38,16 @@ import json
 DATASET_PATH = "dataset/"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
-TRAINING_EPOCHS = 50
-FINE_TUNE_EPOCHS = 25
+TRAINING_EPOCHS = 100
+FINE_TUNE_EPOCHS = 100
 
-# Vary these for DoE partial factorial tests
+# Tuning parameters by emily :) work in progress
 INITIAL_LEARNING_RATE = 5e-5
-FINE_LEARNING_RATE = 1e-5
+FINE_LEARNING_RATE = 1e-6
 DEPTH = 175
 DROPOUT_RATE = 0.5
+TIME_MASK_WIDTH = 25
+FREQ_MASK_WIDTH = 25
 
 # Set global random seed for reproducibility
 SEED = 42
@@ -83,10 +85,74 @@ print("Classes:", class_names)
 with open("class_names.json", "w") as f:
     json.dump(class_names, f)
 
+
+def spec_augment(images, labels):
+    """
+    Applies spectrogram augmentation to mask out random frequency and time
+    regions of each image in a batch. This function calls a helper per each
+    single image in the batch.
+
+    Args:
+        images (tf.Tensor): Batch of spectrogram images.
+        labels (tf.Tensor): Batch of integer genre labels.
+    Returns:
+        Tuple of (augmented images, unchanged labels).
+    """
+
+    aug_images = tf.map_fn(spec_augment_helper, images)
+    return aug_images, labels
+
+
+def spec_augment_helper(image):
+    """
+    Takes one single tensor/image and applies spectrogram augmentation, then
+    returns that tensor/image.
+    """
+
+    # Pick width and start points for each dimension
+    freq_width = tf.random.uniform(
+        shape=[], maxval=FREQ_MASK_WIDTH, dtype=tf.dtypes.int32
+    )
+    freq_start = tf.random.uniform(
+        shape=[], maxval=IMG_SIZE[0] - freq_width, dtype=tf.dtypes.int32
+    )
+    time_width = tf.random.uniform(
+        shape=[], maxval=TIME_MASK_WIDTH, dtype=tf.dtypes.int32
+    )
+    time_start = tf.random.uniform(
+        shape=[], maxval=IMG_SIZE[1] - time_width, dtype=tf.dtypes.int32
+    )
+
+    # Draw frequency and time masks
+    freq_mask = tf.concat(
+        [
+            tf.ones([freq_start, IMG_SIZE[1], 3]),
+            tf.zeros([freq_width, IMG_SIZE[1], 3]),
+            tf.ones([IMG_SIZE[0] - freq_start - freq_width, IMG_SIZE[1], 3]),
+        ],
+        0,
+    )
+    time_mask = tf.concat(
+        [
+            tf.ones([IMG_SIZE[0], time_start, 3]),
+            tf.zeros([IMG_SIZE[0], time_width, 3]),
+            tf.ones([IMG_SIZE[0], IMG_SIZE[1] - time_start - time_width, 3]),
+        ],
+        1,
+    )
+
+    # Combine into one mask, apply to image and return masked image
+    mask = freq_mask * time_mask
+    return mask * image
+
+
 # ----- PREPROCESSING -----
 train_ds = train_ds.map(lambda x, y: (preprocess_input(x), y))
 val_ds   = val_ds.map(lambda x, y: (preprocess_input(x), y))
 test_ds  = test_ds.map(lambda x, y: (preprocess_input(x), y))
+
+# Spectrogram Augmentation on training data (comment out if desired)
+train_ds = train_ds.map(spec_augment)
 
 # Prefetch (improves performance)
 AUTOTUNE = tf.data.AUTOTUNE
@@ -108,7 +174,7 @@ x = layers.GlobalAveragePooling2D()(x)
 
 # Embedding layer
 embedding = layers.Dense(128, activation='relu', name="embedding")(x)
-x = layers.BatchNormalization()(embedding)
+# x = layers.BatchNormalization()(embedding)
 x = layers.Dropout(DROPOUT_RATE)(embedding)
 outputs = layers.Dense(len(class_names), activation='softmax')(x)
 
