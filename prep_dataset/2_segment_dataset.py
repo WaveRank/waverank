@@ -1,6 +1,6 @@
 """
-Segments the GTZAN dataset, where each 30-second audio track is divided into ten
-non-overlapping 3-second segments to expand the dataset size by 10x.
+Segments the GTZAN dataset, where each 30-second audio track is divided into
+segments of a given size to expand the dataset size.
 Assumes that dataset has already been split into training/validation/testing sets.
 
 Note: One of the jazz .wav files is corrupted and is thus skipped.
