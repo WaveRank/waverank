@@ -24,6 +24,9 @@ Things to try to improve the model:
 - And more! These are just some ideas
 """
 import os
+
+os.environ["TF_DETERMINISTIC_OPS"] = "1"
+
 import random
 import tensorflow as tf
 from tensorflow.keras import layers, models
@@ -41,6 +44,12 @@ BATCH_SIZE = 32
 TRAINING_EPOCHS = 10
 FINE_TUNE_EPOCHS = 5
 
+# Vary these for DoE partial factorial tests
+INITIAL_LEARNING_RATE = 5e-5
+FINE_LEARNING_RATE = 1e-5
+DEPTH = 175
+DROPOUT_RATE = 0.5
+
 # Set global random seed for reproducibility
 SEED = 42
 os.environ["PYTHONHASHSEED"] = str(SEED)
@@ -53,14 +62,18 @@ print("Loading Training Set:")
 train_ds = tf.keras.utils.image_dataset_from_directory(
     DATASET_PATH + "train",
     image_size=IMG_SIZE,
-    batch_size=BATCH_SIZE
+    batch_size=BATCH_SIZE,
+    shuffle=True,
+    seed=SEED
 )
 
 print("Loading Validation Set:")
 val_ds = tf.keras.utils.image_dataset_from_directory(
     DATASET_PATH + "val",
     image_size=IMG_SIZE,
-    batch_size=BATCH_SIZE
+    batch_size=BATCH_SIZE,
+    shuffle=True,
+    seed=SEED
 )
 
 print("Loading Test Set:")
