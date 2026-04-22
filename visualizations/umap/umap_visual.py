@@ -60,11 +60,11 @@ def generate_umap(embeddings_path, class_names_path, output_path):
     plt.legend(
         handles, 
         genre_names, 
-        title="Genres", 
-        ncol=2, 
-        loc="lower left", 
-        fontsize=7
+        title="Genres",
+        fontsize=7,
+        bbox_to_anchor=(1.2, 1)
     )
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
     plt.title("UMAP")
     plt.savefig(os.path.join(output_path, f"umap.png"))
     plt.close()
