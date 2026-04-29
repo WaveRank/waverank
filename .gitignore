@@ -23,3 +23,6 @@ visualizations_output/
 # Custom settings
 .vscode/
 __pycache__
+
+# Webapp
+webapp/client/node_modules/
