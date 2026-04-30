@@ -12,11 +12,6 @@ https://www.tensorflow.org/guide/keras/transfer_learning
 Citation (4/12/26):
 https://keras.io/guides/functional_api/#extract-and-reuse-nodes-in-the-graph
 
-Citation (4/25/26): Data Augmentation to .WAV files
-https://iver56.github.io/audiomentations/
-https://music-classification.github.io/tutorial/part3_supervised/data-augmentation.html
-https://www.tensorflow.org/api_docs/python/tf/data/Dataset#from_generator
-
 Things to try to improve the model:
 - Add data augmentation
 - Tune learning rate (initial training and fine-tuning separately)
@@ -30,7 +25,6 @@ Things to try to improve the model:
 """
 import os
 import random
-import librosa
 import tensorflow as tf
 from tensorflow.keras import layers, models
 from tensorflow.keras.applications import ResNet50
@@ -38,30 +32,14 @@ from tensorflow.keras.applications.resnet50 import preprocess_input
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from PIL import Image
 import json
-from audiomentations import Compose, SomeOf, PitchShift, Gain, AddGaussianNoise, LowPassFilter, HighPassFilter, RoomSimulator
-from sklearn.utils import shuffle
-
-# Suppresses extra info/warning messages
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-import logging
-logging.getLogger('tensorflow').setLevel(logging.ERROR)
 
 # ----- CONFIGURATION -----
-DATASET_PATH = "Data/segmented_dataset/"
-GENRES = sorted(os.listdir(os.path.join(DATASET_PATH, "train/")))
+DATASET_PATH = "dataset/"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
-BUFFER_SIZE = 100
 TRAINING_EPOCHS = 100
 FINE_TUNE_EPOCHS = 100
-
-# Audio loading
-SR = 22050              # sampling rate of y (audio-time series)
-N_FFT = 2048            # length of fft window
-HOP_LENGTH = 512        # num of samples between successive frames
-N_MELS = 128            # num of mel bands to generate
 
 # Tuning parameters by emily :) work in progress
 INITIAL_LEARNING_RATE = 5e-5
@@ -78,140 +56,31 @@ random.seed(SEED)
 np.random.seed(SEED)
 tf.random.set_seed(SEED)
 
-# Audio augmentation settings
-augs = SomeOf(
-    (1, 3),          # Randomly pick 1 to 3 of them
-    [
-        PitchShift(min_semitones=-4, max_semitones=4, p=1.0),
-        Gain(min_gain_db=-10, max_gain_db=10, p=1.0),
-        AddGaussianNoise(min_amplitude=0.001, max_amplitude=0.015, p=1.0),
-        HighPassFilter(min_cutoff_freq=200.0, max_cutoff_freq=1200.0, p=1.0),
-        LowPassFilter(min_cutoff_freq=3000.0, max_cutoff_freq=4000.0, p=1.0),
-        # RoomSimulator(leave_length_unchanged=True, p=1.0)
-    ],
-)
-
 # ----- LOAD DATASETS -----
-
-def extract_log_mel(y, sr):
-    """Convert waveform into spectrogram."""
-    mel = librosa.feature.melspectrogram(
-        y=y,
-        sr=sr,
-        n_fft=N_FFT,
-        hop_length=HOP_LENGTH,
-        n_mels=N_MELS
-    )
-    return librosa.power_to_db(mel, ref=np.max)
-
-def to_image(mel_db):
-    """Convert spectrogram into image using colormap."""
-    mel_db = np.clip(mel_db, -80, 0)
-    mel_db = (mel_db + 80) / 80
-    colored = plt.cm.magma(mel_db)  # returns RGBA
-    img = (colored[:, :, :3] * 255).astype(np.uint8)  # drop alpha, keep RGB
-    return Image.fromarray(img, mode="RGB")
-
-def get_paths_and_labels(split_path):
-    """
-    Takes a path and returns two lists. Walks each genre subfolder under 
-    split_path, collecting all .wav file paths and mapping them to their 
-    integer genre index.
-
-    Args:
-        split_path (str): Path to the split directory containing genre subfolders.
-
-    Returns:
-        tuple[list[str], list[int]]: All .wav file paths and their integer genre labels.
-    """
-
-    wav_paths = []
-    labels = []
-    for genre in GENRES:
-        genre_in = os.path.join(split_path, genre)
-
-        # Get all .wav file paths in this genre folder
-        for file in os.listdir(genre_in):
-            if file.lower().endswith(".wav"):
-                wav_paths.append(os.path.join(genre_in, file))
-                labels.append(GENRES.index(genre))
-        
-    return wav_paths, labels
-
-def make_generator(wav_paths, labels, augment=False):
-    """
-    Yields (image, label) pairs from audio files. Loads each .wav, optionally 
-    augments it, extracts a log-mel spectrogram, and converts it to a float32 
-    RGB image of shape (*IMG_SIZE, 3).
-
-    Args:
-        wav_paths (list[str]): Paths to .wav audio files.
-        labels (list[int]): Corresponding integer genre labels.
-        augment (bool): Whether to apply augmentation. Default False.
-    
-    Yields:
-        tuple[np.ndarray, int]: Float32 RGB image of shape (*IMG_SIZE, 3) and integer genre label.
-    """
-    for path, label in zip(wav_paths, labels):
-        # load audio with librosa
-        y, sr = librosa.load(path, sr=SR, mono=True)
-
-        # if augment: apply audiomentations
-        if augment:
-            y = augs(samples=y, sample_rate=sr)
-
-        # convert to spectrogram
-        mel_db = extract_log_mel(y, sr)
-
-        # convert to image
-        img = to_image(mel_db)
-        img = img.resize(IMG_SIZE)
-        img = np.array(img).astype(np.float32)
-
-        yield (img, label)
-
 print("Loading Training Set:")
-train_paths, train_labels = get_paths_and_labels(os.path.join(DATASET_PATH, "train/"))
-train_paths, train_labels = shuffle(
-    train_paths, train_labels, random_state=SEED
+train_ds = tf.keras.utils.image_dataset_from_directory(
+    DATASET_PATH + "train",
+    image_size=IMG_SIZE,
+    batch_size=BATCH_SIZE
 )
-train_ds = tf.data.Dataset.from_generator(
-    lambda: make_generator(train_paths, train_labels, augment=True),
-    output_signature=(
-        tf.TensorSpec(shape=(*IMG_SIZE, 3), dtype=tf.float32),
-        tf.TensorSpec(shape=(), dtype=tf.int32)
-    )
-)
-train_ds = train_ds.shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
-print(f"Found {len(train_paths)} files belonging to {len(GENRES)} classes.")
 
 print("Loading Validation Set:")
-val_paths, val_labels = get_paths_and_labels(os.path.join(DATASET_PATH, "val/"))
-val_ds = tf.data.Dataset.from_generator(
-    lambda: make_generator(val_paths, val_labels, augment=False),
-    output_signature=(
-        tf.TensorSpec(shape=(*IMG_SIZE, 3), dtype=tf.float32),
-        tf.TensorSpec(shape=(), dtype=tf.int32)
-    )
+val_ds = tf.keras.utils.image_dataset_from_directory(
+    DATASET_PATH + "val",
+    image_size=IMG_SIZE,
+    batch_size=BATCH_SIZE
 )
-val_ds = val_ds.batch(BATCH_SIZE)
-print(f"Found {len(val_paths)} files belonging to {len(GENRES)} classes.")
 
 print("Loading Test Set:")
-test_paths, test_labels = get_paths_and_labels(os.path.join(DATASET_PATH, "test/"))
-test_ds = tf.data.Dataset.from_generator(
-    lambda: make_generator(test_paths, test_labels, augment=False),
-    output_signature=(
-        tf.TensorSpec(shape=(*IMG_SIZE, 3), dtype=tf.float32),
-        tf.TensorSpec(shape=(), dtype=tf.int32)
-    )
+test_ds = tf.keras.utils.image_dataset_from_directory(
+    DATASET_PATH + "test",
+    image_size=IMG_SIZE,
+    batch_size=BATCH_SIZE,
+    shuffle=False   
 )
-test_ds = test_ds.batch(BATCH_SIZE)
-print(f"Found {len(test_paths)} files belonging to {len(GENRES)} classes.")
-
 
 # Extract class (genre) names, save for reference
-class_names = GENRES
+class_names = train_ds.class_names
 print("Classes:", class_names)
 with open("class_names.json", "w") as f:
     json.dump(class_names, f)
@@ -282,7 +151,7 @@ train_ds = train_ds.map(lambda x, y: (preprocess_input(x), y))
 val_ds   = val_ds.map(lambda x, y: (preprocess_input(x), y))
 test_ds  = test_ds.map(lambda x, y: (preprocess_input(x), y))
 
-# Spectrogram Augmentation on training data ONLY (comment out if desired)
+# Spectrogram Augmentation on training data (comment out if desired)
 train_ds = train_ds.map(spec_augment)
 
 # Prefetch (improves performance)
