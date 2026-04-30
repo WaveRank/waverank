@@ -66,7 +66,7 @@ N_MELS = 128            # num of mel bands to generate
 # Tuning parameters by emily :) work in progress
 INITIAL_LEARNING_RATE = 5e-5
 FINE_LEARNING_RATE = 1e-6
-DEPTH = 175
+DEPTH = 75
 DROPOUT_RATE = 0.5
 TIME_MASK_WIDTH = 25
 FREQ_MASK_WIDTH = 25
@@ -320,7 +320,7 @@ model.compile(
 # Set early stopping for when val_loss stops improving after 5 epochs
 early_stopping = tf.keras.callbacks.EarlyStopping(
     monitor='val_loss',
-    patience=5,
+    patience=8,
     restore_best_weights=True
 )
 
@@ -374,7 +374,7 @@ model.compile(
 # Fine-tuning
 early_stopping_finetune = tf.keras.callbacks.EarlyStopping(
     monitor='val_loss',
-    patience=5,
+    patience=8,
     restore_best_weights=True
 )
 
