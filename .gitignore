@@ -23,6 +23,9 @@ visualizations_output/
 # Custom settings
 .vscode/
 __pycache__
+test.py
 
 # Webapp
-webapp/client/node_modules/
+node_modules/
+uploads/
+package-lock.json
