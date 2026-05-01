@@ -1,18 +1,31 @@
 /**
- * Citations:
+ * Citations (4/29/2026):
  * https://www.geeksforgeeks.org/reactjs/file-uploading-in-react-js/
+ * https://www.geeksforgeeks.org/javascript/file-type-validation-while-uploading-it-using-javascript/
  */
-import axios from "axios";
 import React, { useState } from "react";
-import cors from "cors"
 
-const MAX_CONTENT_SIZE = 10 * 1024 * 1024  // 10MB 
+const HOST = "http://localhost"
+const PORT = 5137
+const PATH = "/api/predict"
+const MAX_CONTENT_SIZE = 10 * 1024 * 1024  // 10MB
+const ALLOWED_TYPES = ["audio/wav", "audio/mpeg", "audio/mp4"];
+const ALLOWED_EXTENSIONS = [".wav", ".mp3", ".mp4"]
 
+
+/**
+ * Sends an audio file to the backend prediction endpoint.
+ *
+ * Constructs a form-data request and POSTs it to the Flask API.
+ * Expects a JSON response. Logs server errors if the response is not OK.
+ *
+ * @param {File} file - The audio file selected by the user
+ */
 async function uploadFile(file) {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await fetch("http://localhost:5137/api/predict", {
+  const response = await fetch(`${HOST}:${PORT}${PATH}`, {
     method: "POST",
     body: formData,
   });
@@ -27,60 +40,70 @@ async function uploadFile(file) {
   console.log(data);
 }
 
+// Converts a file size from bytes to a human-readable megabyte string.
+function bytesToMB(bytes) {
+  return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+}
 
-function bytes_to_MB(bytes) {
-  return (bytes / (1024 * 1024)).toFixed(2);
+// Validates that file conforms to allowed types by checking MIME type and extension
+function validFileType(file) {
+  const ext = '.' + file.name.split('.').pop().toLowerCase();
+  return ALLOWED_TYPES.includes(file.type) && ALLOWED_EXTENSIONS.includes(ext) 
 }
 
 
 const App = () => {
-	const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const isValidType = selectedFile && validFileType(selectedFile);
+  const isValidSize = selectedFile && selectedFile.size <= MAX_CONTENT_SIZE;
+  const isValid = selectedFile && isValidSize && isValidType;
 
 	const onFileChange = (event) => {
 		setSelectedFile(event.target.files[0]);
 	};
 
   const onFileUpload = () => {
-    if (!selectedFile) return;
-    if (selectedFile.size > MAX_CONTENT_SIZE) {
-      alert("File too large");
-      console.log(formatSize(file.size));
-      return;
-    }
+    if (!isValidType) return;
     uploadFile(selectedFile);
+    console.log(`uploaded file ${selectedFile.name}`)
   };
 
-	const fileData = () => {
+	const userUploadSection = () => {
 		if (!selectedFile) return;
-    uploadFile(selectedFile)
-    if (selectedFile.size > MAX_CONTENT_SIZE) {
+    if (!isValidSize) {
+      const fileSizeMB = bytesToMB(selectedFile.size)
+      const maxContentMB = bytesToMB(MAX_CONTENT_SIZE).slice(0, -6) + ' MB'
       return (
         <div>
-          <h2>File size {bytes_to_MB(selectedFile.size)}MB exceeds maximum (10MB)</h2>
-          <h3>Please select smaller file.</h3>
+          <h2>Please select smaller file.</h2>
+          <h3>File size {fileSizeMB} exceeds maximum ({maxContentMB})</h3>
           <p>File Name: {selectedFile.name}</p>
           <p>File Type: {selectedFile.type}</p>
         </div>
       )
     }
-    return (
-      <div>
-        <h2>File Details:</h2>
-        <p>File Name: {selectedFile.name}</p>
-        <p>File Type: {selectedFile.type}</p>
-      </div>
-    );
+    else {
+      return (
+        <div>
+          <h2>File Details:</h2>
+          <p>File Name: {selectedFile.name}</p>
+          <p>File Type: {selectedFile.type}</p>
+        </div>
+      );
+    }
   }
+
 
 	return (
 		<div>
 			<h1>WaveRank</h1>
 			<h3>Choose a file to upload</h3>
 			<div>
-				<input type="file" onChange={onFileChange} />
-				<button onClick={onFileUpload}>Upload!</button>
+				<input type="file" accept={ALLOWED_EXTENSIONS.join(',')} onChange={onFileChange} />
+				<button onClick={onFileUpload} disabled={!isValid}>Upload!</button>
 			</div>
-			{fileData()}
+			{userUploadSection()}
 		</div>
 	);
 };
