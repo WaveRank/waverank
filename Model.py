@@ -271,6 +271,8 @@ def load_datasets():
             label_mode="categorical"
         )
 
+        class_names = train_ds.class_names
+
     # Call Spec augmentation after CutMix
     if USE_SPECAUG:
         train_ds = train_ds.map(spec_augment)
