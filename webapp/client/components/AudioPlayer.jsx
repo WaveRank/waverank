@@ -1,10 +1,25 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 // Citation (4/29/26): https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds
 export default function AudioPlayer({ audioFile }) {
     const audioRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
+    const [src, setSrc] = useState(null);
+
+    // Handle file vs string audioFile
+    useEffect(() => {
+        if (!audioFile) return;
+
+        if (audioFile instanceof File) {
+            const url = URL.createObjectURL(audioFile);
+            setSrc(url);
+            return () => URL.revokeObjectURL(url);
+        } else {
+            setSrc(audioFile); // assumes string URL
+        }
+    }, [audioFile]);
+
 
     // Handles play and pause
     const togglePlay = () => {
@@ -41,7 +56,7 @@ export default function AudioPlayer({ audioFile }) {
 
     return (
         <div>
-            <audio ref={audioRef} src={audioFile} onTimeUpdate={onTimeUpdate}/>
+            <audio ref={audioRef} src={src} onTimeUpdate={onTimeUpdate}/>
 
             <button className="playButton" onClick={togglePlay}>
                 {isPlaying ? "Pause" : "Play"}
