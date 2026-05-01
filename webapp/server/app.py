@@ -40,7 +40,6 @@ def upload_file():
     file = request.files['file']
 
     if file.filename == '':
-        flash('No selected file')
         return jsonify({"error": "No file selected"}), 400
 
     if not allowed_file(file.filename):
