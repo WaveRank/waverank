@@ -3,6 +3,13 @@
  * https://www.geeksforgeeks.org/reactjs/file-uploading-in-react-js/
  * https://www.geeksforgeeks.org/javascript/file-type-validation-while-uploading-it-using-javascript/
  */
+
+import { Routes, Route, Link } from "react-router-dom";
+import HomePage from "../pages/HomePage";
+import AboutPage from "../pages/AboutPage";
+import ContributorsPage from "../pages/ContributorsPage";
+import CreditsPage from "../pages/CreditsPage";
+import "./App.css";
 import React, { useState } from "react";
 
 const HOST = "http://localhost"
@@ -52,7 +59,7 @@ function validFileType(file) {
 }
 
 
-const App = () => {
+export default function App() {
   const [selectedFile, setSelectedFile] = useState(null);
 
   const isValidType = selectedFile && validFileType(selectedFile);
@@ -94,18 +101,39 @@ const App = () => {
     }
   }
 
+      return (
+        <div>
+            <div className="navBar">
+                <h1>WaveRank</h1>
 
-	return (
-		<div>
-			<h1>WaveRank</h1>
-			<h3>Choose a file to upload</h3>
-			<div>
-				<input type="file" accept={ALLOWED_EXTENSIONS.join(',')} onChange={onFileChange} />
-				<button onClick={onFileUpload} disabled={!isValid}>Upload!</button>
-			</div>
-			{userUploadSection()}
-		</div>
-	);
-};
+                <div className="navButtons">
+                    <Link to="/about"><button>About</button></Link>
+                    <Link to="/contributors"><button>Contributors</button></Link>
+                    <Link to="/credits"><button>Credits</button></Link>
+                    <Link to="/"><button className="homeButton">Home</button></Link>
+                </div>
+            </div>
 
-export default App;
+            <div className="header">
+                <h1>WaveRank</h1>
+                <p>AI-powered music genre classification from audio clips</p>
+            </div>
+
+            <div>
+              <h3>Choose a file to upload</h3>
+              <div>
+                <input type="file" accept={ALLOWED_EXTENSIONS.join(',')} onChange={onFileChange} />
+                <button onClick={onFileUpload} disabled={!isValid}>Upload!</button>
+              </div>
+              {userUploadSection()}
+            </div>
+
+            <Routes>
+                <Route path="/" element={<HomePage/>}/>
+                <Route path="/about" element={<AboutPage/>}/>
+                <Route path="/contributors" element={<ContributorsPage/>}/>
+                <Route path="/credits" element={<CreditsPage/>}/>
+            </Routes>
+        </div>
+    );
+}
