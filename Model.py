@@ -12,6 +12,8 @@ https://www.tensorflow.org/guide/keras/transfer_learning
 Citation (4/12/26):
 https://keras.io/guides/functional_api/#extract-and-reuse-nodes-in-the-graph
 
+Citation
+
 Things to try to improve the model:
 - Add data augmentation
 - Tune learning rate (initial training and fine-tuning separately)
@@ -26,7 +28,7 @@ Things to try to improve the model:
 import os
 import random
 import tensorflow as tf
-from tensorflow.keras import layers, models
+from tensorflow.keras import layers
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.applications.resnet50 import preprocess_input
 import numpy as np
@@ -41,7 +43,7 @@ BATCH_SIZE = 32
 TRAINING_EPOCHS = 100
 FINE_TUNE_EPOCHS = 100
 
-# Tuning parameters by emily :) work in progress
+# Tuning parameters for best results as of 4/30 -- work in progress
 INITIAL_LEARNING_RATE = 5e-5
 FINE_LEARNING_RATE = 1e-6
 DEPTH = 175
@@ -174,7 +176,6 @@ x = layers.GlobalAveragePooling2D()(x)
 
 # Embedding layer
 embedding = layers.Dense(128, activation='relu', name="embedding")(x)
-# x = layers.BatchNormalization()(embedding)
 x = layers.Dropout(DROPOUT_RATE)(embedding)
 outputs = layers.Dense(len(class_names), activation='softmax')(x)
 
@@ -240,7 +241,7 @@ model.compile(
     metrics=['accuracy']
 )
 
-# Fine-tuning
+# Fine-tuning (Note: separate instances required — EarlyStopping is stateful)
 early_stopping_finetune = tf.keras.callbacks.EarlyStopping(
     monitor='val_loss',
     patience=5,
