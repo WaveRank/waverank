@@ -12,7 +12,8 @@ https://www.tensorflow.org/guide/keras/transfer_learning
 Citation (4/12/26):
 https://keras.io/guides/functional_api/#extract-and-reuse-nodes-in-the-graph
 
-Citation
+Citation (4/20/2026):
+https://medium.com/data-science/audio-deep-learning-made-simple-part-3-data-preparation-and-augmentation-24c6e1f6b52 (Spectrogram Augmentation section)
 
 Things to try to improve the model:
 - Add data augmentation
