@@ -1,17 +1,31 @@
 import InputBox from "../components/InputBox";
 import "../src/App.css";
+import React, { useState } from "react";
 
 
 export default function HomePage() {
+    const [status, setStatus] = useState('Awaiting file')
+
+    // Set status depending on response from Flask backend
+    // TODO: set graphs and prediction result too
+    const handleUploadResult = (data) => {
+        if (data.error) {
+            setStatus(data.error);
+        }
+        else if (data.message) {
+            setStatus(data.message);
+        }
+    };
+
     return (
         <div>
             <div className="body">
 
                 <div className="bodyLeft">
-                    <InputBox/>
+                    <InputBox onUploadResult={handleUploadResult}/>
                     <div className="analysisBox">
                         <h2>Analysis</h2>
-                        <p>Status: ???</p>
+                        <p>Status: {status}</p>
                         <p>Bar chart here</p>
                     </div>
                 </div>
