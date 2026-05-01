@@ -12,6 +12,9 @@ https://www.tensorflow.org/guide/keras/transfer_learning
 Citation (4/12/26):
 https://keras.io/guides/functional_api/#extract-and-reuse-nodes-in-the-graph
 
+Citation(4/21/26):
+https://keras.io/examples/vision/cutmix/
+
 Things to try to improve the model:
 - Add data augmentation
 - Tune learning rate (initial training and fine-tuning separately)
@@ -32,6 +35,7 @@ import tensorflow as tf
 from tensorflow.keras import layers, models
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.applications.resnet50 import preprocess_input
+from sklearn.metrics import f1_score
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -41,14 +45,21 @@ import json
 DATASET_PATH = "dataset/"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
-TRAINING_EPOCHS = 10
-FINE_TUNE_EPOCHS = 5
+TRAINING_EPOCHS = 50
+FINE_TUNE_EPOCHS = 40
 
 # Vary these for DoE partial factorial tests
 INITIAL_LEARNING_RATE = 5e-5
-FINE_LEARNING_RATE = 1e-5
+FINE_LEARNING_RATE = 1e-6
 DEPTH = 175
-DROPOUT_RATE = 0.5
+DROPOUT_RATE = 0.6
+TIME_MASK_WIDTH = 10
+FREQ_MASK_WIDTH = 8
+ALPHA = 1.0
+CUTMIX_PROB = 0.5
+
+USE_CUTMIX = True
+USE_SPECAUG = True
 
 # Set global random seed for reproducibility
 SEED = 42
@@ -57,35 +68,237 @@ random.seed(SEED)
 np.random.seed(SEED)
 tf.random.set_seed(SEED)
 
+# ----- CUTMIX AUGMENTATION -----
+def get_lambda():
+    """
+    Takes an alpha value for the beta distribution
+    to return a lambda mixing ratio
+    """
+    
+    beta_dist = np.random.beta(ALPHA, ALPHA)
+    lambda_tf = tf.constant(beta_dist, dtype=tf.float32)
+
+    return lambda_tf
+
+
+def patch(lambda_val, img_height, img_width):
+    """
+    Determines the size of the image patch that will be used
+    in the cutmix augmentation for cropping
+    """
+
+    ratio = tf.sqrt(1.0 - lambda_val)
+
+    # Get the size of the patch of image
+    cut_height = tf.cast(tf.cast(img_height, tf.float32) * ratio, tf.int32)
+    cut_width = tf.cast(tf.cast(img_width, tf.float32) * ratio, tf.int32)
+
+    # Find a random point on the image
+    cut_x = tf.random.uniform([], 0, img_height, dtype=tf.int32)
+    cut_y = tf.random.uniform([], 0, img_width, dtype=tf.int32)
+
+    # Define the full dimensions of patch
+    y1 = tf.clip_by_value(cut_y - cut_height // 2, 0, img_height)
+    x1 = tf.clip_by_value(cut_x - cut_width // 2, 0, img_width)
+    y2 = tf.clip_by_value(cut_y + cut_height // 2, 0, img_height)
+    x2 = tf.clip_by_value(cut_x + cut_width // 2, 0, img_width)
+
+    # Extract x and y lengths of the patch
+    target_w = tf.maximum(x2 - x1, 1)
+    target_h = tf.maximum(y2 - y1, 1)
+
+    return x1, y1, target_h, target_w
+
+
+def cutmix(train_ds_one, train_ds_two):
+    """
+    Applies the cutmix augmentation to the spectrograms. This function 
+    takes two shuffled train datasets, gets the paired image and label, 
+    then applies cropping and patching to the spectrogram image.
+
+    Returns:
+        Mixed image tensor and label
+    """
+
+    img_h, img_w = IMG_SIZE[0], IMG_SIZE[1]
+
+    (image1, label1), (image2, label2) = train_ds_one, train_ds_two
+
+    lambda_val = get_lambda()
+
+    # Get the bounding box offsets, heights and widths
+    x1, y1, target_h, target_w = patch(lambda_val, img_h, img_w)
+
+    # Takes image 2 and crops a patch of the image
+    cropped_img2 = tf.image.crop_to_bounding_box(image2, y1, x1, target_h, target_w)
+    image2 = tf.image.pad_to_bounding_box(cropped_img2, y1, x1, img_h, img_w)
+
+    # Takes image 1 and creates a hole to place the patch
+    cropped_img1 = tf.image.crop_to_bounding_box(image1, y1, x1, target_h, target_w)
+    image1_patch = tf.image.pad_to_bounding_box(cropped_img1, y1, x1, img_h, img_w)
+
+    # Subtract the patch from the full image to get a hole in the image
+    image1 = image1 - image1_patch
+
+    # Combine the images
+    cutmix_image = image1 + image2
+
+    lambda_val = 1 - tf.cast(target_h * target_w, tf.float32) / tf.cast(img_h * img_w, tf.float32)
+    
+    cutmix_label = lambda_val * label1 + (1 - lambda_val) * label2
+
+
+    return cutmix_image, cutmix_label
+
+
+def cutmix_chances(train_ds_one, train_ds_two):
+    """
+    Determines the chance that each sample gets mixing
+    """
+    (image1, label1), (image2, label2) = train_ds_one, train_ds_two
+
+    probability = tf.random.uniform([]) < CUTMIX_PROB
+
+    if probability:
+        return cutmix(train_ds_one, train_ds_two)
+    else:
+        return image1, label1
+
+
+# ----- SPEC AUGMENTATION -----
+def spec_augment(images, labels):
+    """
+    Applies spectrogram augmentation to mask out random frequency and time
+    regions of each image in a batch. This function calls a helper per each
+    single image in the batch.
+    Args:
+        images (tf.Tensor): Batch of spectrogram images.
+        labels (tf.Tensor): Batch of integer genre labels.
+    Returns:
+        Tuple of (augmented images, unchanged labels).
+    """
+    aug_images = tf.map_fn(spec_augment_helper, images)
+
+    return aug_images, labels
+
+
+def spec_augment_helper(image):
+    """
+    Takes one single tensor/image and applies spectrogram augmentation, then
+    returns that tensor/image.
+    """
+    # Pick width and start points for each dimension
+    freq_width = tf.random.uniform(
+        shape=[], maxval=FREQ_MASK_WIDTH, dtype=tf.dtypes.int32
+    )
+
+    freq_start = tf.random.uniform(
+        shape=[], maxval=IMG_SIZE[0] - freq_width, dtype=tf.dtypes.int32
+    )
+
+    time_width = tf.random.uniform(
+        shape=[], maxval=TIME_MASK_WIDTH, dtype=tf.dtypes.int32
+    )
+
+    time_start = tf.random.uniform(
+        shape=[], maxval=IMG_SIZE[1] - time_width, dtype=tf.dtypes.int32
+    )
+
+    # Draw frequency and time masks
+    freq_mask = tf.concat(
+        [
+            tf.ones([freq_start, IMG_SIZE[1], 3]),
+            tf.zeros([freq_width, IMG_SIZE[1], 3]),
+            tf.ones([IMG_SIZE[0] - freq_start - freq_width, IMG_SIZE[1], 3]),
+        ],
+        0,
+    )
+    time_mask = tf.concat(
+        [
+            tf.ones([IMG_SIZE[0], time_start, 3]),
+            tf.zeros([IMG_SIZE[0], time_width, 3]),
+            tf.ones([IMG_SIZE[0], IMG_SIZE[1] - time_start - time_width, 3]),
+        ],
+        1,
+    )
+    # Combine into one mask, apply to image and return masked image
+    mask = freq_mask * time_mask
+
+    return mask * image
+
+
 # ----- LOAD DATASETS -----
-print("Loading Training Set:")
-train_ds = tf.keras.utils.image_dataset_from_directory(
-    DATASET_PATH + "train",
-    image_size=IMG_SIZE,
-    batch_size=BATCH_SIZE,
-    shuffle=True,
-    seed=SEED
-)
+def load_datasets():
+    """
+    Loads training, validation, and testing datasets depending 
+    on if using CutMix or Spec Augmentations or both
+    """
 
-print("Loading Validation Set:")
-val_ds = tf.keras.utils.image_dataset_from_directory(
-    DATASET_PATH + "val",
-    image_size=IMG_SIZE,
-    batch_size=BATCH_SIZE,
-    shuffle=True,
-    seed=SEED
-)
+    if USE_CUTMIX:
+        print("Loading Training Set:")
+        train_ds = tf.keras.utils.image_dataset_from_directory(
+            DATASET_PATH + "train",
+            image_size=IMG_SIZE,
+            batch_size=None,
+            shuffle=False,
+            label_mode="categorical"
+        )
 
-print("Loading Test Set:")
-test_ds = tf.keras.utils.image_dataset_from_directory(
-    DATASET_PATH + "test",
-    image_size=IMG_SIZE,
-    batch_size=BATCH_SIZE,
-    shuffle=False   
-)
+        # Get class names before any data transformations
+        class_names = train_ds.class_names
+        
+        train_ds_one = (
+            train_ds.shuffle(len(train_ds), seed=SEED)
+        )
+
+        train_ds_two = (
+            train_ds.shuffle(len(train_ds), seed=SEED + 1)
+        )
+
+        train_ds = (
+            tf.data.Dataset.zip((train_ds_one, train_ds_two))
+            .map(cutmix_chances, num_parallel_calls=tf.data.AUTOTUNE)
+            .batch(BATCH_SIZE, drop_remainder=True)
+        )
+
+    else:
+        print("Loading Training Set:")
+        train_ds = tf.keras.utils.image_dataset_from_directory(
+            DATASET_PATH + "train",
+            image_size=IMG_SIZE,
+            batch_size=BATCH_SIZE,
+            shuffle=False,
+            label_mode="categorical"
+        )
+
+    # Call Spec augmentation after CutMix
+    if USE_SPECAUG:
+        train_ds = train_ds.map(spec_augment)
+
+    print("Loading Validation Set:")
+    val_ds = tf.keras.utils.image_dataset_from_directory(
+        DATASET_PATH + "val",
+        image_size=IMG_SIZE,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        label_mode="categorical"
+    )
+
+    print("Loading Test Set:")
+    test_ds = tf.keras.utils.image_dataset_from_directory(
+        DATASET_PATH + "test",
+        image_size=IMG_SIZE,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        label_mode="categorical"
+    )
+
+    return train_ds, val_ds, test_ds, class_names
+
+# Load datasets
+train_ds, val_ds, test_ds, class_names = load_datasets()
 
 # Extract class (genre) names, save for reference
-class_names = train_ds.class_names
 print("Classes:", class_names)
 with open("class_names.json", "w") as f:
     json.dump(class_names, f)
@@ -114,24 +327,42 @@ x = base_model.output
 x = layers.GlobalAveragePooling2D()(x)
 
 # Embedding layer
-embedding = layers.Dense(128, activation='relu', name="embedding")(x)
-x = layers.Dropout(0.5)(embedding)
+embedding = layers.Dense(256, activation='relu', name="embedding")(x)
+x = layers.Dropout(DROPOUT_RATE)(embedding)
 outputs = layers.Dense(len(class_names), activation='softmax')(x)
 
 # Build and compile model
 model = tf.keras.Model(inputs=base_model.input, outputs=outputs)
 model.compile(
-    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
-    loss='sparse_categorical_crossentropy',
+    optimizer=tf.keras.optimizers.Adam(learning_rate=INITIAL_LEARNING_RATE),
+    loss='categorical_crossentropy',
     metrics=['accuracy']
 )
 # model.summary()  # Optional, prints architecture of the model
+
+callbacks = [
+    # Early Stopping
+    tf.keras.callbacks.EarlyStopping(
+        monitor='val_loss',
+        patience=10,
+        restore_best_weights=True
+    ),
+
+    # Reduce LR
+    tf.keras.callbacks.ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.5,
+        patience=5,
+        min_lr=1e-6
+    )
+]
 
 # ----- TRAIN MODEL -----
 history = model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=TRAINING_EPOCHS
+    epochs=TRAINING_EPOCHS,
+    callbacks=callbacks
 )
 
 # Plot and save training curves
@@ -161,21 +392,44 @@ print("Test accuracy:", test_acc)
 base_model.trainable = True
 
 # Fine-tune only last layers
-for layer in base_model.layers[:-50]:
+for layer in base_model.layers[:-DEPTH]:
     layer.trainable = False
+
+for layer in base_model.layers:
+    if isinstance(layer, tf.keras.layers.BatchNormalization):
+        layer.trainable = False
 
 # Recompile with lower learning rate
 model.compile(
-    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5),
-    loss='sparse_categorical_crossentropy',
+    optimizer=tf.keras.optimizers.Adam(FINE_LEARNING_RATE, weight_decay=1e-4),
+    loss='categorical_crossentropy',
     metrics=['accuracy']
 )
+
+# Fine tuning callbacks
+callbacks_finetune = [
+    # Early Stopping
+    tf.keras.callbacks.EarlyStopping(
+        monitor='val_loss',
+        patience=15,
+        restore_best_weights=True
+    ),
+
+    # Reduce LR
+    tf.keras.callbacks.ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.3,
+        patience=7,
+        min_lr=1e-8
+    )
+]
 
 # Train again
 model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=FINE_TUNE_EPOCHS
+    epochs=FINE_TUNE_EPOCHS,
+    callbacks=callbacks_finetune
 )
 
 # Evaluate
@@ -204,9 +458,10 @@ def extract_embeddings(dataset, emb_model, clf_model):
         # Predicted class index and confidence of prediction
         pred = np.argmax(prob, axis=1)
         conf = np.max(prob, axis=1)
+        label = np.argmax(y.numpy(), axis=1)
 
         embeddings.append(emb)
-        labels.append(y.numpy())
+        labels.append(label)
         preds.append(pred)
         confidences.append(conf)
 
@@ -225,6 +480,10 @@ x_emb, y_true, y_pred, conf = extract_embeddings(
     model
 )
 df = pd.DataFrame(x_emb)
+
+# F1 Score
+macro_f1 = f1_score(y_true, y_pred, average="macro")
+print(f"F1 Score: {macro_f1}")
 
 # Add metadata columns
 df["label"] = y_true
@@ -246,7 +505,7 @@ def extract_confidences(dataset, clf_model):
     for images, y in dataset:
         # Class probabilities
         prob = clf_model.predict(images, verbose=0)
-        labels.append(y.numpy())
+        labels.append(np.argmax(y.numpy(), axis=1))
         confidences.append(prob)
 
     # Combine into single arrays
