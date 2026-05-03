@@ -36,8 +36,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import json
+import os
+import librosa
+import soundfile as sf
+import numpy as np
 
 # ----- CONFIGURATION -----
+SAVE_PATH = "webapp/server/model/"
 DATASET_PATH = "dataset/"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
@@ -85,7 +90,7 @@ test_ds = tf.keras.utils.image_dataset_from_directory(
 # Extract class (genre) names, save for reference
 class_names = train_ds.class_names
 print("Classes:", class_names)
-with open("class_names.json", "w") as f:
+with open(os.path.join(SAVE_PATH, "class_names.json"), "w") as f:
     json.dump(class_names, f)
 
 
@@ -260,6 +265,10 @@ model.fit(
 # Evaluate
 test_loss, test_acc = model.evaluate(test_ds)
 print("Test accuracy after fine-tuning:", test_acc)
+
+# Save entire model for future use
+os.makedirs(SAVE_PATH, exist_ok=True)
+model.save(os.path.join(SAVE_PATH, 'final_model.keras'))
 
 # ----- EMBEDDING MODEL -----
 embedding_model = tf.keras.Model(
