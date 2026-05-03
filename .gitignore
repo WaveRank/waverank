@@ -25,5 +25,7 @@ visualizations_output/
 __pycache__
 requirements.txt
 
-# Emily's temporary vit model pls ignore
-vit_model.py
+# Webapp
+node_modules/
+uploads/
+webapp/server/model/song.mp3
