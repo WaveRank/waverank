@@ -245,7 +245,7 @@ def load_datasets():
     train_ds = tf.keras.utils.image_dataset_from_directory(
         DATASET_PATH + "train",
         image_size=IMG_SIZE,
-        batch_size=BATCH_SIZE,
+        batch_size=None,
         shuffle=True,
         label_mode="categorical"
     )
@@ -271,15 +271,6 @@ def load_datasets():
     class_names = train_ds.class_names
 
     if USE_CUTMIX:
-        print("Loading Training Set (with CutMix):")
-        train_ds = tf.keras.utils.image_dataset_from_directory(
-            DATASET_PATH + "train",
-            image_size=IMG_SIZE,
-            batch_size=None,
-            shuffle=False,
-            label_mode="categorical"
-        )
-        
         train_ds_one = (
             train_ds.shuffle(len(train_ds), seed=SEED)
         )
@@ -293,6 +284,9 @@ def load_datasets():
             .map(cutmix_chances, num_parallel_calls=tf.data.AUTOTUNE)
             .batch(BATCH_SIZE, drop_remainder=True)
         )
+
+    else:
+        train_ds = train_ds.batch(BATCH_SIZE)
 
     # Call Spec augmentation after CutMix
     if USE_SPECAUG:
