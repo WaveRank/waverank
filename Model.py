@@ -59,7 +59,7 @@ ALPHA = 1.0
 CUTMIX_PROB = 0.5
 
 USE_CUTMIX = True
-USE_SPECAUG = True
+USE_SPECAUG = False
 
 # Set global random seed for reproducibility
 SEED = 42
@@ -85,6 +85,10 @@ def patch(lambda_val, img_height, img_width):
     """
     Determines the size of the image patch that will be used
     in the cutmix augmentation for cropping
+
+    Returns:
+        Positional offsets of the patch (x1, y1) and the dimensions
+        height and width of the patch (target_h, target_w)
     """
 
     ratio = tf.sqrt(1.0 - lambda_val)
@@ -94,8 +98,8 @@ def patch(lambda_val, img_height, img_width):
     cut_width = tf.cast(tf.cast(img_width, tf.float32) * ratio, tf.int32)
 
     # Find a random point on the image
-    cut_x = tf.random.uniform([], 0, img_height, dtype=tf.int32)
-    cut_y = tf.random.uniform([], 0, img_width, dtype=tf.int32)
+    cut_x = tf.random.uniform([], 0, img_width, dtype=tf.int32)
+    cut_y = tf.random.uniform([], 0, img_height, dtype=tf.int32)
 
     # Define the full dimensions of patch
     y1 = tf.clip_by_value(cut_y - cut_height // 2, 0, img_height)
@@ -143,8 +147,10 @@ def cutmix(train_ds_one, train_ds_two):
     # Combine the images
     cutmix_image = image1 + image2
 
+    # Recalculate lambda to match correct pixel ratios after cropping
     lambda_val = 1 - tf.cast(target_h * target_w, tf.float32) / tf.cast(img_h * img_w, tf.float32)
     
+    # Using adjusted lambda to create new label of mixed genre ratios
     cutmix_label = lambda_val * label1 + (1 - lambda_val) * label2
 
 
@@ -159,10 +165,11 @@ def cutmix_chances(train_ds_one, train_ds_two):
 
     probability = tf.random.uniform([]) < CUTMIX_PROB
 
-    if probability:
-        return cutmix(train_ds_one, train_ds_two)
-    else:
-        return image1, label1
+    return tf.cond(
+        probability,
+        lambda: cutmix(train_ds_one, train_ds_two),
+        lambda: (image1, label1)
+    )
 
 
 # ----- SPEC AUGMENTATION -----
@@ -234,8 +241,37 @@ def load_datasets():
     on if using CutMix or Spec Augmentations or both
     """
 
+    print("Loading Training Set:")
+    train_ds = tf.keras.utils.image_dataset_from_directory(
+        DATASET_PATH + "train",
+        image_size=IMG_SIZE,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
+        label_mode="categorical"
+    )
+
+    print("Loading Validation Set:")
+    val_ds = tf.keras.utils.image_dataset_from_directory(
+        DATASET_PATH + "val",
+        image_size=IMG_SIZE,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
+        label_mode="categorical"
+    )
+
+    print("Loading Test Set:")
+    test_ds = tf.keras.utils.image_dataset_from_directory(
+        DATASET_PATH + "test",
+        image_size=IMG_SIZE,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        label_mode="categorical"
+    )
+
+    class_names = train_ds.class_names
+
     if USE_CUTMIX:
-        print("Loading Training Set:")
+        print("Loading Training Set (with CutMix):")
         train_ds = tf.keras.utils.image_dataset_from_directory(
             DATASET_PATH + "train",
             image_size=IMG_SIZE,
@@ -243,9 +279,6 @@ def load_datasets():
             shuffle=False,
             label_mode="categorical"
         )
-
-        # Get class names before any data transformations
-        class_names = train_ds.class_names
         
         train_ds_one = (
             train_ds.shuffle(len(train_ds), seed=SEED)
@@ -261,39 +294,9 @@ def load_datasets():
             .batch(BATCH_SIZE, drop_remainder=True)
         )
 
-    else:
-        print("Loading Training Set:")
-        train_ds = tf.keras.utils.image_dataset_from_directory(
-            DATASET_PATH + "train",
-            image_size=IMG_SIZE,
-            batch_size=BATCH_SIZE,
-            shuffle=False,
-            label_mode="categorical"
-        )
-
-        class_names = train_ds.class_names
-
     # Call Spec augmentation after CutMix
     if USE_SPECAUG:
         train_ds = train_ds.map(spec_augment)
-
-    print("Loading Validation Set:")
-    val_ds = tf.keras.utils.image_dataset_from_directory(
-        DATASET_PATH + "val",
-        image_size=IMG_SIZE,
-        batch_size=BATCH_SIZE,
-        shuffle=False,
-        label_mode="categorical"
-    )
-
-    print("Loading Test Set:")
-    test_ds = tf.keras.utils.image_dataset_from_directory(
-        DATASET_PATH + "test",
-        image_size=IMG_SIZE,
-        batch_size=BATCH_SIZE,
-        shuffle=False,
-        label_mode="categorical"
-    )
 
     return train_ds, val_ds, test_ds, class_names
 
