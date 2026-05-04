@@ -28,5 +28,5 @@ requirements.txt
 # Webapp
 node_modules/
 uploads/
-webapp/server/model/song.mp3
+webapp/server/model/song*.mp3
 webapp/server/test_results.*
