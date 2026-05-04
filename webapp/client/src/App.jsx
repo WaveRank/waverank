@@ -5,8 +5,10 @@ import ContributorsPage from "../pages/ContributorsPage";
 import CreditsPage from "../pages/CreditsPage";
 import "./App.css";
 
+
 export default function App() {
-    return (
+
+      return (
         <div>
             <div className="navBar">
                 <h1>WaveRank</h1>

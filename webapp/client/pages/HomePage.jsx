@@ -1,40 +1,33 @@
-import AudioPlayer from "../components/AudioPlayer";
+import InputBox from "../components/InputBox";
 import "../src/App.css";
+import React, { useState } from "react";
 
-const onUploadFile = () => {
-    return;
-};
-
-const onPasteURL = () => {
-    return;
-};
 
 export default function HomePage() {
+    const [status, setStatus] = useState('Awaiting file')
+
+    // Set status depending on response from Flask backend
+    // TODO: set graphs and prediction result too
+    const handleUploadResult = (data) => {
+        if (data.error) {
+            setStatus(data.error);
+        }
+        else if (data.message) {
+            setStatus(data.message);
+        }
+    };
+
     return (
         <div>
             <div className="body">
 
                 <div className="bodyLeft">
-
-                    <div className="inputBox">
-                        <h2>Input</h2>
-                        <p>Upload an audio clip to classify its top_N music genres using a CNN trained on spectrogram features.</p>
-                        <div className="inputButtons">
-                            <button onClick={onUploadFile}>Upload audio file</button>
-                            <button onClick={onPasteURL}>Paste URL</button>
-                        </div>
-                        <div className="inputAudio">
-                            <p>File/song name here</p>
-                            <AudioPlayer audioFile={"/demo_song.mp3"}/>
-                        </div>
-                    </div>
-
+                    <InputBox onUploadResult={handleUploadResult}/>
                     <div className="analysisBox">
                         <h2>Analysis</h2>
-                        <p>Status: ???</p>
+                        <p>Status: {status}</p>
                         <p>Bar chart here</p>
                     </div>
-
                 </div>
 
                 <div className="bodyRight">
