@@ -88,10 +88,19 @@ def predict_genre(filepath):
     spect_stack = np.stack(spectrograms)
     model_results = loaded_model.predict(spect_stack)
 
+    # # temporary debug - print per segment confidences for one song
+    # for i, row in enumerate(model_results):
+    #     all_genres = np.argsort(row)[::-1]
+    #     all_str = ', '.join([f"{class_names[j]} {row[j]:.0%}" for j in all_genres])
+    #     print(f"  Segment {i}: {all_str}")
+
     # Do averaging/math on output for final combined predictions and return
     model_results = np.mean(model_results, axis=0).tolist()
+
+
+
     return dict(zip(class_names, model_results))
 
 if __name__ == "__main__":
-    result = predict_genre(os.path.join(BASE_DIR, "model/song.mp3"))
+    result = predict_genre(os.path.join(BASE_DIR, "model/song2.mp3"))
     print(result)
