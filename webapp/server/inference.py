@@ -14,6 +14,7 @@ https://stackoverflow.com/questions/32231892/typeerror-with-int-for-jsonify-from
 """
 
 import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"    # Suppresses TF startup logs
 import tensorflow as tf
 from tensorflow.keras.applications.resnet50 import preprocess_input
 import numpy as np
