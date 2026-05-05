@@ -37,7 +37,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import json
 
-
 # ----- CONFIGURATION -----
 SAVE_PATH = "webapp/server/model/"
 DATASET_PATH = "dataset/"
