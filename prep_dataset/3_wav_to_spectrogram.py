@@ -9,6 +9,7 @@ https://medium.com/analytics-vidhya/understanding-the-mel-spectrogram-fca2afa2ce
 import os
 import librosa
 import numpy as np
+import matplotlib.pyplot as plt
 from PIL import Image
 
 # ----- CONFIGURATION -----
@@ -35,11 +36,12 @@ def extract_log_mel(y, sr):
     return librosa.power_to_db(mel, ref=np.max)
 
 def to_image(mel_db):
-    """Convert spectrogram into grayscale image."""
+    """Convert spectrogram into image using colormap."""
     mel_db = np.clip(mel_db, -80, 0)
     mel_db = (mel_db + 80) / 80
-    img = (mel_db * 255).astype(np.uint8)
-    return Image.fromarray(img, mode="L")
+    colored = plt.cm.magma(mel_db)  # returns RGBA
+    img = (colored[:, :, :3] * 255).astype(np.uint8)  # drop alpha, keep RGB
+    return Image.fromarray(img, mode="RGB")
 
 # ----- MAIN PIPELINE -----
 os.makedirs(OUTPUT_DIR, exist_ok=True)
