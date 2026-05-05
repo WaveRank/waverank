@@ -150,9 +150,9 @@ def spec_augment_helper(image):
 
 
 # ----- PREPROCESSING -----
-train_ds = train_ds.map(lambda x, y: (preprocess_input(x), y))
-val_ds   = val_ds.map(lambda x, y: (preprocess_input(x), y))
-test_ds  = test_ds.map(lambda x, y: (preprocess_input(x), y))
+train_ds = train_ds.map(lambda x, y: (preprocess_input(x), y)).cache()
+val_ds   = val_ds.map(lambda x, y: (preprocess_input(x), y)).cache()
+test_ds  = test_ds.map(lambda x, y: (preprocess_input(x), y)).cache()
 
 # Spectrogram Augmentation on training data (comment out if desired)
 train_ds = train_ds.map(spec_augment)
