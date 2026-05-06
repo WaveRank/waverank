@@ -58,8 +58,8 @@ FREQ_MASK_WIDTH = 8
 ALPHA = 1.0
 CUTMIX_PROB = 0.5
 
-USE_CUTMIX = True
-USE_SPECAUG = False
+USE_CUTMIX = False
+USE_SPECAUG = True
 
 # Set global random seed for reproducibility
 SEED = 42
@@ -163,10 +163,10 @@ def cutmix_chances(train_ds_one, train_ds_two):
     """
     (image1, label1), (image2, label2) = train_ds_one, train_ds_two
 
-    probability = tf.random.uniform([]) < CUTMIX_PROB
+    cutmix_apply = tf.random.uniform([]) < CUTMIX_PROB
 
     return tf.cond(
-        probability,
+        cutmix_apply,
         lambda: cutmix(train_ds_one, train_ds_two),
         lambda: (image1, label1)
     )
@@ -235,67 +235,53 @@ def spec_augment_helper(image):
 
 
 # ----- LOAD DATASETS -----
-def load_datasets():
+def load_dataset(set, shuffle=False):
     """
     Loads training, validation, and testing datasets depending 
     on if using CutMix or Spec Augmentations or both
     """
-
-    print("Loading Training Set:")
-    train_ds = tf.keras.utils.image_dataset_from_directory(
-        DATASET_PATH + "train",
-        image_size=IMG_SIZE,
-        batch_size=None,
-        shuffle=True,
-        label_mode="categorical"
+    
+    print(f"Loading {set} set...")
+    
+    return tf.keras.utils.image_dataset_from_directory(
+    	DATASET_PATH + set,
+    	image_size=IMG_SIZE,
+    	batch_size=None,
+    	shuffle=shuffle,
+    	label_mode="categorical"
     )
 
-    print("Loading Validation Set:")
-    val_ds = tf.keras.utils.image_dataset_from_directory(
-        DATASET_PATH + "val",
-        image_size=IMG_SIZE,
-        batch_size=BATCH_SIZE,
-        shuffle=True,
-        label_mode="categorical"
+
+# Get datasets
+train_ds = load_dataset("train", shuffle=True)
+val_ds = load_dataset("val").batch(BATCH_SIZE)
+test_ds = load_dataset("test").batch(BATCH_SIZE)
+
+# Get class names
+class_names = train_ds.class_names
+
+if USE_CUTMIX:
+    train_ds_one = (
+        train_ds.shuffle(len(train_ds), seed=SEED)
     )
 
-    print("Loading Test Set:")
-    test_ds = tf.keras.utils.image_dataset_from_directory(
-        DATASET_PATH + "test",
-        image_size=IMG_SIZE,
-        batch_size=BATCH_SIZE,
-        shuffle=False,
-        label_mode="categorical"
+    train_ds_two = (
+        train_ds.shuffle(len(train_ds), seed=SEED + 1)
     )
 
-    class_names = train_ds.class_names
+    train_ds = (
+        tf.data.Dataset.zip((train_ds_one, train_ds_two))
+        .map(cutmix_chances, num_parallel_calls=tf.data.AUTOTUNE)
+        .batch(BATCH_SIZE, drop_remainder=True)
+    )
 
-    if USE_CUTMIX:
-        train_ds_one = (
-            train_ds.shuffle(len(train_ds), seed=SEED)
-        )
+# Apply batch size to training set if cutmix is not used
+else:
+    train_ds = train_ds.batch(BATCH_SIZE)
 
-        train_ds_two = (
-            train_ds.shuffle(len(train_ds), seed=SEED + 1)
-        )
-
-        train_ds = (
-            tf.data.Dataset.zip((train_ds_one, train_ds_two))
-            .map(cutmix_chances, num_parallel_calls=tf.data.AUTOTUNE)
-            .batch(BATCH_SIZE, drop_remainder=True)
-        )
-
-    else:
-        train_ds = train_ds.batch(BATCH_SIZE)
-
-    # Call Spec augmentation after CutMix
-    if USE_SPECAUG:
-        train_ds = train_ds.map(spec_augment)
-
-    return train_ds, val_ds, test_ds, class_names
-
-# Load datasets
-train_ds, val_ds, test_ds, class_names = load_datasets()
+# Call spec augmentation after CutMix
+if USE_SPECAUG:
+    train_ds = train_ds.map(spec_augment)
 
 # Extract class (genre) names, save for reference
 print("Classes:", class_names)
