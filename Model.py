@@ -12,6 +12,9 @@ https://www.tensorflow.org/guide/keras/transfer_learning
 Citation (4/12/26):
 https://keras.io/guides/functional_api/#extract-and-reuse-nodes-in-the-graph
 
+Citation (4/20/2026):
+https://medium.com/data-science/audio-deep-learning-made-simple-part-3-data-preparation-and-augmentation-24c6e1f6b52 (Spectrogram Augmentation section)
+
 Citation(4/21/26):
 https://keras.io/examples/vision/cutmix/
 
@@ -32,7 +35,7 @@ os.environ["TF_DETERMINISTIC_OPS"] = "1"
 
 import random
 import tensorflow as tf
-from tensorflow.keras import layers, models
+from tensorflow.keras import layers
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.applications.resnet50 import preprocess_input
 from sklearn.metrics import f1_score
@@ -45,19 +48,20 @@ import json
 DATASET_PATH = "dataset/"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
-TRAINING_EPOCHS = 50
-FINE_TUNE_EPOCHS = 40
+TRAINING_EPOCHS = 100
+FINE_TUNE_EPOCHS = 100
 
 # Vary these for DoE partial factorial tests
 INITIAL_LEARNING_RATE = 5e-5
-FINE_LEARNING_RATE = 1e-6
+FINE_LEARNING_RATE = 1e-5
 DEPTH = 175
-DROPOUT_RATE = 0.6
-TIME_MASK_WIDTH = 10
-FREQ_MASK_WIDTH = 8
+DROPOUT_RATE = 0.5
+TIME_MASK_WIDTH = 25
+FREQ_MASK_WIDTH = 25
 ALPHA = 1.0
 CUTMIX_PROB = 0.5
 
+# Set augmentation
 USE_CUTMIX = False
 USE_SPECAUG = True
 
@@ -67,6 +71,68 @@ os.environ["PYTHONHASHSEED"] = str(SEED)
 random.seed(SEED)
 np.random.seed(SEED)
 tf.random.set_seed(SEED)
+
+
+# ----- SPEC AUGMENTATION -----
+def spec_augment(images, labels):
+    """
+    Applies spectrogram augmentation to mask out random frequency and time
+    regions of each image in a batch. This function calls a helper per each
+    single image in the batch.
+
+    Args:
+        images (tf.Tensor): Batch of spectrogram images.
+        labels (tf.Tensor): Batch of integer genre labels.
+    Returns:
+        Tuple of (augmented images, unchanged labels).
+    """
+
+    aug_images = tf.map_fn(spec_augment_helper, images)
+    return aug_images, labels
+
+
+def spec_augment_helper(image):
+    """
+    Takes one single tensor/image and applies spectrogram augmentation, then
+    returns that tensor/image.
+    """
+
+    # Pick width and start points for each dimension
+    freq_width = tf.random.uniform(
+        shape=[], maxval=FREQ_MASK_WIDTH, dtype=tf.dtypes.int32
+    )
+    freq_start = tf.random.uniform(
+        shape=[], maxval=IMG_SIZE[0] - freq_width, dtype=tf.dtypes.int32
+    )
+    time_width = tf.random.uniform(
+        shape=[], maxval=TIME_MASK_WIDTH, dtype=tf.dtypes.int32
+    )
+    time_start = tf.random.uniform(
+        shape=[], maxval=IMG_SIZE[1] - time_width, dtype=tf.dtypes.int32
+    )
+
+    # Draw frequency and time masks
+    freq_mask = tf.concat(
+        [
+            tf.ones([freq_start, IMG_SIZE[1], 3]),
+            tf.zeros([freq_width, IMG_SIZE[1], 3]),
+            tf.ones([IMG_SIZE[0] - freq_start - freq_width, IMG_SIZE[1], 3]),
+        ],
+        0,
+    )
+    time_mask = tf.concat(
+        [
+            tf.ones([IMG_SIZE[0], time_start, 3]),
+            tf.zeros([IMG_SIZE[0], time_width, 3]),
+            tf.ones([IMG_SIZE[0], IMG_SIZE[1] - time_start - time_width, 3]),
+        ],
+        1,
+    )
+
+    # Combine into one mask, apply to image and return masked image
+    mask = freq_mask * time_mask
+    return mask * image
+
 
 # ----- CUTMIX AUGMENTATION -----
 def get_lambda():
@@ -163,75 +229,13 @@ def cutmix_chances(train_ds_one, train_ds_two):
     """
     (image1, label1), (image2, label2) = train_ds_one, train_ds_two
 
-    cutmix_apply = tf.random.uniform([]) < CUTMIX_PROB
+    probability = tf.random.uniform([]) < CUTMIX_PROB
 
     return tf.cond(
-        cutmix_apply,
+        probability,
         lambda: cutmix(train_ds_one, train_ds_two),
         lambda: (image1, label1)
     )
-
-
-# ----- SPEC AUGMENTATION -----
-def spec_augment(images, labels):
-    """
-    Applies spectrogram augmentation to mask out random frequency and time
-    regions of each image in a batch. This function calls a helper per each
-    single image in the batch.
-    Args:
-        images (tf.Tensor): Batch of spectrogram images.
-        labels (tf.Tensor): Batch of integer genre labels.
-    Returns:
-        Tuple of (augmented images, unchanged labels).
-    """
-    aug_images = tf.map_fn(spec_augment_helper, images)
-
-    return aug_images, labels
-
-
-def spec_augment_helper(image):
-    """
-    Takes one single tensor/image and applies spectrogram augmentation, then
-    returns that tensor/image.
-    """
-    # Pick width and start points for each dimension
-    freq_width = tf.random.uniform(
-        shape=[], maxval=FREQ_MASK_WIDTH, dtype=tf.dtypes.int32
-    )
-
-    freq_start = tf.random.uniform(
-        shape=[], maxval=IMG_SIZE[0] - freq_width, dtype=tf.dtypes.int32
-    )
-
-    time_width = tf.random.uniform(
-        shape=[], maxval=TIME_MASK_WIDTH, dtype=tf.dtypes.int32
-    )
-
-    time_start = tf.random.uniform(
-        shape=[], maxval=IMG_SIZE[1] - time_width, dtype=tf.dtypes.int32
-    )
-
-    # Draw frequency and time masks
-    freq_mask = tf.concat(
-        [
-            tf.ones([freq_start, IMG_SIZE[1], 3]),
-            tf.zeros([freq_width, IMG_SIZE[1], 3]),
-            tf.ones([IMG_SIZE[0] - freq_start - freq_width, IMG_SIZE[1], 3]),
-        ],
-        0,
-    )
-    time_mask = tf.concat(
-        [
-            tf.ones([IMG_SIZE[0], time_start, 3]),
-            tf.zeros([IMG_SIZE[0], time_width, 3]),
-            tf.ones([IMG_SIZE[0], IMG_SIZE[1] - time_start - time_width, 3]),
-        ],
-        1,
-    )
-    # Combine into one mask, apply to image and return masked image
-    mask = freq_mask * time_mask
-
-    return mask * image
 
 
 # ----- LOAD DATASETS -----
@@ -250,7 +254,6 @@ def load_dataset(set, shuffle=False):
     	shuffle=shuffle,
     	label_mode="categorical"
     )
-
 
 # Get datasets
 train_ds = load_dataset("train", shuffle=True)
@@ -275,13 +278,9 @@ if USE_CUTMIX:
         .batch(BATCH_SIZE, drop_remainder=True)
     )
 
-# Apply batch size to training set if cutmix is not used
+# Training set if cutmix is not used
 else:
     train_ds = train_ds.batch(BATCH_SIZE)
-
-# Call spec augmentation after CutMix
-if USE_SPECAUG:
-    train_ds = train_ds.map(spec_augment)
 
 # Extract class (genre) names, save for reference
 print("Classes:", class_names)
@@ -289,9 +288,13 @@ with open("class_names.json", "w") as f:
     json.dump(class_names, f)
 
 # ----- PREPROCESSING -----
-train_ds = train_ds.map(lambda x, y: (preprocess_input(x), y))
-val_ds   = val_ds.map(lambda x, y: (preprocess_input(x), y))
-test_ds  = test_ds.map(lambda x, y: (preprocess_input(x), y))
+train_ds = train_ds.map(lambda x, y: (preprocess_input(x), y)).cache()
+val_ds   = val_ds.map(lambda x, y: (preprocess_input(x), y)).cache()
+test_ds  = test_ds.map(lambda x, y: (preprocess_input(x), y)).cache()
+
+# Spectrogram Augmentation on training data (comment out if desired)
+if USE_SPECAUG:
+    train_ds = train_ds.map(spec_augment)
 
 # Prefetch (improves performance)
 AUTOTUNE = tf.data.AUTOTUNE
@@ -312,7 +315,7 @@ x = base_model.output
 x = layers.GlobalAveragePooling2D()(x)
 
 # Embedding layer
-embedding = layers.Dense(256, activation='relu', name="embedding")(x)
+embedding = layers.Dense(128, activation='relu', name="embedding")(x)
 x = layers.Dropout(DROPOUT_RATE)(embedding)
 outputs = layers.Dense(len(class_names), activation='softmax')(x)
 
@@ -323,13 +326,14 @@ model.compile(
     loss='categorical_crossentropy',
     metrics=['accuracy']
 )
+
 # model.summary()  # Optional, prints architecture of the model
 
 callbacks = [
     # Early Stopping
     tf.keras.callbacks.EarlyStopping(
         monitor='val_loss',
-        patience=10,
+        patience=5,
         restore_best_weights=True
     ),
 
@@ -386,17 +390,17 @@ for layer in base_model.layers:
 
 # Recompile with lower learning rate
 model.compile(
-    optimizer=tf.keras.optimizers.Adam(FINE_LEARNING_RATE, weight_decay=1e-4),
+    optimizer=tf.keras.optimizers.Adam(FINE_LEARNING_RATE, weight_decay=1e-5),
     loss='categorical_crossentropy',
     metrics=['accuracy']
 )
 
-# Fine tuning callbacks
+# Fine-tuning (Note: separate instances required — EarlyStopping is stateful)
 callbacks_finetune = [
     # Early Stopping
     tf.keras.callbacks.EarlyStopping(
         monitor='val_loss',
-        patience=15,
+        patience=5,
         restore_best_weights=True
     ),
 
