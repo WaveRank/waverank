@@ -18,6 +18,7 @@ BASE_PATH = "./"
 INPUT_DIR = os.path.join(BASE_PATH, "Data/distributed_dataset")
 OUTPUT_DIR = os.path.join(BASE_PATH, "Data/segmented_dataset")
 
+SR = 22050
 SEGMENT_SEC = 10
 MAX_SEC = 30
 HOP_SEC = 5         # 50% overlap
@@ -27,7 +28,7 @@ skipped_files = []
 def load_audio(path):
     """Load an audio file using librosa."""
     try:
-        return librosa.load(path, sr=None, mono=True)
+        return librosa.load(path, sr=SR, mono=True)
     except Exception:
         return None, None
 
