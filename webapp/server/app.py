@@ -8,11 +8,7 @@ from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import librosa
 
-
-PORT = 5137
-UPLOAD_FOLDER = "../uploads"
-ALLOWED_EXTENSIONS = {'wav', 'mp3', 'mp4'}
-MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10MB 
+from config import PORT, MAX_CONTENT_LENGTH, ALLOWED_EXTENSIONS, UPLOAD_FOLDER
 
 
 app = Flask(__name__)
@@ -45,6 +41,7 @@ def upload_file():
     
     # Fast extension check (early rejection of obvious invalid inputs)
     if not allowed_file(file.filename):
+        print(f'received file {filename} rejected: file type not allowed')
         return jsonify({"error": "Invalid file type"}), 400
 
     # Sanitize filename to prevent path traversal or unsafe characters
@@ -60,12 +57,16 @@ def upload_file():
         librosa.load(filepath, duration=5)
     except Exception:
         os.remove(filepath)  # Avoid storing unusable or malicious data
+        print(f'received file: {filename} rejected: failed to decode')
         return jsonify({"error": "Invalid audio file"}), 400
 
+    print(f'received file: {filename}')
     # TODO
     # Convert to .wav
     # Send to inference pipeline
     # Receive stuff from inference pipeline
+
+    # os.remove(filepath)  # commented out for now until inference pipeline wired up
     return jsonify({
         "message": "File uploaded",
         "filename": file.filename
