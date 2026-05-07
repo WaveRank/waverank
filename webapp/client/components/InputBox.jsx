@@ -8,10 +8,10 @@
 import React, { useState } from "react";
 import AudioPlayer from "../components/AudioPlayer";
 
-const HOST = "http://localhost"
-const PORT = 5137
-const PATH = "/api/predict"
 
+const API_PREDICT_PATH = "/api/predict"
+
+// Client-side constraints for file uploads
 const MAX_CONTENT_SIZE = 10 * 1024 * 1024  // 10MB
 const ALLOWED_TYPES = ["audio/wav", "audio/mpeg", "audio/mp4"];
 const ALLOWED_EXTENSIONS = [".wav", ".mp3", ".mp4"]
@@ -26,7 +26,7 @@ async function uploadFile(file) {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await fetch(`${HOST}:${PORT}${PATH}`, {
+    const response = await fetch(API_PREDICT_PATH, {
         method: "POST",
         body: formData,
     });
