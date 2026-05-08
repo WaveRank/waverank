@@ -1,8 +1,8 @@
 import { Routes, Route, Link } from "react-router-dom";
-import HomePage from "../pages/HomePage";
-import AboutPage from "../pages/AboutPage";
-import ContributorsPage from "../pages/ContributorsPage";
-import CreditsPage from "../pages/CreditsPage";
+import HomePage from "./pages/HomePage";
+import AboutPage from "./pages/AboutPage";
+import ContributorsPage from "./pages/ContributorsPage";
+import CreditsPage from "./pages/CreditsPage";
 import "./App.css";
 
 
