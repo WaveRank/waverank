@@ -18,7 +18,7 @@ BASE_PATH = "./"
 INPUT_DIR = os.path.join(BASE_PATH, "Data/distributed_dataset")
 OUTPUT_DIR = os.path.join(BASE_PATH, "Data/segmented_dataset")
 
-SR = 22050 
+SR = 22050
 SEGMENT_SEC = 10
 MAX_SEC = 30
 HOP_SEC = 5         # 50% overlap
