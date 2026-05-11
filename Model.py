@@ -64,6 +64,8 @@ CUTMIX_PROB = 0.5
 # Set augmentation
 USE_CUTMIX = False
 USE_SPECAUG = True
+
+# Controls label format and loss funcs
 LOSS = 'categorical_crossentropy' if USE_CUTMIX else 'sparse_categorical_crossentropy'
 LABEL_MODE = 'categorical' if USE_CUTMIX else 'int'
 
