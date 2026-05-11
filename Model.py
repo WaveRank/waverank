@@ -53,7 +53,7 @@ FINE_TUNE_EPOCHS = 100
 
 # Vary these for DoE partial factorial tests
 INITIAL_LEARNING_RATE = 5e-5
-FINE_LEARNING_RATE = 1e-5
+FINE_LEARNING_RATE = 1e-6
 DEPTH = 175
 DROPOUT_RATE = 0.5
 TIME_MASK_WIDTH = 25
@@ -64,6 +64,8 @@ CUTMIX_PROB = 0.5
 # Set augmentation
 USE_CUTMIX = False
 USE_SPECAUG = True
+LOSS = 'categorical_crossentropy' if USE_CUTMIX else 'sparse_categorical_crossentropy'
+LABEL_MODE = 'categorical' if USE_CUTMIX else 'int'
 
 # Set global random seed for reproducibility
 SEED = 42
@@ -252,12 +254,12 @@ def load_dataset(set, shuffle=False):
     	image_size=IMG_SIZE,
     	batch_size=None,
     	shuffle=shuffle,
-    	label_mode="categorical"
+    	label_mode=LABEL_MODE
     )
 
 # Get datasets
 train_ds = load_dataset("train", shuffle=True)
-val_ds = load_dataset("val").batch(BATCH_SIZE)
+val_ds = load_dataset("val", shuffle=True).batch(BATCH_SIZE)
 test_ds = load_dataset("test").batch(BATCH_SIZE)
 
 # Get class names
@@ -323,7 +325,7 @@ outputs = layers.Dense(len(class_names), activation='softmax')(x)
 model = tf.keras.Model(inputs=base_model.input, outputs=outputs)
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=INITIAL_LEARNING_RATE),
-    loss='categorical_crossentropy',
+    loss=LOSS,
     metrics=['accuracy']
 )
 
@@ -335,14 +337,6 @@ callbacks = [
         monitor='val_loss',
         patience=5,
         restore_best_weights=True
-    ),
-
-    # Reduce LR
-    tf.keras.callbacks.ReduceLROnPlateau(
-        monitor='val_loss',
-        factor=0.5,
-        patience=5,
-        min_lr=1e-6
     )
 ]
 
@@ -384,14 +378,10 @@ base_model.trainable = True
 for layer in base_model.layers[:-DEPTH]:
     layer.trainable = False
 
-for layer in base_model.layers:
-    if isinstance(layer, tf.keras.layers.BatchNormalization):
-        layer.trainable = False
-
 # Recompile with lower learning rate
 model.compile(
-    optimizer=tf.keras.optimizers.Adam(FINE_LEARNING_RATE, weight_decay=1e-5),
-    loss='categorical_crossentropy',
+    optimizer=tf.keras.optimizers.Adam(FINE_LEARNING_RATE),
+    loss=LOSS,
     metrics=['accuracy']
 )
 
@@ -402,14 +392,6 @@ callbacks_finetune = [
         monitor='val_loss',
         patience=5,
         restore_best_weights=True
-    ),
-
-    # Reduce LR
-    tf.keras.callbacks.ReduceLROnPlateau(
-        monitor='val_loss',
-        factor=0.3,
-        patience=7,
-        min_lr=1e-8
     )
 ]
 
@@ -447,7 +429,11 @@ def extract_embeddings(dataset, emb_model, clf_model):
         # Predicted class index and confidence of prediction
         pred = np.argmax(prob, axis=1)
         conf = np.max(prob, axis=1)
-        label = np.argmax(y.numpy(), axis=1)
+
+        if LABEL_MODE == 'categorical':
+            label = np.argmax(y.numpy(), axis=1)
+        else:
+            label = y.numpy()
 
         embeddings.append(emb)
         labels.append(label)
@@ -494,7 +480,10 @@ def extract_confidences(dataset, clf_model):
     for images, y in dataset:
         # Class probabilities
         prob = clf_model.predict(images, verbose=0)
-        labels.append(np.argmax(y.numpy(), axis=1))
+        if LABEL_MODE == 'categorical':
+            labels.append(np.argmax(y.numpy(), axis=1))
+        else:
+            labels.append(y.numpy())
         confidences.append(prob)
 
     # Combine into single arrays
