@@ -23,6 +23,11 @@ visualizations_output/
 # Custom settings
 .vscode/
 __pycache__
+test.py
+
+# Webapp
+node_modules/
+uploads/
 requirements.txt
 
 # Webapp
