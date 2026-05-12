@@ -45,6 +45,7 @@ import matplotlib.pyplot as plt
 import json
 
 # ----- CONFIGURATION -----
+SAVE_PATH = "webapp/server/model/"
 DATASET_PATH = "dataset/"
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
@@ -408,6 +409,10 @@ model.fit(
 # Evaluate
 test_loss, test_acc = model.evaluate(test_ds)
 print("Test accuracy after fine-tuning:", test_acc)
+
+# Save entire model for future use
+os.makedirs(SAVE_PATH, exist_ok=True)
+model.save(os.path.join(SAVE_PATH, 'final_model.keras'))
 
 # ----- EMBEDDING MODEL -----
 embedding_model = tf.keras.Model(
