@@ -1,5 +1,5 @@
 import InputBox from "../components/InputBox";
-import "../src/App.css";
+import "../App.css";
 import React, { useState } from "react";
 
 
