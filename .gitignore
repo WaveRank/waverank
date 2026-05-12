@@ -30,5 +30,8 @@ node_modules/
 uploads/
 requirements.txt
 
-# Emily's temporary vit model pls ignore
-vit_model.py
+# Webapp
+node_modules/
+uploads/
+webapp/server/model/song*.mp3
+webapp/server/test_results.*
