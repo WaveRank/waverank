@@ -1,0 +1,116 @@
+:root {
+    --light-orange: #F6A97A;
+    --dark-gray: #1b1b1b;
+    --light-gray: #fafafa;
+    --light-purple: #cfc3ce;
+    --medium-purple: #b187ab;
+    --dark-purple: #281d30;
+}
+
+body {
+    background-color: var(--dark-gray);
+    margin: 0;
+    padding: 0;
+    font-family: "Roboto";
+    color: white;
+}
+
+.navBar {
+    display: flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 0px 12px;
+    border-bottom: 1px solid black;
+    background-color: var(--dark-purple);
+}
+
+.navBar h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 10px;
+    letter-spacing: -0.02em;
+}
+
+.navButtons { 
+    display: flex;
+    gap: 10px;
+}
+
+.navButtons button {
+    background: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.navButtons .homeButton {
+    background: var(--light-purple);
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.navButtons button:hover {
+    background: var(--medium-purple);
+}
+
+.header {
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 24px;
+    box-sizing: border-box;
+
+    background-image: url('/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    backdrop-filter: blur(6px);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    color: white;
+}
+
+.header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35); 
+}
+
+.header > * {
+    position: relative;
+    z-index: 1;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 4rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.header p {
+    margin-top: 8px;
+    font-size: 1.5rem;
+    opacity: 0.9;
+    max-width: 600px;
+}
+
+.body {
+    display:flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+.bodyLeft, .bodyRight {
+    flex: 1;
+    box-sizing: border-box;
+}
