@@ -28,9 +28,6 @@ test.py
 # Webapp
 node_modules/
 uploads/
-
-# Webapp
-node_modules/
-uploads/
 webapp/server/model/song*.mp3
 webapp/server/test_results.*
+final_fma_model.keras
