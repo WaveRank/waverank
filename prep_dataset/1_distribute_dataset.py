@@ -6,8 +6,8 @@ import shutil
 
 # ----- CONFIGURATION -----
 BASE_PATH = "./"
-INPUT_DIR = os.path.join(BASE_PATH, "Data/genres_original")
-OUTPUT_DIR = os.path.join(BASE_PATH, "Data/distributed_dataset")
+INPUT_DIR = os.path.join(BASE_PATH, "Data/fma_med_genres_original")
+OUTPUT_DIR = os.path.join(BASE_PATH, "Data/fma_med_distributed_dataset")
 
 SPLITS = {"train": 0.8, "val": 0.1, "test": 0.1}
 

@@ -11,7 +11,9 @@ import os
 import pandas as pd
 import json
 import matplotlib.pyplot as plt
-from sklearn.metrics import ConfusionMatrixDisplay
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+SCALING = 100
 
 
 def generate_confusion_matrix(predictions_path, class_names_path, output_path):
@@ -34,14 +36,13 @@ def generate_confusion_matrix(predictions_path, class_names_path, output_path):
 
     # Plot confusion matrix
     fig, ax = plt.subplots()
-    ax.set_title("Confusion Matrix")
-
-    ConfusionMatrixDisplay.from_predictions(
-        y_true=y_true, 
-        y_pred=y_pred, 
+    cm = confusion_matrix(y_true, y_pred, normalize="true") * SCALING
+    cm = ConfusionMatrixDisplay(
+        confusion_matrix=cm,
         display_labels=genre_names, 
-        ax=ax
-    )
+    ).plot(ax=ax, values_format=".0f")
+
+    ax.set_title("Confusion Matrix")
     
     plt.setp(ax.get_xticklabels(), rotation=45)
     plt.tight_layout()

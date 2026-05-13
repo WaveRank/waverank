@@ -31,12 +31,12 @@ import soundfile as sf
  
 # ----- CONFIGURATION -----
 BASE_PATH       = "./"
-FMA_AUDIO_DIR   = os.path.join(BASE_PATH, "Data/fma_small")
+FMA_AUDIO_DIR   = os.path.join(BASE_PATH, "Data/fma_medium")
 FMA_META_PATH   = os.path.join(BASE_PATH, "Data/fma_metadata/tracks.csv")
-OUTPUT_DIR      = os.path.join(BASE_PATH, "Data/fma_genres_original")
+OUTPUT_DIR      = os.path.join(BASE_PATH, "Data/fma_med_genres_original")
 
 # Use only the 'small' subset (8000 tracks, 8 genres)
-TARGET_SUBSET   = "small"
+TARGET_SUBSET   = "medium"
 SR_OUT          = 22050     # resample to match script 3's SR expectation
 skipped_files   = []
  
