@@ -16,30 +16,31 @@ https://stackoverflow.com/questions/32231892/typeerror-with-int-for-jsonify-from
 # ----- IMPORTS -----
 import sys
 import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"    # Suppresses TF startup logs
 import tensorflow as tf
 from tensorflow.keras.applications.resnet50 import preprocess_input
 import numpy as np
 import json
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-from shared.audio_utils import load_audio, segment_audio, make_spectrogram,spectrogram_to_image
+from shared.audio_utils import load_audio, segment_audio, make_spectrogram, spectrogram_to_image
 
 # ----- CONFIGURATION -----
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "model")
 
-# ----- MAIN PIPELINE -----
+# ----- MODEL LOADING -----
 # Load the model and class names
 loaded_model = tf.keras.models.load_model(os.path.join(MODEL_PATH, "final_model.keras"))
 with open(os.path.join(MODEL_PATH, "class_names.json"), "r") as f:
     class_names = json.load(f)
 
+# ----- INFERENCE -----
 def predict_genre(filepath):
     """
     Uses pretrained CNN to predict the genres of a given song.
 
     Args:
-        filepath: path to song to be inspected
+        filepath (str): path to song to be inspected
 
     Returns:
         dictionary with the probability for each genre

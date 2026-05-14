@@ -12,9 +12,9 @@ https://stackoverflow.com/questions/60105626/split-audio-on-timestamps-librosa
 # ----- IMPORTS -----
 import sys
 import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import soundfile as sf
 import numpy as np
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from shared.audio_utils import load_audio, segment_audio
 
 # ----- CONFIGURATION -----
