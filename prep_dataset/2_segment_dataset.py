@@ -21,7 +21,7 @@ from shared.audio_utils import load_audio, segment_audio
 BASE_PATH = "./"
 INPUT_DIR = os.path.join(BASE_PATH, "Data/distributed_dataset")
 OUTPUT_DIR = os.path.join(BASE_PATH, "Data/segmented_dataset")
-MAX_SEC = 30       # 50% overlap
+MAX_SEC = 30
 skipped_files = []
 
 # ----- HELPER FUNCTIONS -----
