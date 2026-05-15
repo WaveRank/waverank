@@ -57,7 +57,7 @@ def segment_audio(y, sr):
     return segments
 
 
-def make_spectrogram(segment, sr):
+def make_spectrogram(segment, sr, n_fft=N_FFT, hop_len=HOP_LENGTH, n_mels=N_MELS):
     """
     Convert an audio segment into a log-mel spectrogram.
     Args:
@@ -76,7 +76,7 @@ def make_spectrogram(segment, sr):
     return librosa.power_to_db(mel, ref=np.max)
 
 
-def spectrogram_to_image(mel):
+def spectrogram_to_image(mel, img_size=IMG_SIZE):
     """
     Normalize a log-mel spectrogram and convert to a PIL Image using the magma 
     colormap.
@@ -89,4 +89,8 @@ def spectrogram_to_image(mel):
     mel = (mel + 80) / 80
     colored = cm.magma(mel)  # returns RGBA
     img = (colored[:, :, :3] * 255).astype(np.uint8)  # drop alpha, keep RGB
-    return Image.fromarray(img, mode="RGB").resize(IMG_SIZE)
+    img = Image.fromarray(img, mode="RGB")
+    if img_size:
+        img = img.resize(img_size)
+
+    return img
