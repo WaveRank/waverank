@@ -1,7 +1,11 @@
 import InputBox from "../components/InputBox";
-import "../App.css";
+import AudioPlayer from "../components/AudioPlayer";
+import { AnalysisSummary, WaveformSpectrumData, MelSpectrogramData } from '../components/AnalysisData';
+import "../styles/inputBox.css";
+import "../styles/audioPlayer.css";
+import "../styles/popup.css";
+import "../styles/analysisBoxes.css";
 import React, { useState } from "react";
-
 
 export default function HomePage() {
     const [status, setStatus] = useState('Awaiting file')
@@ -21,20 +25,15 @@ export default function HomePage() {
         <div>
             <div className="body">
 
-                <div className="bodyLeft">
-                    <InputBox onUploadResult={handleUploadResult}/>
-                    <div className="analysisBox">
-                        <h2>Analysis</h2>
-                        <p>Status: {status}</p>
-                        <p>Bar chart here</p>
-                    </div>
-                </div>
+                <InputBox onUploadResult={handleUploadResult}/>
 
-                <div className="bodyRight">
-                    <div className="dataBox">
-                        <h2>Data</h2>
-                        <p>Graphs here</p>
-                    </div>
+                {/* NOTE: AUDIOPLAYER STATIC AT THE MOMENT, SET TO demo_song.mp3 */}
+                <AudioPlayer audioFile="/demo_song.mp3"/>
+
+                <div className="bodyOutput">
+                    <AnalysisSummary status={status}></AnalysisSummary>
+                    <WaveformSpectrumData></WaveformSpectrumData>
+                    <MelSpectrogramData></MelSpectrogramData>
                 </div>
 
             </div>

@@ -9,29 +9,36 @@ import "./App.css";
 export default function App() {
 
       return (
-        <div>
-            <div className="navBar">
-                <h1>WaveRank</h1>
+        <div className="page">
+            <div className="frame">
+                <div className="navBar">
+                    <h2>WaveRank</h2>
 
-                <div className="navButtons">
-                    <Link to="/about"><button>About</button></Link>
-                    <Link to="/contributors"><button>Contributors</button></Link>
-                    <Link to="/credits"><button>Credits</button></Link>
-                    <Link to="/"><button className="homeButton">Home</button></Link>
+                    <div className="navButtons">
+                        <Link to="/about"><button>About</button></Link>
+                        <Link to="/contributors"><button>Contributors</button></Link>
+                        <Link to="/credits"><button>Credits</button></Link>
+                        <Link to="/"><button className="homeButton">Return to Home</button></Link>
+                    </div>
                 </div>
-            </div>
 
-            <div className="header">
-                <h1>WaveRank</h1>
-                <p>AI-powered music genre classification from audio clips</p>
-            </div>
+                <div className="navDivider"></div>
 
-            <Routes>
-                <Route path="/" element={<HomePage/>}/>
-                <Route path="/about" element={<AboutPage/>}/>
-                <Route path="/contributors" element={<ContributorsPage/>}/>
-                <Route path="/credits" element={<CreditsPage/>}/>
-            </Routes>
+                <div className="header">
+                    <div className="headerTitle">
+                        <h1>WaveRank</h1>
+                        <h1>Audio Classifier</h1>
+                    </div>
+                    <p>AI-powered audio analysis and music genre classification from sound clips.</p>
+                </div>
+
+                <Routes>
+                    <Route path="/" element={<HomePage/>}/>
+                    <Route path="/about" element={<AboutPage/>}/>
+                    <Route path="/contributors" element={<ContributorsPage/>}/>
+                    <Route path="/credits" element={<CreditsPage/>}/>
+                </Routes>
+            </div>
         </div>
     );
 };
