@@ -1,3 +1,11 @@
+"""
+Configuration file for the genre classification CNN model.
+
+Defines all the hyperparameters, augmentation, and training settings for the 
+entire model pipeline. This includes the dataset parameters, learning rates,
+model architecture, training, evalutaion, and tuning scripts.
+"""
+
 import os
 import random
 import numpy as np
@@ -13,16 +21,12 @@ SAVE_PATH = os.path.join(BASE_PATH, "webapp/server/model/")
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
 SEED = 42
-os.environ["PYTHONHASHSEED"] = str(SEED)
-random.seed(SEED)
-np.random.seed(SEED)
-tf.random.set_seed(SEED)
 
 # Training
 TRAINING_EPOCHS = 1
 FINE_TUNE_EPOCHS = 1
-INITIAL_LEARNING_RATE = 5e-5
-FINE_LEARNING_RATE = 1e-5
+INITIAL_LEARNING_RATE = 5e-4
+FINE_LEARNING_RATE = 8e-5
 DEPTH = 175
 DROPOUT_RATE = 0.5
 WEIGHT_DECAY = 1e-5
@@ -35,6 +39,15 @@ FREQ_MASK_WIDTH = 25
 ALPHA = 1.0
 CUTMIX_PROB = 0.5
 
-# Controls label format and loss funcs
-LOSS = 'categorical_crossentropy' if USE_CUTMIX else 'sparse_categorical_crossentropy'
-LABEL_MODE = 'categorical' if USE_CUTMIX else 'int'
+# Tuning
+N_TRIALS = 15
+
+
+def set_seeds():
+    """
+    Sets global random seed for reproducibility
+    """
+    os.environ["PYTHONHASHSEED"] = str(SEED)
+    random.seed(SEED)
+    np.random.seed(SEED)
+    tf.random.set_seed(SEED)
