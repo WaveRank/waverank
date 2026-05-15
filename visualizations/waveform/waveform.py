@@ -17,8 +17,8 @@ def downsample_waveform(y, factor=1000):
 # This visualization is tailored for human viewing, not CCN input.
 def generate_waveform(filepath):
     base_name = get_basename(filepath)
-    output_name = base_name + "_waveform.png"
-    output_path = os.path.join(GRAPH_DIR, output_name)
+    filename = base_name + "_waveform.png"
+    output_path = os.path.join(GRAPH_DIR, filename)
 
     y, _ = load_audio(filepath)
 
@@ -36,5 +36,6 @@ def generate_waveform(filepath):
     plt.ylabel('Amplitude')
 
     plt.savefig(output_path)
+    plt.close()
 
-    return output_path
+    return filename

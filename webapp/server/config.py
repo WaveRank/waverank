@@ -19,4 +19,12 @@ PROJECT_DIR = SERVER_DIR.parent.parent
 GRAPH_DIR = SERVER_DIR / "graphs"
 UPLOAD_DIR = SERVER_DIR / "uploads"
 
+# Graphs
 GRAPH_COLOR = "mediumvioletred"
+HOURS_TO_LIVE = 1
+
+# Specs for webapp spectrogram graph
+IMG_SIZE = (512, 512)
+N_FFT = 2048            # incrase for more detail?
+HOP_LENGTH = 128        # decrease for more detail?
+N_MELS = 256            # increase for more detail?
