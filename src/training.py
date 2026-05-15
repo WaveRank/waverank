@@ -1,8 +1,15 @@
-import tensorflow as tf
 from config import *
+import tensorflow as tf
+import config
 
 
+# ----- TRAINING -----
 def get_callbacks(phase):
+    """
+    Organizes a list of keras callbacks for a specified training phase.
+    Callbacks include EarlyStopping and ReduceLROnPlateau with desired
+    settings for initial and fine tune training.
+    """
     if phase == 1:
         callbacks = [
             # Early Stopping
@@ -34,7 +41,7 @@ def get_callbacks(phase):
             tf.keras.callbacks.ReduceLROnPlateau(
                 monitor='val_loss',
                 factor=0.3,
-                patience=7,
+                patience=5,
                 min_lr=1e-8
             )
         ]
@@ -43,9 +50,18 @@ def get_callbacks(phase):
 
 
 def initial_train(model, train_ds, val_ds):
+    """
+    Compiles and and trains model for initial training phase.
+    Uses INITIAL_LEARNING_RATE and TRAINING_EPOCHS, and gets callbacks
+    for phase 1.
+
+    Returns:
+        - training history: metric values recorded during training
+        - model: updated model with weights
+    """
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=INITIAL_LEARNING_RATE),
-        loss=LOSS,
+        optimizer=tf.keras.optimizers.Adam(learning_rate=config.INITIAL_LEARNING_RATE),
+        loss='categorical_crossentropy',
         metrics=['accuracy']
     )
 
@@ -53,23 +69,35 @@ def initial_train(model, train_ds, val_ds):
         train_ds,
         validation_data=val_ds,
         epochs=TRAINING_EPOCHS,
-        callbacks=get_callbacks(1)
+        callbacks=get_callbacks(phase=1)
     )
 
-    return history
+    return model, history
 
 
 def fine_tune(model, base_model, train_ds, val_ds):
+    """
+    Compiles and trains model for fine tuning phase.
+    Unfreezes the entire base model and re-freeze outside depth 
+    to fine-tune specific layers.
+    Uses FINE_LEARNING_RATE, WEIGHT_DECAY, DEPTH, and gets callbacks 
+    for phase 2.
+    """
     base_model.trainable = True
 
     # Fine-tune only last layers
-    for layer in base_model.layers[:-DEPTH]:
+    for layer in base_model.layers[:-config.DEPTH]:
         layer.trainable = False
+
+    # Freeze BatchNormalization layers
+    for layer in base_model.layers:
+        if isinstance(layer, tf.keras.layers.BatchNormalization):
+            layer.trainable = False
 
     # Recompile with lower learning rate
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(FINE_LEARNING_RATE, weight_decay=WEIGHT_DECAY),
-        loss=LOSS,
+        optimizer=tf.keras.optimizers.Adam(config.FINE_LEARNING_RATE, weight_decay=WEIGHT_DECAY),
+        loss='categorical_crossentropy',
         metrics=['accuracy']
     )
 
@@ -78,7 +106,7 @@ def fine_tune(model, base_model, train_ds, val_ds):
         train_ds,
         validation_data=val_ds,
         epochs=FINE_TUNE_EPOCHS,
-        callbacks=get_callbacks(2)
+        callbacks=get_callbacks(phase=2)
     )
 
     return model

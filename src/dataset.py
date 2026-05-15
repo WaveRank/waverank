@@ -7,8 +7,7 @@ from config import *
 # ----- LOAD DATASETS -----
 def load_dataset(set, shuffle=False):
     """
-    Loads training, validation, and testing datasets depending 
-    on if using CutMix or Spec Augmentations or both
+    Loads training, validation, and testing datasets
     """
     
     print(f"Loading {set} set...")
@@ -18,12 +17,22 @@ def load_dataset(set, shuffle=False):
     	image_size=IMG_SIZE,
     	batch_size=None,
     	shuffle=shuffle,
-    	label_mode=LABEL_MODE
+    	label_mode='categorical'
     )
 
 
 def get_datasets():
+    """
+    Prepares the train, validation, and test datasets for training. a
+    Applies shuffling, optional augmentations (CutMix, Spectrogram Augmentation), 
+    and prefetch autotune for performance. 
 
+    Returns:
+        - Train dataset
+        - Validation dataset
+        - Test dataset
+        - Class names
+    """
     train_ds = load_dataset("train", shuffle=True)
     val_ds = load_dataset("val", shuffle=True).batch(BATCH_SIZE)
     test_ds = load_dataset("test").batch(BATCH_SIZE)
@@ -31,6 +40,7 @@ def get_datasets():
     # Extract class (genre) names, save for reference
     class_names = train_ds.class_names
     print("Classes:", class_names)
+    os.makedirs(OUTPUT_PATH, exist_ok=True)
     with open(os.path.join(OUTPUT_PATH, "class_names.json"), "w") as f:
         json.dump(class_names, f)
 
