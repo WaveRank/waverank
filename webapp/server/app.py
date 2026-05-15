@@ -4,24 +4,23 @@ https://flask.palletsprojects.com/en/stable/patterns/fileuploads/
 """
 from flask import Flask, request, jsonify
 import os
-from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import librosa
 
-from config import PORT, MAX_CONTENT_LENGTH, ALLOWED_EXTENSIONS, UPLOAD_FOLDER
-
+from webapp.server.config import PORT, MAX_CONTENT_LENGTH, ALLOWED_EXTENSIONS, UPLOAD_DIR, GRAPH_DIR
+from webapp.server.services.file_io import save_file
+from webapp.server.services.audio_validation import allowed_file, decodable_audio_file
+from shared.audio_utils import load_audio
+from visualizations.waveform.waveform import generate_waveform
+from visualizations.spectrum.spectrum import generate_spectrum
+from visualizations.spectrogram.spectrogram import generate_spectrogram
 
 app = Flask(__name__)
 CORS(app)
 
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(GRAPH_DIR, exist_ok=True)
 
-app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Performs a fast, non-secure extension check.
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # ----- ROUTES -----
 @app.route('/')
@@ -39,37 +38,35 @@ def upload_file():
     if file.filename == '':
         return jsonify({"error": "No file selected"}), 400
     
-    # Fast extension check (early rejection of obvious invalid inputs)
+    # Reject obviously invalid files
     if not allowed_file(file.filename):
         print(f'received file {filename} rejected: file type not allowed')
         return jsonify({"error": "Invalid file type"}), 400
 
-    # Sanitize filename to prevent path traversal or unsafe characters
-    filename = secure_filename(file.filename)
-
-    # Save file to disk for downstream processing
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(filepath)
-
+    filename, filepath = save_file(file)
+    print(filepath)
     # Attempt to decode the file as audio - authoritative validation.
-    # Only a short duration is loaded to reduce processing cost.
-    try:
-        librosa.load(filepath, duration=5)
-    except Exception:
-        os.remove(filepath)  # Avoid storing unusable or malicious data
-        print(f'received file: {filename} rejected: failed to decode')
+    if not decodable_audio_file(filepath):
+        os.remove(filepath)
+        print(f'received file {filename} rejected: failed to decode')
         return jsonify({"error": "Invalid audio file"}), 400
 
     print(f'received file: {filename}')
-    # TODO
-    # Convert to .wav
-    # Send to inference pipeline
-    # Receive stuff from inference pipeline
 
-    # os.remove(filepath)  # commented out for now until inference pipeline wired up
+    # Generate graphs
+    waveform_graph_path = generate_waveform(filepath)
+    spectrum_graph_path = generate_spectrum(filepath)
+    spectrograpm_graph_path = generate_spectrogram(filepath)
+
+    # Get genre prediction from inference pipeline
+
+    # Clean up
+    os.remove(filepath)
+    # TODO remove graphs after return
+    
     return jsonify({
         "message": "File uploaded",
-        "filename": file.filename
+        "filename": file.filename,
         # more stuff from inference pipeline goes here
     })
 
