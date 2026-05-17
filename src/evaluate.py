@@ -70,8 +70,7 @@ def save_embeddings(test_ds, emb_model, clf_model, class_names):
     emb_df["pred_name"] = [class_names[i] for i in y_pred]
 
     # Save to CSV
-    os.makedirs(OUTPUT_PATH, exist_ok=True)
-    emb_df.to_csv(os.path.join(OUTPUT_PATH, "embeddings.csv"), index=False)
+    emb_df.to_csv(os.path.join(BASE_PATH, "embeddings.csv"), index=False)
     print("Saved embeddings.csv")
 
     conf_df = pd.DataFrame(conf)
@@ -80,7 +79,7 @@ def save_embeddings(test_ds, emb_model, clf_model, class_names):
     conf_df["label_name"] = [class_names[i] for i in y_true]
 
     # Save to CSV
-    conf_df.to_csv(os.path.join(OUTPUT_PATH, "confidences.csv"), index=False)
+    conf_df.to_csv(os.path.join(BASE_PATH, "confidences.csv"), index=False)
     print("Saved confidences.csv")
 
 
@@ -95,7 +94,7 @@ def save_curves(history):
     plt.plot(history.history['val_accuracy'], label='val')
     plt.legend()
     plt.title("Accuracy")
-    plt.savefig(os.path.join(OUTPUT_PATH, "accuracy_curve.png"), dpi=300)
+    plt.savefig(os.path.join(BASE_PATH, "accuracy_curve.png"), dpi=300)
     print("Saved accuracy_curve.png")
     plt.close()
 
@@ -104,7 +103,7 @@ def save_curves(history):
     plt.plot(history.history['val_loss'], label='val')
     plt.legend()
     plt.title("Loss")
-    plt.savefig(os.path.join(OUTPUT_PATH, "loss_curve.png"), dpi=300)
+    plt.savefig(os.path.join(BASE_PATH, "loss_curve.png"), dpi=300)
     print("Saved loss_curve.png")
     plt.close()
 

@@ -70,6 +70,6 @@ run_visualization(
 shutil.copy(CONFIDENCES_PATH, os.path.join(OUTPUT_PATH, "confidences.csv"))
 shutil.copy(PREDICTIONS_PATH, os.path.join(OUTPUT_PATH, "embeddings.csv"))
 shutil.copy(CLASS_NAMES_PATH, os.path.join(OUTPUT_PATH, "class_names.json"))
-shutil.copy("Model.py", os.path.join(OUTPUT_PATH, "Model.py"))
+shutil.copytree("src", os.path.join(OUTPUT_PATH, os.path.basename("src")), dirs_exist_ok=True)
 
 print("\033[32m\nAll done! :)\n\033[0m")

@@ -40,8 +40,8 @@ def get_datasets():
     # Extract class (genre) names, save for reference
     class_names = train_ds.class_names
     print("Classes:", class_names)
-    os.makedirs(OUTPUT_PATH, exist_ok=True)
-    with open(os.path.join(OUTPUT_PATH, "class_names.json"), "w") as f:
+    os.makedirs(BASE_PATH, exist_ok=True)
+    with open(os.path.join(BASE_PATH, "class_names.json"), "w") as f:
         json.dump(class_names, f)
 
     if USE_CUTMIX:
