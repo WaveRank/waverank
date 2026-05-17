@@ -82,6 +82,8 @@ def save_embeddings(test_ds, emb_model, clf_model, class_names):
     conf_df.to_csv(os.path.join(BASE_PATH, "confidences.csv"), index=False)
     print("Saved confidences.csv")
 
+    return y_true, y_pred
+
 
 def save_curves(history):
     """
