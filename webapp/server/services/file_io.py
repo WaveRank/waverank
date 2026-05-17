@@ -2,47 +2,33 @@
 Citations (5/15):
 https://www.geeksforgeeks.org/python/delete-files-older-than-n-days-in-python/
 """
-from werkzeug.utils import secure_filename
 import os
+import shutil
+from pathlib import Path
 import time
+import uuid
 from webapp.server.config import UPLOAD_DIR, GRAPH_DIR, HOURS_TO_LIVE
 
 
-def save_file(file):
-    """
-    Sanitizing filename, save file
-    Args:
-        file (file)
-    Returns:
-        filename (str), filepath (PosixPath)
-    Side Effects:
-        saves file to disk at filepath
-    """
-    # Prevent path traversal or unsafe characters
-    filename = secure_filename(file.filename)
+# Create a uniquely named subdirectory in the given directory and return its path
+def create_unique_dir(dir=UPLOAD_DIR):
+    unique_dir_name = str(uuid.uuid4().hex[:8])
+    path = dir / unique_dir_name
 
-    filepath = os.path.join(UPLOAD_DIR, filename)
-    file.save(filepath)
-    return filename, filepath
+    path.mkdir(exist_ok=True)
+
+    return unique_dir_name
 
 
-# Return base filename without extension from a given filepath
-def get_basename(filepath):
-    filename = os.path.basename(filepath)
-    base_name = os.path.splitext(filename)[0]
-    return base_name
-
-
-# Delete files older than the given limit
-def delete_old_files(dir, hours_to_live=HOURS_TO_LIVE):
+# Delete folders older than the given limit
+def delete_old_subdirs(dir, hours_to_live=HOURS_TO_LIVE):
     SEC_IN_HOUR = 3600
-    list_of_files = os.listdir(dir)
+    list_of_subdirs = os.listdir(dir)
     current_time = time.time()
 
-    for filename in list_of_files:
-        filepath = os.path.join(dir, filename)
-        last_modified = os.stat(filepath).st_mtime
+    for subdir in list_of_subdirs:
+        path = dir / subdir
+        last_modified = os.stat(path).st_mtime
 
         if (current_time - last_modified > hours_to_live * SEC_IN_HOUR):
-            print(f"removing old file: {filepath}")
-            os.remove(filepath)
+            shutil.rmtree(path)
