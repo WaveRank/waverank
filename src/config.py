@@ -11,6 +11,8 @@ import random
 import numpy as np
 import tensorflow as tf
 
+
+# ----- CONFIGURATIONS -----
 # Paths
 BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATASET_PATH = os.path.join(BASE_PATH, "dataset/")
