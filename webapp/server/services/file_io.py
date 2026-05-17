@@ -10,8 +10,10 @@ import uuid
 from webapp.server.config import UPLOAD_DIR, GRAPH_DIR, HOURS_TO_LIVE
 
 
-# Create a uniquely named subdirectory in the given directory and return its path
-def create_unique_dir(dir=UPLOAD_DIR):
+def create_unique_dir(dir):
+    """
+    Create a uniquely named subdirectory in the given directory and return its path.
+    """
     unique_dir_name = str(uuid.uuid4().hex[:8])
     path = dir / unique_dir_name
 
@@ -20,8 +22,10 @@ def create_unique_dir(dir=UPLOAD_DIR):
     return unique_dir_name
 
 
-# Delete folders older than the given limit
 def delete_old_subdirs(dir, hours_to_live=HOURS_TO_LIVE):
+    """
+    Deletes subdirectories of the given directory if older than the given limit.
+    """
     SEC_IN_HOUR = 3600
     list_of_subdirs = os.listdir(dir)
     current_time = time.time()

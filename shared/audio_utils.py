@@ -57,21 +57,24 @@ def segment_audio(y, sr):
     return segments
 
 
-def make_spectrogram(segment, sr, n_fft=N_FFT, hop_len=HOP_LENGTH, n_mels=N_MELS):
+def make_spectrogram(segment, sr, n_fft=N_FFT, hop_length=HOP_LENGTH, n_mels=N_MELS):
     """
     Convert an audio segment into a log-mel spectrogram.
     Args:
         segment (np.ndarray): audio time series
         sr (int): sample rate
+        n_fft (int): length of the FFT window
+        hop_length (int): number of samples between successive frames
+        n_mels (int): number of Mel bands to generate
     Returns:
         np.ndarray: log-mel spectrogram in dB scale
     """
     mel = librosa.feature.melspectrogram(
         y=segment,
         sr=sr,
-        n_fft=N_FFT,
-        hop_length=HOP_LENGTH,
-        n_mels=N_MELS
+        n_fft=n_fft,
+        hop_length=hop_length,
+        n_mels=n_mels
     )
     return librosa.power_to_db(mel, ref=np.max)
 
@@ -82,6 +85,7 @@ def spectrogram_to_image(mel, img_size=IMG_SIZE):
     colormap.
     Args:
         mel (np.ndarray): log-mel spectrogram in dB scale
+        img_size (tuple of ints or None): size of output image in pixels
     Returns:
         PIL.Image: RGB image resized to IMG_SIZE
     """

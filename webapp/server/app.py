@@ -79,6 +79,7 @@ def handle_uploaded_file():
     os.remove(filepath)
     delete_old_subdirs(GRAPH_DIR)
     
+    # Send JSON response
     base_url = request.host_url.rstrip("/")
 
     return jsonify({
