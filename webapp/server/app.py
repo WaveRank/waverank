@@ -43,45 +43,58 @@ def handle_uploaded_file():
         return jsonify({"error": "File to upload doesn't exist"}), 400
 
     file = request.files['file']
-    filename = secure_filename(file.filename)
+    raw_filename = file.filename
 
-    if file == '':
-        return jsonify({"error": "No file selected"}), 400
-    
-    # Reject obviously invalid files
-    if not allowed_file(filename):
-        print(f'received file {filename} rejected: file type not allowed')
+    # Reject files with no base name
+    if raw_filename == '' or raw_filename.startswith('.'):
+        print(f'rejected file "{raw_filename}": no base filename')
+        return jsonify({"error": "Invalid filename"}), 400
+
+    # Reject obviously invalid file types
+    if not allowed_file(raw_filename):
+        print(f'rejected file "{raw_filename}": file type not allowed')
         return jsonify({"error": "Invalid file type"}), 400
+
+    # Sanitize filename
+    filename = secure_filename(raw_filename)
 
     # Save to disk in randomly generated folder to avoid filename collisions
     new_upload_subdir = create_unique_dir(UPLOAD_DIR)
     filepath = UPLOAD_DIR / new_upload_subdir / filename
     file.save(filepath)
      
-    # Attempt to decode the file as audio - authoritative validation.
+    # Attempt to decode the file as audio - authoritative validation
     if not decodable_audio_file(filepath):
-        os.remove(filepath)
-        print(f'received file {filename} rejected: failed to decode')
+        filepath.unlink()
+        print(f'rejected file "{filename}": failed to decode')
         return jsonify({"error": "Invalid audio file"}), 400
 
-    print(f'received file: {filename}')
+    print(f'received file: "{filename}"')
 
-    # Generate graphs and save to disk. Client will GET query for them. 
+    # Generate graphs and save to disk. Client will GET query for them.
     new_graph_subdir = create_unique_dir(GRAPH_DIR)
-    waveform_filename = generate_waveform(filepath, GRAPH_DIR / new_graph_subdir)
-    spectrum_filename = generate_spectrum(filepath, GRAPH_DIR / new_graph_subdir)
-    spectrogram_filename = generate_spectrogram(filepath, GRAPH_DIR / new_graph_subdir)
+    try:
+        waveform_filename = generate_waveform(filepath, GRAPH_DIR / new_graph_subdir)
+        spectrum_filename = generate_spectrum(filepath, GRAPH_DIR / new_graph_subdir)
+        spectrogram_filename = generate_spectrogram(filepath, GRAPH_DIR / new_graph_subdir)
+    except Exception as e:
+        filepath.unlink()
+        print("Graph generation failed:", repr(e))
+        return jsonify({"error": "Error generating graphs"}), 500
+
 
     # Get genre prediction from inference pipeline
     # TODO maybe look into handling this asynchronously, graph generation too
 
-    # Delete the uploaded file and graphs older than the age limit
-    os.remove(filepath)
-    delete_old_subdirs(GRAPH_DIR)
+    # Clean up the uploaded file and graphs older than the age limit
+    filepath.unlink()
+    try:
+        delete_old_subdirs(GRAPH_DIR)
+    except Exception as e:
+        print("Cleanup failed:", repr(e))
     
     # Send JSON response
     base_url = request.host_url.rstrip("/")
-
     return jsonify({
         "message": "File uploaded",
         "filename": filename,
