@@ -3,7 +3,7 @@ Configuration file for the genre classification CNN model.
 
 Defines all the hyperparameters, augmentation, and training settings for the 
 entire model pipeline. This includes the dataset parameters, learning rates,
-model architecture, training, evalutaion, and tuning scripts.
+model architecture, training, evaluation, and tuning scripts.
 """
 
 import os
@@ -24,8 +24,8 @@ BATCH_SIZE = 32
 SEED = 42
 
 # Training
-TRAINING_EPOCHS = 1
-FINE_TUNE_EPOCHS = 1
+TRAINING_EPOCHS = 100
+FINE_TUNE_EPOCHS = 100
 INITIAL_LEARNING_RATE = 5e-4
 FINE_LEARNING_RATE = 8e-5
 DEPTH = 175

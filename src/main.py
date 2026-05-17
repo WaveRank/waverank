@@ -33,7 +33,6 @@ Things to try to improve the model:
 - And more! These are just some ideas
 """
 
-import random
 from config import *
 from dataset import get_datasets
 from model import build_model
