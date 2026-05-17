@@ -63,14 +63,7 @@ evaluate_model(model, test_ds, phase=2)
 
 # Extract embeddings
 emb_model = embedding_model(model)
-save_embeddings(test_ds, emb_model, model, class_names)
-
-# Get y_true and y_pred to determine F1 score
-x_emb, y_true, y_pred, conf = extract_embeddings(
-        test_ds,
-        emb_model,
-        model
-    )
+y_true, y_pred = save_embeddings(test_ds, emb_model, model, class_names)
 
 macro_f1 = f1_score(y_true, y_pred, average="macro")
 print(f"F1 Score: {macro_f1}")
