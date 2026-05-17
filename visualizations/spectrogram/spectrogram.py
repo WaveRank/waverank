@@ -2,24 +2,31 @@
 Citation (5/14):
 https://medium.com/analytics-vidhya/understanding-the-mel-spectrogram-fca2afa2ce53
 """
-import sys
-import os
+from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
+import librosa
+import librosa.display
 from shared.audio_utils import load_audio, make_spectrogram, spectrogram_to_image
-from webapp.server.config import GRAPH_DIR, IMG_SIZE, N_FFT, HOP_LENGTH, N_MELS
-from webapp.server.services.file_io import get_basename
+from visualizations.config import SPECTROGRAM_IMG_SIZE, SPECTROGRAM_N_FFT, SPECTROGRAM_HOP_LEN, SPECTROGRAM_N_MELS
 
 
-def generate_spectrogram(filepath):
-    base_name = get_basename(filepath)
-    filename = base_name + "_spectrogram.png"
-    output_path = os.path.join(GRAPH_DIR, filename)
+# Generate mel spectrogram of audio file at given path, save to disk, and return filename.
+# This visualization is tailored for human viewing, not CCN input.
+def generate_spectrogram(filepath, output_dir):
+    output_filename = filepath.stem + "_spectrogram.png"
+    output_path = output_dir / output_filename
+    
+    y, sr = load_audio(filepath)
+    mel_spect = make_spectrogram(y, sr, SPECTROGRAM_N_FFT, SPECTROGRAM_HOP_LEN, SPECTROGRAM_N_MELS)
+    # spectrogram_graph = spectrogram_to_image(spectrogram, SPECTROGRAM_IMG_SIZE)
 
-    waveform, sr = load_audio(filepath)
-    spectrogram = make_spectrogram(waveform, sr, N_FFT, HOP_LENGTH, N_MELS)
-    spectrogram_graph = spectrogram_to_image(spectrogram, IMG_SIZE)
+    plt.figure()
+    librosa.display.specshow(mel_spect, y_axis='mel', fmax=8000, x_axis='time', sr=sr, n_fft=SPECTROGRAM_N_FFT, hop_length=SPECTROGRAM_HOP_LEN)
+    plt.title('Mel Spectrogram')
+    plt.colorbar(format='%+2.0f dB')
 
-    spectrogram_graph.save(output_path)
+    plt.savefig(output_path)
+    plt.close
 
-    return filename
+    return output_filename

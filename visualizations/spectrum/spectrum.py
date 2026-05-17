@@ -2,25 +2,25 @@
 Citation (5/14):
 https://medium.com/analytics-vidhya/understanding-the-mel-spectrogram-fca2afa2ce53
 """
-import os
+from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 from shared.audio_utils import load_audio
-from webapp.server.config import GRAPH_DIR, GRAPH_COLOR
-from webapp.server.services.file_io import get_basename
+from visualizations.config import GRAPH_COLOR
 
 
-def generate_spectrum(filepath):
-    base_name = get_basename(filepath)
-    filename = base_name + "_spectrum.png"
-    output_path = os.path.join(GRAPH_DIR, filename)
+# Generate spectrum graph of audio file at given path, save to disk, and return filename.
+def generate_spectrum(filepath, output_dir):
+    output_filename = filepath.stem + "_spectrum.png"
+    output_path = output_dir / output_filename
 
     y, _ = load_audio(filepath)
 
+    print(np.max(np.abs(y)))
+    
     # compute spectrum
     n_fft = 2048
-    frame = y[:n_fft]
-    windowed = frame * np.hanning(len(frame))
+    windowed = y * np.hanning(len(y))
     spectrum = np.abs(np.fft.rfft(windowed))
 
     # plot graph
@@ -34,4 +34,4 @@ def generate_spectrum(filepath):
     plt.savefig(output_path)
     plt.close()
 
-    return filename
+    return output_filename
