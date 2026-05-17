@@ -11,15 +11,24 @@ from shared.audio_utils import load_audio, make_spectrogram, spectrogram_to_imag
 from visualizations.config import SPECTROGRAM_IMG_SIZE, SPECTROGRAM_N_FFT, SPECTROGRAM_HOP_LEN, SPECTROGRAM_N_MELS
 
 
-# Generate mel spectrogram of audio file at given path, save to disk, and return filename.
-# This visualization is tailored for human viewing, not CCN input.
 def generate_spectrogram(filepath, output_dir):
+    """
+    Generate mel spectrogram graph of audio file at given path.
+    This visualization is tailored for human viewing, not CCN input.
+    Args:
+        filepath (PosixPath): path of audio file
+        output_dir (PosixPath): path of directory to save graph into
+    Returns:
+        output_filename (str): name of created graph
+    Side Effects:
+        Graph saved to disk at output_path
+    """
     output_filename = filepath.stem + "_spectrogram.png"
     output_path = output_dir / output_filename
     
     y, sr = load_audio(filepath)
+    
     mel_spect = make_spectrogram(y, sr, SPECTROGRAM_N_FFT, SPECTROGRAM_HOP_LEN, SPECTROGRAM_N_MELS)
-    # spectrogram_graph = spectrogram_to_image(spectrogram, SPECTROGRAM_IMG_SIZE)
 
     plt.figure()
     librosa.display.specshow(mel_spect, y_axis='mel', fmax=8000, x_axis='time', sr=sr, n_fft=SPECTROGRAM_N_FFT, hop_length=SPECTROGRAM_HOP_LEN)

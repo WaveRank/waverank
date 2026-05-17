@@ -9,14 +9,22 @@ from shared.audio_utils import load_audio
 from visualizations.config import GRAPH_COLOR
 
 
-# Generate spectrum graph of audio file at given path, save to disk, and return filename.
 def generate_spectrum(filepath, output_dir):
+    """
+    Generate spectrum graph of audio file at given path.
+    This visualization is tailored for human viewing, not CCN input.
+    Args:
+        filepath (PosixPath): path of audio file
+        output_dir (PosixPath): path of directory to save graph into
+    Returns:
+        output_filename (str): name of created graph
+    Side Effects:
+        Graph saved to disk at output_path
+    """
     output_filename = filepath.stem + "_spectrum.png"
     output_path = output_dir / output_filename
 
     y, _ = load_audio(filepath)
-
-    print(np.max(np.abs(y)))
     
     # compute spectrum
     n_fft = 2048

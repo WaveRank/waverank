@@ -8,13 +8,25 @@ import numpy as np
 from shared.audio_utils import load_audio
 from visualizations.config import GRAPH_COLOR
 
-# Reduce number of samples
 def downsample_waveform(y, factor=1000):
+    """
+    Reduce number of samples of a given waveform.
+    """
     return y[::factor]
 
-# Generate waveform graph of audio file at given path, save to disk, and return filename.
-# This visualization is tailored for human viewing, not CCN input.
+
 def generate_waveform(filepath, output_dir):
+    """
+    Generate waveform graph of audio file at given path.
+    This visualization is tailored for human viewing, not CCN input.
+    Args:
+        filepath (PosixPath): path of audio file
+        output_dir (PosixPath): path of directory to save graph into
+    Returns:
+        output_filename (str): name of created graph
+    Side Effects:
+        Graph saved to disk at output_path
+    """
     output_filename = filepath.stem + "_waveform.png"
     output_path = output_dir / output_filename
 

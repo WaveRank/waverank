@@ -19,4 +19,4 @@ GRAPH_DIR = SERVER_DIR / "graphs"
 UPLOAD_DIR = SERVER_DIR / "uploads"
 
 # Graphs
-HOURS_TO_LIVE = 1
+HOURS_TO_LIVE = 0.5
