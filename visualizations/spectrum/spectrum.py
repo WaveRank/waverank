@@ -1,4 +1,7 @@
 """
+Utility for generating a FFT-based audio spectrum visualization.
+This visualization is tailored for human viewing, not CNN input.
+
 Citation (5/14):
 https://medium.com/analytics-vidhya/understanding-the-mel-spectrogram-fca2afa2ce53
 """
@@ -11,8 +14,7 @@ from visualizations.config import GRAPH_COLOR
 
 def generate_spectrum(filepath, output_dir):
     """
-    Generate spectrum graph of audio file at given path.
-    This visualization is tailored for human viewing, not CCN input.
+    Generate a spectrum graph of the audio file at the given path.
     Args:
         filepath (PosixPath): path of audio file
         output_dir (PosixPath): path of directory to save graph into
@@ -27,7 +29,6 @@ def generate_spectrum(filepath, output_dir):
     y, _ = load_audio(filepath)
     
     # compute spectrum
-    n_fft = 2048
     windowed = y * np.hanning(len(y))
     spectrum = np.abs(np.fft.rfft(windowed))
 
