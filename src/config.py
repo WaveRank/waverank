@@ -14,7 +14,6 @@ import tensorflow as tf
 # Paths
 BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATASET_PATH = os.path.join(BASE_PATH, "dataset/")
-OUTPUT_PATH = os.path.join(BASE_PATH, "outputs")
 SAVE_PATH = os.path.join(BASE_PATH, "webapp/server/model/")
 
 # Model
