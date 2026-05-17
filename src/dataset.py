@@ -23,7 +23,7 @@ def load_dataset(set, shuffle=False):
 
 def get_datasets():
     """
-    Prepares the train, validation, and test datasets for training. a
+    Prepares the train, validation, and test datasets for training.
     Applies shuffling, optional augmentations (CutMix, Spectrogram Augmentation), 
     and prefetch autotune for performance. 
 
@@ -68,7 +68,7 @@ def get_datasets():
     val_ds   = val_ds.map(lambda x, y: (preprocess_input(x), y)).cache()
     test_ds  = test_ds.map(lambda x, y: (preprocess_input(x), y)).cache()
 
-    # Spectrogram Augmentation on training data (comment out if desired)
+    # Spectrogram Augmentation on training data
     if USE_SPECAUG:
         train_ds = train_ds.map(spec_augment)
 
