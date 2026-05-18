@@ -14,9 +14,8 @@ npm run dev
 
 #### backend
 ```
-cd webapp/server
 python3 -m venv env
-source env/bin/activate
-# pip install -r requirements.txt
-python app.py
+source webapp/server/env/bin/activate
+# pip install -r webapp/server/requirements.txt
+python run_server.py
 ```
