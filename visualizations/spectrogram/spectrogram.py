@@ -10,10 +10,8 @@ https://medium.com/analytics-vidhya/understanding-the-mel-spectrogram-fca2afa2ce
 """
 from pathlib import Path
 import matplotlib.pyplot as plt
-import numpy as np
-import librosa
 import librosa.display
-from shared.audio_utils import load_audio, make_spectrogram, spectrogram_to_image
+from shared.audio_utils import load_audio, make_spectrogram
 from visualizations.config import SPECTROGRAM_IMG_SIZE, SPECTROGRAM_N_FFT, SPECTROGRAM_HOP_LEN, SPECTROGRAM_N_MELS
 
 
