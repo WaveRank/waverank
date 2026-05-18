@@ -24,9 +24,9 @@ def create_unique_dir(dir):
         (str): generated subdirectory name
     """
     unique_dir_name = str(uuid.uuid4().hex[:8])
-    path = dir / unique_dir_name
+    filepath = dir / unique_dir_name
 
-    path.mkdir(exist_ok=True)
+    filepath.mkdir(exist_ok=True)
 
     return unique_dir_name
 
@@ -46,7 +46,7 @@ def delete_old_subdirs(dir, hours_to_live=HOURS_TO_LIVE):
 
     for filename in list_of_contents:
         filepath = dir / filename
-        last_modified = path.stat().st_mtime
+        last_modified = filepath.stat().st_mtime
 
         if (current_time - last_modified > hours_to_live * SEC_IN_HOUR):
             if filepath.is_dir():
