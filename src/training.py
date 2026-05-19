@@ -1,6 +1,5 @@
-from config import *
+import config as cfg
 import tensorflow as tf
-import config
 
 
 # ----- TRAINING -----
@@ -60,7 +59,7 @@ def initial_train(model, train_ds, val_ds):
         - model: updated model with weights
     """
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=config.INITIAL_LEARNING_RATE),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=cfg.INITIAL_LEARNING_RATE),
         loss='categorical_crossentropy',
         metrics=['accuracy']
     )
@@ -68,7 +67,7 @@ def initial_train(model, train_ds, val_ds):
     history = model.fit(
         train_ds,
         validation_data=val_ds,
-        epochs=TRAINING_EPOCHS,
+        epochs=cfg.TRAINING_EPOCHS,
         callbacks=get_callbacks(phase=1)
     )
 
@@ -86,7 +85,7 @@ def fine_tune(model, base_model, train_ds, val_ds):
     base_model.trainable = True
 
     # Fine-tune only last layers
-    for layer in base_model.layers[:-config.DEPTH]:
+    for layer in base_model.layers[:-cfg.DEPTH]:
         layer.trainable = False
 
     # Freeze BatchNormalization layers
@@ -96,7 +95,7 @@ def fine_tune(model, base_model, train_ds, val_ds):
 
     # Recompile with lower learning rate
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(config.FINE_LEARNING_RATE, weight_decay=WEIGHT_DECAY),
+        optimizer=tf.keras.optimizers.Adam(cfg.FINE_LEARNING_RATE, weight_decay=cfg.WEIGHT_DECAY),
         loss='categorical_crossentropy',
         metrics=['accuracy']
     )
@@ -105,7 +104,7 @@ def fine_tune(model, base_model, train_ds, val_ds):
     model.fit(
         train_ds,
         validation_data=val_ds,
-        epochs=FINE_TUNE_EPOCHS,
+        epochs=cfg.FINE_TUNE_EPOCHS,
         callbacks=get_callbacks(phase=2)
     )
 

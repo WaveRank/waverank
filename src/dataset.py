@@ -1,7 +1,8 @@
+import os
 import json
+import config as cfg
 import tensorflow as tf
 from tensorflow.keras.applications.resnet50 import preprocess_input
-from config import *
 
 
 # ----- LOAD DATASETS -----
@@ -13,8 +14,8 @@ def load_dataset(set, shuffle=False):
     print(f"Loading {set} set...")
     
     return tf.keras.utils.image_dataset_from_directory(
-    	DATASET_PATH + set,
-    	image_size=IMG_SIZE,
+    	cfg.DATASET_PATH + set,
+    	image_size=cfg.IMG_SIZE,
     	batch_size=None,
     	shuffle=shuffle,
     	label_mode='categorical'
@@ -34,34 +35,33 @@ def get_datasets():
         - Class names
     """
     train_ds = load_dataset("train", shuffle=True)
-    val_ds = load_dataset("val", shuffle=True).batch(BATCH_SIZE)
-    test_ds = load_dataset("test").batch(BATCH_SIZE)
+    val_ds = load_dataset("val", shuffle=True).batch(cfg.BATCH_SIZE)
+    test_ds = load_dataset("test").batch(cfg.BATCH_SIZE)
 
     # Extract class (genre) names, save for reference
     class_names = train_ds.class_names
     print("Classes:", class_names)
-    os.makedirs(BASE_PATH, exist_ok=True)
-    with open(os.path.join(BASE_PATH, "class_names.json"), "w") as f:
+    with open(os.path.join(cfg.BASE_PATH, "class_names.json"), "w") as f:
         json.dump(class_names, f)
 
-    if USE_CUTMIX:
+    if cfg.USE_CUTMIX:
         train_ds_one = (
-            train_ds.shuffle(len(train_ds), seed=SEED)
+            train_ds.shuffle(len(train_ds), seed=cfg.SEED)
         )
 
         train_ds_two = (
-            train_ds.shuffle(len(train_ds), seed=SEED + 1)
+            train_ds.shuffle(len(train_ds), seed=cfg.SEED + 1)
         )
 
         train_ds = (
             tf.data.Dataset.zip((train_ds_one, train_ds_two))
             .map(cutmix_chances, num_parallel_calls=tf.data.AUTOTUNE)
-            .batch(BATCH_SIZE, drop_remainder=True)
+            .batch(cfg.BATCH_SIZE, drop_remainder=True)
         )
 
     # Training set if cutmix is not used
     else:
-        train_ds = train_ds.batch(BATCH_SIZE)
+        train_ds = train_ds.batch(cfg.BATCH_SIZE)
 
     # ----- PREPROCESSING -----
     train_ds = train_ds.map(lambda x, y: (preprocess_input(x), y)).cache()
@@ -69,7 +69,7 @@ def get_datasets():
     test_ds  = test_ds.map(lambda x, y: (preprocess_input(x), y)).cache()
 
     # Spectrogram Augmentation on training data
-    if USE_SPECAUG:
+    if cfg.USE_SPECAUG:
         train_ds = train_ds.map(spec_augment)
 
     # Prefetch (improves performance)
@@ -107,32 +107,32 @@ def spec_augment_helper(image):
 
     # Pick width and start points for each dimension
     freq_width = tf.random.uniform(
-        shape=[], maxval=FREQ_MASK_WIDTH, dtype=tf.dtypes.int32
+        shape=[], maxval=cfg.FREQ_MASK_WIDTH, dtype=tf.dtypes.int32
     )
     freq_start = tf.random.uniform(
-        shape=[], maxval=IMG_SIZE[0] - freq_width, dtype=tf.dtypes.int32
+        shape=[], maxval=cfg.IMG_SIZE[0] - freq_width, dtype=tf.dtypes.int32
     )
     time_width = tf.random.uniform(
-        shape=[], maxval=TIME_MASK_WIDTH, dtype=tf.dtypes.int32
+        shape=[], maxval=cfg.TIME_MASK_WIDTH, dtype=tf.dtypes.int32
     )
     time_start = tf.random.uniform(
-        shape=[], maxval=IMG_SIZE[1] - time_width, dtype=tf.dtypes.int32
+        shape=[], maxval=cfg.IMG_SIZE[1] - time_width, dtype=tf.dtypes.int32
     )
 
     # Draw frequency and time masks
     freq_mask = tf.concat(
         [
-            tf.ones([freq_start, IMG_SIZE[1], 3]),
-            tf.zeros([freq_width, IMG_SIZE[1], 3]),
-            tf.ones([IMG_SIZE[0] - freq_start - freq_width, IMG_SIZE[1], 3]),
+            tf.ones([freq_start, cfg.IMG_SIZE[1], 3]),
+            tf.zeros([freq_width, cfg.IMG_SIZE[1], 3]),
+            tf.ones([cfg.IMG_SIZE[0] - freq_start - freq_width, cfg.IMG_SIZE[1], 3]),
         ],
         0,
     )
     time_mask = tf.concat(
         [
-            tf.ones([IMG_SIZE[0], time_start, 3]),
-            tf.zeros([IMG_SIZE[0], time_width, 3]),
-            tf.ones([IMG_SIZE[0], IMG_SIZE[1] - time_start - time_width, 3]),
+            tf.ones([cfg.IMG_SIZE[0], time_start, 3]),
+            tf.zeros([cfg.IMG_SIZE[0], time_width, 3]),
+            tf.ones([cfg.IMG_SIZE[0], cfg.IMG_SIZE[1] - time_start - time_width, 3]),
         ],
         1,
     )
@@ -149,7 +149,7 @@ def get_lambda():
     to return a lambda mixing ratio
     """
     
-    beta_dist = np.random.beta(ALPHA, ALPHA)
+    beta_dist = np.random.beta(cfg.ALPHA, cfg.ALPHA)
     lambda_tf = tf.constant(beta_dist, dtype=tf.float32)
 
     return lambda_tf
@@ -198,7 +198,7 @@ def cutmix(train_ds_one, train_ds_two):
         Mixed image tensor and label
     """
 
-    img_h, img_w = IMG_SIZE[0], IMG_SIZE[1]
+    img_h, img_w = cfg.IMG_SIZE[0], cfg.IMG_SIZE[1]
 
     (image1, label1), (image2, label2) = train_ds_one, train_ds_two
 
@@ -237,7 +237,7 @@ def cutmix_chances(train_ds_one, train_ds_two):
     """
     (image1, label1), (image2, label2) = train_ds_one, train_ds_two
 
-    probability = tf.random.uniform([]) < CUTMIX_PROB
+    probability = tf.random.uniform([]) < cfg.CUTMIX_PROB
 
     return tf.cond(
         probability,

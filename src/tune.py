@@ -10,9 +10,8 @@ depth, spec augmentation masking widths, cutmix probability...
 """
 
 import optuna
-import config
+import config as cfg
 import tensorflow as tf
-from config import *
 from model import build_model
 from dataset import get_datasets
 from sklearn.metrics import f1_score
@@ -26,7 +25,7 @@ def tuning_pipeline():
     and other visualizations.
     """
     # Set global random seed for reproducibility
-    set_seeds()
+    cfg.set_seeds()
 
     # DATA
     train_ds, val_ds, test_ds, class_names = get_datasets()
@@ -66,10 +65,10 @@ def optimize_config(trials):
     tf.keras.backend.clear_session()
 
     # Configure sample float/int values on a given range per trial
-    config.INITIAL_LEARNING_RATE = trials.suggest_float("initial_lr", 1e-5, 1e-3, log=True)
-    config.FINE_LEARNING_RATE = trials.suggest_float("fine_lr", 1e-4, 5e-4, log=True)
-    config.DROPOUT_RATE = trials.suggest_float("dropout", 0.2, 0.6)
-    config.DEPTH = trials.suggest_int("depth", 50, 175)
+    cfg.INITIAL_LEARNING_RATE = trials.suggest_float("initial_lr", 1e-5, 1e-3, log=True)
+    cfg.FINE_LEARNING_RATE = trials.suggest_float("fine_lr", 1e-4, 5e-4, log=True)
+    cfg.DROPOUT_RATE = trials.suggest_float("dropout", 0.2, 0.6)
+    cfg.DEPTH = trials.suggest_int("depth", 50, 175)
 
     return tuning_pipeline()
 
@@ -81,8 +80,8 @@ def optimization():
     the best performing results.
     """
     # Initialize optuna study to track trials
-    study = optuna.create_study(direction="maximize", sampler=optuna.samplers.TPESampler(seed=SEED))
-    study.optimize(optimize_config, n_trials=N_TRIALS)
+    study = optuna.create_study(direction="maximize", sampler=optuna.samplers.TPESampler(seed=cfg.SEED))
+    study.optimize(optimize_config, n_trials=cfg.N_TRIALS)
 
     # Best trial stats
     print("\nBEST TRIAL RUN:")

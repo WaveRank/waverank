@@ -33,7 +33,7 @@ Things to try to improve the model:
 - And more! These are just some ideas
 """
 
-from config import *
+import config as cfg
 from dataset import get_datasets
 from model import build_model
 from sklearn.metrics import f1_score
@@ -44,7 +44,7 @@ from evaluate import *
 # ----- MAIN PIPELINE -----
 
 # Set global random seed for reproducibility
-set_seeds()
+cfg.set_seeds()
 
 # Get testing, val, and training datasets, and class names
 train_ds, val_ds, test_ds, class_names = get_datasets()
@@ -55,11 +55,17 @@ base_model, model = build_model(class_names)
 # Initial training and evaluation
 model, history = initial_train(model, train_ds, val_ds)
 save_curves(history)
-evaluate_model(model, test_ds, phase=1)
+test_loss, test_acc = model.evaluate(test_ds)
+print("Test accuracy:", test_acc)
 
 # Fine tune training and evaluation
 model = fine_tune(model, base_model, train_ds, val_ds)
-evaluate_model(model, test_ds, phase=2)
+test_loss, test_acc = model.evaluate(test_ds)
+print("Test accuracy after fine-tuning:", test_acc)
+
+# Save entire model for future use
+os.makedirs(cfg.SAVE_PATH, exist_ok=True)
+model.save(os.path.join(cfg.SAVE_PATH, 'final_model.keras'))
 
 # Extract embeddings
 emb_model = embedding_model(model)
