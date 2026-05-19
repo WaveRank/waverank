@@ -1,8 +1,7 @@
+import config as cfg
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.applications import ResNet50
-from config import *
-import config
 
 
 def build_model(class_names):
@@ -22,7 +21,7 @@ def build_model(class_names):
     base_model = ResNet50(
         weights='imagenet',
         include_top=False,
-        input_shape=(*IMG_SIZE, 3)
+        input_shape=(*cfg.IMG_SIZE, 3)
     )
     base_model.trainable = False
 
@@ -32,7 +31,7 @@ def build_model(class_names):
 
     # Embedding layer
     embedding = layers.Dense(128, activation='relu', name="embedding")(x)
-    x = layers.Dropout(config.DROPOUT_RATE)(embedding)
+    x = layers.Dropout(cfg.DROPOUT_RATE)(embedding)
     outputs = layers.Dense(len(class_names), activation='softmax')(x)
 
     model = tf.keras.Model(inputs=base_model.input, outputs=outputs)

@@ -1,9 +1,9 @@
-import matplotlib.pyplot as plt
-import tensorflow as tf
-import pandas as pd
-import numpy as np
 import os
-from config import *
+import numpy as np
+import pandas as pd 
+import config as cfg
+import tensorflow as tf
+import matplotlib.pyplot as plt
 
 
 def embedding_model(model):
@@ -70,7 +70,7 @@ def save_embeddings(test_ds, emb_model, clf_model, class_names):
     emb_df["pred_name"] = [class_names[i] for i in y_pred]
 
     # Save to CSV
-    emb_df.to_csv(os.path.join(BASE_PATH, "embeddings.csv"), index=False)
+    emb_df.to_csv(os.path.join(cfg.BASE_PATH, "embeddings.csv"), index=False)
     print("Saved embeddings.csv")
 
     conf_df = pd.DataFrame(conf)
@@ -79,7 +79,7 @@ def save_embeddings(test_ds, emb_model, clf_model, class_names):
     conf_df["label_name"] = [class_names[i] for i in y_true]
 
     # Save to CSV
-    conf_df.to_csv(os.path.join(BASE_PATH, "confidences.csv"), index=False)
+    conf_df.to_csv(os.path.join(cfg.BASE_PATH, "confidences.csv"), index=False)
     print("Saved confidences.csv")
 
     return y_true, y_pred
@@ -96,7 +96,7 @@ def save_curves(history):
     plt.plot(history.history['val_accuracy'], label='val')
     plt.legend()
     plt.title("Accuracy")
-    plt.savefig(os.path.join(BASE_PATH, "accuracy_curve.png"), dpi=300)
+    plt.savefig(os.path.join(cfg.BASE_PATH, "accuracy_curve.png"), dpi=300)
     print("Saved accuracy_curve.png")
     plt.close()
 
@@ -105,23 +105,6 @@ def save_curves(history):
     plt.plot(history.history['val_loss'], label='val')
     plt.legend()
     plt.title("Loss")
-    plt.savefig(os.path.join(BASE_PATH, "loss_curve.png"), dpi=300)
+    plt.savefig(os.path.join(cfg.BASE_PATH, "loss_curve.png"), dpi=300)
     print("Saved loss_curve.png")
     plt.close()
-
-
-def evaluate_model(model, test_ds, phase):
-    """
-    Evaluates the trained model on the test dataset.
-
-    Returns:
-        - test loss: loss value measuring how correct predictions are
-        - test acc: percentage of test samples the model classified correctly
-    """
-    test_loss, test_acc = model.evaluate(test_ds)
-    if phase == 1:
-        print("Test accuracy:", test_acc)
-    elif phase == 2:
-        print("Test accuracy after fine-tuning:", test_acc)
-
-    return test_loss, test_acc
