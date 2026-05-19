@@ -6,9 +6,10 @@ https://pytutorial.com/flask-send_from_directory-serve-files-securely-from-direc
 """
 from flask import Flask, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import RequestEntityTooLarge
 from flask_cors import CORS
 
-from webapp.server.config import PORT, UPLOAD_DIR, GRAPH_DIR
+from webapp.server.config import PORT, UPLOAD_DIR, GRAPH_DIR, MAX_CONTENT_LENGTH
 from webapp.server.services.file_io import create_unique_dir, delete_old_subdirs
 from webapp.server.services.audio_validation import allowed_file, decodable_audio_file
 from visualizations.waveform.waveform import generate_waveform
@@ -16,6 +17,8 @@ from visualizations.spectrum.spectrum import generate_spectrum
 from visualizations.spectrogram.spectrogram import generate_spectrogram
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
+
 CORS(app)
 
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -31,6 +34,13 @@ def main():
 @app.route("/api/graphs/<path:graph_path>")
 def serve_graph(graph_path):
     return send_from_directory(GRAPH_DIR, graph_path)
+
+
+@app.errorhandler(RequestEntityTooLarge)
+def handle_large_file(error):
+    # Replace default error behavior of flask.request for overly large files
+    print(f'rejected file: file exceeds maximum size')
+    return jsonify({"error": "File exceeds maximum size"}), 413
 
 
 @app.route("/api/predict", methods=["POST"])
