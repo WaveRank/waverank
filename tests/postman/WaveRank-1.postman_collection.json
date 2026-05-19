@@ -1,0 +1,634 @@
+{
+  "info": {
+    "_postman_id": "aed54283-f529-4347-89f7-f4075cb57fc9",
+    "name": "WaveRank-1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54116243",
+    "_collection_link": "https://go.postman.co/collection/54116243-aed54283-f529-4347-89f7-f4075cb57fc9?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Get /",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{server_url}}",
+              "host": [
+                "{{server_url}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Invalid Uploads",
+      "item": [
+        {
+          "name": "No File",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Correct error message\", function () {\r",
+                  "    pm.expect(pm.response.json().error)\r",
+                  "        .to.eql(\"File to upload doesn't exist\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{server_url}}/api/predict",
+              "host": [
+                "{{server_url}}"
+              ],
+              "path": [
+                "api",
+                "predict"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Extension",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "eedcf0b4-a945-475e-b73d-6593fa22b6c0",
+                  "src": "{{test_assets_dir}}/invalid.txt"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{server_url}}/api/predict",
+              "host": [
+                "{{server_url}}"
+              ],
+              "path": [
+                "api",
+                "predict"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No Extension, named mp3",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "eedcf0b4-a945-475e-b73d-6593fa22b6c0",
+                  "src": "{{test_assets_dir}}/mp3"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{server_url}}/api/predict",
+              "host": [
+                "{{server_url}}"
+              ],
+              "path": [
+                "api",
+                "predict"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Corrupt Audio File",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Correct error message\", function () {\r",
+                  "    pm.expect(pm.response.json().error)\r",
+                  "        .to.eql(\"Invalid audio file\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "0d4a563f-b852-49ab-8d89-9cc6b2fe9a47",
+                  "src": "{{test_assets_dir}}/corrupt.wav"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{server_url}}/api/predict",
+              "host": [
+                "{{server_url}}"
+              ],
+              "path": [
+                "api",
+                "predict"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Too Large Audio File",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 413\", function () {\r",
+                  "    pm.response.to.have.status(413);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Correct error message\", function () {\r",
+                  "    pm.expect(pm.response.json().error)\r",
+                  "        .to.eql(\"File exceeds maximum size\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "0d4a563f-b852-49ab-8d89-9cc6b2fe9a47",
+                  "src": "{{test_assets_dir}}/too_large.mp3"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{server_url}}/api/predict",
+              "host": [
+                "{{server_url}}"
+              ],
+              "path": [
+                "api",
+                "predict"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Fake Audio File",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Correct error message\", function () {\r",
+                  "    pm.expect(pm.response.json().error)\r",
+                  "        .to.eql(\"Invalid audio file\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "0d4a563f-b852-49ab-8d89-9cc6b2fe9a47",
+                  "src": "{{test_assets_dir}}/fake.mp3"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{server_url}}/api/predict",
+              "host": [
+                "{{server_url}}"
+              ],
+              "path": [
+                "api",
+                "predict"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Filename .mp3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Correct error message\", function () {\r",
+                  "    pm.expect(pm.response.json().error)\r",
+                  "        .to.eql(\"Invalid filename\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "0d4a563f-b852-49ab-8d89-9cc6b2fe9a47",
+                  "src": "{{test_assets_dir}}/.mp3"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{server_url}}/api/predict",
+              "host": [
+                "{{server_url}}"
+              ],
+              "path": [
+                "api",
+                "predict"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Filename .py",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Correct error message\", function () {\r",
+                  "    pm.expect(pm.response.json().error)\r",
+                  "        .to.eql(\"Invalid audio file\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "0d4a563f-b852-49ab-8d89-9cc6b2fe9a47",
+                  "src": "{{test_assets_dir}}/fake.mp3"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{server_url}}/api/predict",
+              "host": [
+                "{{server_url}}"
+              ],
+              "path": [
+                "api",
+                "predict"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Valid Uploads",
+      "item": [
+        {
+          "name": "Upload Valid mp3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "const jsonData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Graphs exist\", function () {\r",
+                  "    pm.expect(jsonData.graphs.waveform).to.exist;\r",
+                  "    pm.expect(jsonData.graphs.spectrum).to.exist;\r",
+                  "    pm.expect(jsonData.graphs.spectrogram).to.exist;\r",
+                  "});\r",
+                  "\r",
+                  "pm.environment.set(\r",
+                  "    \"valid_mp3_waveform_url\",\r",
+                  "    jsonData.graphs.waveform\r",
+                  ");\r",
+                  "pm.environment.set(\r",
+                  "    \"valid_mp3_spectrum_url\",\r",
+                  "    jsonData.graphs.spectrum\r",
+                  ");\r",
+                  "pm.environment.set(\r",
+                  "    \"valid_mp3_spectrogram_url\",\r",
+                  "    jsonData.graphs.spectrogram\r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "5020327e-d8c5-4d0b-b3cf-69ac1e32c0d0",
+                  "src": "{{test_assets_dir}}/valid.mp3"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{server_url}}/api/predict",
+              "host": [
+                "{{server_url}}"
+              ],
+              "path": [
+                "api",
+                "predict"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Same mp3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "const jsonData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Graphs exist\", function () {\r",
+                  "    pm.expect(jsonData.graphs.waveform).to.exist;\r",
+                  "    pm.expect(jsonData.graphs.spectrum).to.exist;\r",
+                  "    pm.expect(jsonData.graphs.spectrogram).to.exist;\r",
+                  "});\r",
+                  "\r",
+                  "pm.environment.set(\r",
+                  "    \"valid_mp3_waveform_url\",\r",
+                  "    jsonData.graphs.waveform\r",
+                  ");\r",
+                  "pm.environment.set(\r",
+                  "    \"valid_mp3_spectrum_url\",\r",
+                  "    jsonData.graphs.spectrum\r",
+                  ");\r",
+                  "pm.environment.set(\r",
+                  "    \"valid_mp3_spectrogram_url\",\r",
+                  "    jsonData.graphs.spectrogram\r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "5020327e-d8c5-4d0b-b3cf-69ac1e32c0d0",
+                  "src": "{{test_assets_dir}}/valid.mp3"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{server_url}}/api/predict",
+              "host": [
+                "{{server_url}}"
+              ],
+              "path": [
+                "api",
+                "predict"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get mp3 Waveform Graph",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{valid_mp3_waveform_url}}",
+              "host": [
+                "{{valid_mp3_waveform_url}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get mp3 Spectrum Graph",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{valid_mp3_spectrum_url}}",
+              "host": [
+                "{{valid_mp3_spectrum_url}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get mp3 Spectrogram Graph",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{valid_mp3_spectrogram_url}}",
+              "host": [
+                "{{valid_mp3_spectrogram_url}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Graph Access",
+      "item": [
+        {
+          "name": "Non-Existant Graph",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{server_url}}/api/graphs/fake/fake.png",
+              "host": [
+                "{{server_url}}"
+              ],
+              "path": [
+                "api",
+                "graphs",
+                "fake",
+                "fake.png"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "waveform_url",
+      "value": ""
+    },
+    {
+      "key": "spectrum_url",
+      "value": ""
+    },
+    {
+      "key": "spectrogram_url",
+      "value": ""
+    },
+    {
+      "key": "valid_mp3_waveform_url",
+      "value": ""
+    },
+    {
+      "key": "valid_mp3_spectrum_url",
+      "value": ""
+    },
+    {
+      "key": "valid_mp3_spectrogram_url",
+      "value": ""
+    }
+  ]
+}

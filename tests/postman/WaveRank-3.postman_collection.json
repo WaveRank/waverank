@@ -1,0 +1,238 @@
+{
+  "info": {
+    "_postman_id": "42d084fa-c352-490c-a3ec-69f91f76a57d",
+    "name": "WaveRank-3",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54116243",
+    "_collection_link": "https://go.postman.co/collection/54116243-42d084fa-c352-490c-a3ec-69f91f76a57d?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Valid Uploads Parallel",
+      "item": [
+        {
+          "name": "Upload Valid mp4",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "const jsonData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Graphs exist\", function () {\r",
+                  "    pm.expect(jsonData.graphs.waveform).to.exist;\r",
+                  "    pm.expect(jsonData.graphs.spectrum).to.exist;\r",
+                  "    pm.expect(jsonData.graphs.spectrogram).to.exist;\r",
+                  "});\r",
+                  "\r",
+                  "pm.environment.set(\r",
+                  "    \"valid_mp4_waveform_url\",\r",
+                  "    jsonData.graphs.waveform\r",
+                  ");\r",
+                  "pm.environment.set(\r",
+                  "    \"valid_mp4_spectrum_url\",\r",
+                  "    jsonData.graphs.spectrum\r",
+                  ");\r",
+                  "pm.environment.set(\r",
+                  "    \"valid_mp4_spectrogram_url\",\r",
+                  "    jsonData.graphs.spectrogram\r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "90e6a7d4-102b-4d01-9eb5-ad1e95404d32",
+                  "src": "{{test_assets_dir}}/valid.mp4"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{server_url}}/api/predict",
+              "host": [
+                "{{server_url}}"
+              ],
+              "path": [
+                "api",
+                "predict"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": null,
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get mp4 Spectrum Graph",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{valid_mp4_spectrum_url}}",
+              "host": [
+                "{{valid_mp4_spectrum_url}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get mp4 Spectrogram Graph",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{valid_mp4_spectrogram_url}}",
+              "host": [
+                "{{valid_mp4_spectrogram_url}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get mp4 Waveform Graph",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{valid_mp4_waveform_url}}",
+              "host": [
+                "{{valid_mp4_waveform_url}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Valid wav",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "const jsonData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Graphs exist\", function () {\r",
+                  "    pm.expect(jsonData.graphs.waveform).to.exist;\r",
+                  "    pm.expect(jsonData.graphs.spectrum).to.exist;\r",
+                  "    pm.expect(jsonData.graphs.spectrogram).to.exist;\r",
+                  "});\r",
+                  "\r",
+                  "pm.environment.set(\r",
+                  "    \"valid_wav_waveform_url\",\r",
+                  "    jsonData.graphs.waveform\r",
+                  ");\r",
+                  "pm.environment.set(\r",
+                  "    \"valid_wav_spectrum_url\",\r",
+                  "    jsonData.graphs.spectrum\r",
+                  ");\r",
+                  "pm.environment.set(\r",
+                  "    \"valid_wav_spectrogram_url\",\r",
+                  "    jsonData.graphs.spectrogram\r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "5020327e-d8c5-4d0b-b3cf-69ac1e32c0d0",
+                  "src": "{{test_assets_dir}}/valid.wav"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{server_url}}/api/predict",
+              "host": [
+                "{{server_url}}"
+              ],
+              "path": [
+                "api",
+                "predict"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get wav Spectrogram Graph",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{valid_wav_spectrogram_url}}",
+              "host": [
+                "{{valid_wav_spectrogram_url}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get wav Waveform Graph",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{valid_wav_waveform_url}}",
+              "host": [
+                "{{valid_wav_waveform_url}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get wav Spectrum Graph",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{valid_wav_spectrum_url}}",
+              "host": [
+                "{{valid_wav_spectrum_url}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
