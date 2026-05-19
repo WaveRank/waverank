@@ -1,5 +1,6 @@
 import os
 import json
+import numpy as np
 import config as cfg
 import tensorflow as tf
 from tensorflow.keras.applications.resnet50 import preprocess_input
