@@ -98,3 +98,17 @@ def spectrogram_to_image(mel, img_size=IMG_SIZE):
         img = img.resize(img_size)
 
     return img
+
+def pad_if_needed(segment, target_len):
+    """
+    Pad an audio segment with zeros at the end if shorter than target_len.
+    If the segment already meets/exceeds target_len, it is returned unchanged.
+    Args:
+        segment (np.ndarray): audio time series
+        target_len (int): desired length in samples
+    Returns:
+        np.ndarray: segment of length >= target_len, zero-padded if necessary
+    """
+    if len(segment) < target_len:
+        return np.pad(segment, (0, target_len - len(segment)), mode="constant")
+    return segment

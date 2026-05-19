@@ -14,7 +14,6 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import soundfile as sf
-import numpy as np
 from shared.audio_utils import load_audio, segment_audio
 
 # ----- CONFIGURATION -----
@@ -24,18 +23,11 @@ OUTPUT_DIR = os.path.join(BASE_PATH, "Data/segmented_dataset")
 MAX_SEC = 30
 skipped_files = []
 
-# ----- HELPER FUNCTIONS -----
-# NOTE: not currently called; retained for potential use with partial segments
-def pad_if_needed(segment, target_len):
-    """Pad an audio segment with zeros if shorter than the target length."""
-    if len(segment) < target_len:
-        return np.pad(segment, (0, target_len - len(segment)), mode="constant")
-    return segment
 
 # ----- MAIN PIPELINE -----
 for split_name in os.listdir(INPUT_DIR):
     split_path = os.path.join(INPUT_DIR, split_name)
-   
+
     for genre in os.listdir(split_path):
         genre_in = os.path.join(split_path, genre)
         genre_out = os.path.join(OUTPUT_DIR, split_name, genre)
