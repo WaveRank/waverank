@@ -5,6 +5,7 @@ import React, { useState } from "react";
 
 export default function HomePage() {
     const [status, setStatus] = useState('Awaiting file')
+    const [data, setData] = useState(null)
 
     // Set status depending on response from Flask backend
     // TODO: set graphs and prediction result too
@@ -14,8 +15,11 @@ export default function HomePage() {
         }
         else if (data.message) {
             setStatus(data.message);
+            setData(data);
         }
     };
+
+    const graphs = data?.graphs;
 
     return (
         <div>
@@ -34,6 +38,11 @@ export default function HomePage() {
                     <div className="dataBox">
                         <h2>Data</h2>
                         <p>Graphs here</p>
+                        <>
+                            {graphs?.waveform && <img src={graphs.waveform} />}
+                            {graphs?.spectrum && <img src={graphs.spectrum} />}
+                            {graphs?.spectrogram && <img src={graphs.spectrogram} />}
+                        </>
                     </div>
                 </div>
 
