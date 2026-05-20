@@ -9,14 +9,16 @@ The tunable parameters include the initial LR, fine-tune LR, dropout rate,
 depth, spec augmentation masking widths, cutmix probability...
 """
 
+import os
+
+os.environ["TF_DETERMINISTIC_OPS"] = "1"
+
 import optuna
 import config as cfg
 import tensorflow as tf
 from model import build_model
 from dataset import get_datasets
-from sklearn.metrics import f1_score
 from training import initial_train, fine_tune
-from evaluate import extract_embeddings, embedding_model
 
 
 def tuning_pipeline():
@@ -35,16 +37,16 @@ def tuning_pipeline():
 
     # Initial training
     model, history = initial_train(model, train_ds, val_ds)
-    test_loss, test_acc = model.evaluate(test_ds)
+    _, test_acc = model.evaluate(test_ds)
     print("Test accuracy:", test_acc)
 
     # Fine tuning
     model = fine_tune(model, base_model, train_ds, val_ds)
-    test_loss, test_acc = model.evaluate(test_ds)
+    _, test_acc = model.evaluate(test_ds)
     print("Test accuracy after fine-tuning:", test_acc)
 
     # Evaluate model for val accuracy
-    val_loss, val_acc = model.evaluate(val_ds)
+    _, val_acc = model.evaluate(val_ds)
     print("Val accuracy:", val_acc)
 
     return val_acc
@@ -65,10 +67,10 @@ def optimize_config(trials):
     tf.keras.backend.clear_session()
 
     # Configure sample float/int values on a given range per trial
-    cfg.INITIAL_LEARNING_RATE = trials.suggest_float("initial_lr", 1e-5, 1e-3, log=True)
-    cfg.FINE_LEARNING_RATE = trials.suggest_float("fine_lr", 1e-4, 5e-4, log=True)
-    cfg.DROPOUT_RATE = trials.suggest_float("dropout", 0.2, 0.6)
-    cfg.DEPTH = trials.suggest_int("depth", 50, 175)
+    cfg.INITIAL_LEARNING_RATE = trials.suggest_float("initial_lr", 1e-4, 5e-4, log=True)
+    cfg.FINE_LEARNING_RATE = trials.suggest_float("fine_lr", 1e-5, 1e-4, log=True)
+    cfg.DROPOUT_RATE = trials.suggest_float("dropout", 0.4, 0.7, step=0.1)
+    cfg.DEPTH = trials.suggest_int("depth", 60, 100)
 
     return tuning_pipeline()
 
@@ -85,14 +87,19 @@ def optimization():
 
     # Best trial stats
     print("\nBEST TRIAL RUN:")
-    print(f"Val acc: {study.best_trial.value}")
-    print(f"Params:  {study.best_trial.params}")
-
-    print("\nBEST HYPERPARAMETERS:")
+    print(f"VAL ACCURACY          = {study.best_trial.value}")
     print(f"INITIAL_LEARNING_RATE = {study.best_trial.params['initial_lr']}")
     print(f"FINE_LEARNING_RATE    = {study.best_trial.params['fine_lr']}")
     print(f"DROPOUT_RATE          = {study.best_trial.params['dropout']}")
     print(f"DEPTH                 = {study.best_trial.params['depth']}")
+
+    # Top 5 trial stats
+    trials = sorted(study.trials, key=lambda t: t.value, reverse=True)[:5]
+    for i, trial in enumerate(trials):
+        print(f"\nRank {i+1} (Trial {trial.number}):")
+        print(f"  VAL ACCURACY: {trial.value}")
+        for key, value in trial.params.items():
+            print(f"  {key}: {value}")
 
 
 if __name__ == "__main__":
