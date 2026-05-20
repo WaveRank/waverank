@@ -543,7 +543,7 @@
                   "key": "file",
                   "type": "file",
                   "uuid": "5020327e-d8c5-4d0b-b3cf-69ac1e32c0d0",
-                  "src": "{{test_assets_dir}}//valid.mp3"
+                  "src": "{{test_assets_dir}}/valid.mp3"
                 }
               ]
             },
