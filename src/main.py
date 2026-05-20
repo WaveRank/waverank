@@ -33,6 +33,10 @@ Things to try to improve the model:
 - And more! These are just some ideas
 """
 
+import os
+
+os.environ["TF_DETERMINISTIC_OPS"] = "1"
+
 import config as cfg
 from dataset import get_datasets
 from model import build_model
