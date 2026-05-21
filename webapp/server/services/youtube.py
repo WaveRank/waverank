@@ -13,11 +13,9 @@ def download_youtube_audio(link):
     """
     Downloads the audio for the youtube video at the link provided.
     Args:
-        link (_type_): _description_
+        link (str): YouTube video link
     Returns:
-        filepath
-        filename
-    
+        filepath, filename (str, str): Path to and title of audio file
     """
     new_upload_subdir = create_unique_dir(UPLOAD_DIR)
     filepath = UPLOAD_DIR / new_upload_subdir / "audio" # yt-dlp appends extension
