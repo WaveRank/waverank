@@ -32,22 +32,24 @@ def generate_spectrogram(filepath, output_dir):
     
     y, sr = load_audio(filepath)
 
-    mel_spect = make_spectrogram(y, sr, SPECTROGRAM_N_FFT, SPECTROGRAM_HOP_LEN, SPECTROGRAM_N_MELS)
+    mel_spectrogram = make_spectrogram(y, sr, SPECTROGRAM_N_FFT, SPECTROGRAM_HOP_LEN, SPECTROGRAM_N_MELS)
 
-    plt.figure()
-    librosa.display.specshow(
-        mel_spect, 
+    # Plot graph
+    fig, ax = plt.subplots()
+    img = librosa.display.specshow(
+        mel_spectrogram , 
         y_axis='mel',
         x_axis='time',
+        ax=ax,
         fmax=8000,
         sr=sr,
         n_fft=SPECTROGRAM_N_FFT,
         hop_length=SPECTROGRAM_HOP_LEN
     )
-    plt.title('Mel Spectrogram')
-    plt.colorbar(format='%+2.0f dB')
+    ax.set_title('Mel Spectrogram')
+    fig.colorbar(img, ax=ax, format='%+2.0f dB')
 
-    plt.savefig(output_path)
-    plt.close()
+    fig.savefig(output_path)
+    plt.close(fig)
 
     return output_filename

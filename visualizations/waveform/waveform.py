@@ -42,14 +42,14 @@ def generate_waveform(filepath, output_dir):
     if peak > 0:
         y = y / peak
 
-    # plot graph
-    plt.figure()
-    plt.plot(y, color=GRAPH_COLOR)
-    plt.title('Waveform')
-    plt.xlabel('Time (samples)')
-    plt.ylabel('Amplitude')
+    # Plot graph
+    fig, ax = plt.subplots()
+    ax.plot(y, color=GRAPH_COLOR)
+    ax.set_title('Waveform')
+    ax.set_xlabel('Time (samples)')
+    ax.set_ylabel('Amplitude')
 
-    plt.savefig(output_path)
-    plt.close()
+    fig.savefig(output_path)
+    plt.close(fig)
 
     return output_filename
