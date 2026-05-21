@@ -9,22 +9,29 @@ import React, { useState } from "react";
 import AudioFileDetails from "./AudioFileDetails";
 import { isValidFileType } from "../utils/fileType";
 import { isValidFileSize } from "../utils/fileSize";
+import { isValidYoutubeLink } from "../utils/validLink";
 import { formatMB } from "../utils/fileSize";
-import { uploadFile } from "../services/api";
+import { uploadFile, uploadLink } from "../services/api";
 import { MAX_CONTENT_SIZE, ALLOWED_EXTENSIONS } from "../config/uploadConfig";
 
 
 export default function InputBox( {onUploadResult} ) {
     const [selectedFile, setSelectedFile] = useState(null);
+    const [sentLink, setSentLink] = useState(null);
 
     // Validation flags used to gate upload button and prevent invalid requests
     const isValidType = !!selectedFile && isValidFileType(selectedFile);
     const isValidSize = !!selectedFile && isValidFileSize(selectedFile);
     const canUpload = !!selectedFile && isValidSize && isValidType;
+    const isValidLink = isValidYoutubeLink(sentLink);
 
     const onFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
     };
+
+    const onLinkChange = (event) => {
+        setSentLink(event.target.value);
+    }
 
     // Triggers file upload to backend, forwards response via callback.
     // Redundant validation helps safeguard against UI bypass
@@ -37,8 +44,15 @@ export default function InputBox( {onUploadResult} ) {
     };
 
     // TODO: start backend->inference pipeline from a URL rather than file upload
-    const onPasteURL = () => {
-        return;
+    const onPasteLink = async () => {
+        // Validate link is a real YouTube
+        if (!isValidLink) return;
+        // send it to new flask route
+        const responseData = await uploadLink(sentLink);
+        // handle response
+        if (responseData && onUploadResult) {
+            onUploadResult(responseData);
+        }
     };
 
     
@@ -55,7 +69,11 @@ export default function InputBox( {onUploadResult} ) {
                     <input type="file" accept={ALLOWED_EXTENSIONS.join(',')} onChange={onFileChange} />
                     <button onClick={onUploadFile} disabled={!canUpload}>Upload!</button>
                 </div>
-                <button onClick={onPasteURL}>Paste URL</button>
+                <div>
+                    <input type="url" id="homepage" name="homepage" onChange={onLinkChange}></input>
+                    <button onClick={onPasteLink}>Paste URL</button>
+                </div>
+                
             </div>
             <AudioFileDetails 
                 selectedFile={selectedFile} 
