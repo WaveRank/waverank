@@ -28,19 +28,18 @@ def generate_spectrum(filepath, output_dir):
 
     y, _ = load_audio(filepath)
     
-    # compute spectrum
+    # Compute spectrum
     windowed = y * np.hanning(len(y))
     spectrum = np.abs(np.fft.rfft(windowed))
 
-    # plot graph
-    plt.figure()
-    plt.clf()
-    plt.plot(spectrum, color=GRAPH_COLOR)
-    plt.title('Spectrum')
-    plt.xlabel('Frequency Bin')
-    plt.ylabel('Amplitude')
+    # Plot graph
+    fig, ax = plt.subplots()
+    ax.plot(spectrum, color=GRAPH_COLOR)
+    ax.set_title('Spectrum')
+    ax.set_xlabel('Frequency Bin')
+    ax.set_ylabel('Amplitude')
 
-    plt.savefig(output_path)
-    plt.close()
+    fig.savefig(output_path)
+    plt.close(fig)
 
     return output_filename
