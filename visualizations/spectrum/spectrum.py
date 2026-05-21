@@ -12,7 +12,7 @@ from shared.audio_utils import load_audio
 from visualizations.config import GRAPH_COLOR
 
 
-def generate_spectrum(filepath, output_dir):
+def generate_spectrum(y, output_path):
     """
     Generate a spectrum graph of the audio file at the given path.
     Args:
@@ -23,10 +23,8 @@ def generate_spectrum(filepath, output_dir):
     Side Effects:
         Graph saved to disk at output_path
     """
-    output_filename = filepath.stem + "_spectrum.png"
-    output_path = output_dir / output_filename
-
-    y, _ = load_audio(filepath)
+    # output_filename = filepath.stem + "_spectrum.png"
+    # output_path = output_dir / output_filename
     
     # Compute spectrum
     windowed = y * np.hanning(len(y))
@@ -42,4 +40,4 @@ def generate_spectrum(filepath, output_dir):
     fig.savefig(output_path)
     plt.close(fig)
 
-    return output_filename
+    # return output_filename

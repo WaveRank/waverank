@@ -15,7 +15,7 @@ from shared.audio_utils import load_audio, make_spectrogram
 from visualizations.config import SPECTROGRAM_IMG_SIZE, SPECTROGRAM_N_FFT, SPECTROGRAM_HOP_LEN, SPECTROGRAM_N_MELS
 
 
-def generate_spectrogram(filepath, output_dir):
+def generate_spectrogram(y, sr, output_path):
     """
     Generate mel spectrogram graph of audio file at given path.
     This visualization is tailored for human viewing, not CNN input.
@@ -27,11 +27,9 @@ def generate_spectrogram(filepath, output_dir):
     Side Effects:
         Graph saved to disk at output_path
     """
-    output_filename = filepath.stem + "_spectrogram.png"
-    output_path = output_dir / output_filename
+    # output_filename = filepath.stem + "_spectrogram.png"
+    # output_path = output_dir / output_filename
     
-    y, sr = load_audio(filepath)
-
     mel_spectrogram = make_spectrogram(y, sr, SPECTROGRAM_N_FFT, SPECTROGRAM_HOP_LEN, SPECTROGRAM_N_MELS)
 
     # Plot graph
@@ -52,4 +50,4 @@ def generate_spectrogram(filepath, output_dir):
     fig.savefig(output_path)
     plt.close(fig)
 
-    return output_filename
+    # return output_filename

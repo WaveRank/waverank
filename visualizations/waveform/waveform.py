@@ -18,7 +18,7 @@ def downsample_waveform(y, factor):
     return y[::factor]
 
 
-def generate_waveform(filepath, output_dir):
+def generate_waveform(y, output_path):
     """
     Generate waveform graph of audio file at given path.
     Args:
@@ -29,11 +29,9 @@ def generate_waveform(filepath, output_dir):
     Side Effects:
         Graph saved to disk at output_path
     """
-    output_filename = filepath.stem + "_waveform.png"
-    output_path = output_dir / output_filename
+    # output_filename = filepath.stem + "_waveform.png"
+    # output_path = output_dir / output_filename
 
-    y, _ = load_audio(filepath)
-    
     # Reduce number of samples (too many looks like a filled rectangle)
     y = downsample_waveform(y, WAVEFORM_DOWNSAMPLE_FACTOR)
 
@@ -52,4 +50,4 @@ def generate_waveform(filepath, output_dir):
     fig.savefig(output_path)
     plt.close(fig)
 
-    return output_filename
+    # return output_filename
