@@ -10,47 +10,40 @@ https://stackoverflow.com/questions/60105626/split-audio-on-timestamps-librosa
 """
 
 # ----- IMPORTS -----
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from pathlib import Path
 import soundfile as sf
 from shared.audio_utils import load_audio, segment_audio
 
 # ----- CONFIGURATION -----
-BASE_PATH = "./"
-INPUT_DIR = os.path.join(BASE_PATH, "Data/distributed_dataset")
-OUTPUT_DIR = os.path.join(BASE_PATH, "Data/segmented_dataset")
+INPUT_DIR = Path("Data/distributed_dataset")
+OUTPUT_DIR = Path("Data/segmented_dataset")
 MAX_SEC = 30
 skipped_files = []
 
 
 # ----- MAIN PIPELINE -----
-for split_name in os.listdir(INPUT_DIR):
-    split_path = os.path.join(INPUT_DIR, split_name)
+for split_path in INPUT_DIR.iterdir():
+    for genre_in in split_path.iterdir():
+        genre_out =  OUTPUT_DIR / split_path.name / genre_in.name
+        genre_out.mkdir(parents=True, exist_ok=True)
 
-    for genre in os.listdir(split_path):
-        genre_in = os.path.join(split_path, genre)
-        genre_out = os.path.join(OUTPUT_DIR, split_name, genre)
-        os.makedirs(genre_out, exist_ok=True)
+        for file in genre_in.iterdir():
 
-        for file in os.listdir(genre_in):
             # Skip non-audio files
-            if not file.lower().endswith(".wav"):
+            if file.suffix.lower() != ".wav":
                 continue
-            path = os.path.join(genre_in, file)
 
             # Load audio
-            y, sr = load_audio(path)
+            y, sr = load_audio(file)
             if y is None:
-                skipped_files.append(path)
+                skipped_files.append(file)
                 continue
 
             # Trim to max length and split into fixed-size overlapping segments
             y = y[:MAX_SEC * sr]
-            base = os.path.splitext(file)[0]
             segments = segment_audio(y, sr)
             for i, segment in enumerate(segments):
-                out_path = os.path.join(genre_out, f"{base}_{i}.wav")
+                out_path = genre_out / f"{file.stem}_{i}.wav"
                 sf.write(out_path, segment, sr)
 
 # ----- SUMMARY -----
