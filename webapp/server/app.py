@@ -84,7 +84,7 @@ def handle_youtube_link():
     # Get genre prediction from inference pipeline
     # TODO maybe look into handling this asynchronously, graph generation too
 
-    # Clean up the uploaded file and graphs older than the age limit
+    # Clean up the uploads and graphs older than the age limit
     try:
         delete_old_subdirs(GRAPH_DIR)
         delete_old_subdirs(UPLOAD_DIR)
@@ -157,9 +157,9 @@ def handle_uploaded_file():
     # TODO maybe look into handling this asynchronously, graph generation too
 
     # Clean up the uploaded file and graphs older than the age limit
-    filepath.unlink()
     try:
         delete_old_subdirs(GRAPH_DIR)
+        delete_old_subdirs(UPLOAD_DIR)
     except Exception as e:
         print("Cleanup failed:", repr(e))
     

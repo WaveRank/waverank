@@ -1,9 +1,10 @@
 """
 Utilities for downloading audio file from youtube link.
 This module provides:
-- stuff
+- a utility function for downloading audio from YouTube links
 
 Citations (5/20):
+https://github.com/yt-dlp/yt-dlp
 """
 import yt_dlp
 from webapp.server.config import UPLOAD_DIR
@@ -25,6 +26,7 @@ def download_youtube_audio(link):
         'outtmpl': str(filepath),
         'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}],
         'quiet': True,
+        'noplaylist': True
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         # ydl.download([link])
