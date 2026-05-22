@@ -13,6 +13,7 @@ from pathlib import Path
 from webapp.server.config import PORT, UPLOAD_DIR, GRAPH_DIR, MAX_CONTENT_LENGTH
 from webapp.server.services.file_io import create_unique_dir, delete_old_subdirs
 from webapp.server.services.audio_validation import allowed_file, decodable_audio_file
+from webapp.server.services.audio_processing import process_audio_file
 from shared.audio_utils import load_audio
 from webapp.server.services.youtube import download_youtube_audio
 from visualizations.waveform.waveform import generate_waveform
@@ -56,63 +57,24 @@ def handle_youtube_link():
     if data == None or 'URL' not in data:
         return jsonify({"error": "YouTube link missing"}), 400
 
-    # Extract audio from youtube link using download_youtube_audio, which saves to disk
+    # Extract audio from youtube, which saves to disk
     try:
         filepath, filename = download_youtube_audio(data['URL'])
     except Exception as e:
         print("YouTube download failed:", repr(e))
         return jsonify({"error": "Invalid audio file"}), 400
-
-    # Attempt to decode the file as audio - authoritative validation
-    y, sr = load_audio(filepath)
-    if y is None:
-        filepath.unlink()
-        print(f'rejected file "{filename}": failed to decode')
-        return jsonify({"error": "Invalid audio file"}), 400
-    else:
-        print(f'received file: "{filename}"')
-
-    # Generate graphs and save to disk. Client will GET query for them.
-    new_graph_subdir = create_unique_dir(GRAPH_DIR)
-    output_dir = GRAPH_DIR / new_graph_subdir
-    file_basename = Path(filename).stem
     
-    waveform_filename = file_basename + "_waveform.png"
-    spectrum_filename = file_basename + "_spectrum.png"
-    spectrogram_filename = file_basename + "_spectrogram.png"
-    try:
-        generate_waveform(y, output_dir / waveform_filename)
-        generate_spectrum(y, output_dir / spectrum_filename)
-        generate_spectrogram(y, sr, output_dir / spectrogram_filename)
-    except Exception as e:
-        filepath.unlink()
-        print("Graph generation failed:", repr(e))
-        return jsonify({"error": "Error generating graphs"}), 500
-
-
-    # TODO Get genre prediction from inference pipeline
-    # TODO maybe look into handling this asynchronously, graph generation too
-
-    # Clean up the uploads and graphs older than the age limit
-    try:
-        delete_old_subdirs(GRAPH_DIR)
-        delete_old_subdirs(UPLOAD_DIR)
-    except Exception as e:
-        print("Cleanup failed:", repr(e))
+    # Process the file
+    response_data, status = process_audio_file(filepath, filename)
+    if status != 200:
+        return jsonify(response_data), status
     
-    # Send JSON response
-    base_url = request.host_url.rstrip("/")
-    return jsonify({
-        "message": "File uploaded",
-        "filename": filename,
-        "graphs": {
-            "waveform": f"{base_url}/api/graphs/{new_graph_subdir}/{waveform_filename}",
-            "spectrum": f"{base_url}/api/graphs/{new_graph_subdir}/{spectrum_filename}",
-            "spectrogram": f"{base_url}/api/graphs/{new_graph_subdir}/{spectrogram_filename}",
-        },
-        "audio": f"{base_url}/api/audio/{filepath.parent.name}/audio.mp3",
-        # "genres": {}
-    })
+    # Complete and return response data
+    response_data["audio"] = (
+        f"{request.host_url.rstrip('/')}/api/audio/{filepath.parent.name}/audio.mp3"
+    )
+
+    return jsonify(response_data)
 
 
 @app.route("/api/predict", methods=["POST"])
@@ -141,57 +103,19 @@ def handle_uploaded_file():
     new_upload_subdir = create_unique_dir(UPLOAD_DIR)
     filepath = UPLOAD_DIR / new_upload_subdir / filename
     file.save(filepath)
-     
-    # Attempt to decode the file as audio - authoritative validation
-    y, sr = load_audio(filepath)
-    if y is None:
-        filepath.unlink()
-        print(f'rejected file "{filename}": failed to decode')
-        return jsonify({"error": "Invalid audio file"}), 400
-    else:
-        print(f'received file: "{filename}"')
 
-    # Generate graphs and save to disk. Client will GET query for them.
-    new_graph_subdir = create_unique_dir(GRAPH_DIR)
-    output_dir = GRAPH_DIR / new_graph_subdir
-    file_basename = Path(filename).stem
     
-    waveform_filename = file_basename + "_waveform.png"
-    spectrum_filename = file_basename + "_spectrum.png"
-    spectrogram_filename = file_basename + "_spectrogram.png"
-    try:
-        generate_waveform(y, output_dir / waveform_filename)
-        generate_spectrum(y, output_dir / spectrum_filename)
-        generate_spectrogram(y, sr, output_dir / spectrogram_filename)
-    except Exception as e:
-        filepath.unlink()
-        print("Graph generation failed:", repr(e))
-        return jsonify({"error": "Error generating graphs"}), 500
-
-
-    # TODO Get genre prediction from inference pipeline
-    # TODO maybe look into handling this asynchronously
-
-    # Clean up the uploads and graphs older than the age limit
-    try:
-        delete_old_subdirs(GRAPH_DIR)
-        delete_old_subdirs(UPLOAD_DIR)
-    except Exception as e:
-        print("Cleanup failed:", repr(e))
+    # Process the file
+    response_data, status = process_audio_file(filepath, filename)
+    if status != 200:
+        return jsonify(response_data), status
     
-    # Send JSON response
-    server_url = request.host_url.rstrip("/")
-    return jsonify({
-        "message": "File uploaded",
-        "filename": filename,
-        "graphs": {
-            "waveform": f"{server_url}/api/graphs/{new_graph_subdir}/{waveform_filename}",
-            "spectrum": f"{server_url}/api/graphs/{new_graph_subdir}/{spectrum_filename}",
-            "spectrogram": f"{server_url}/api/graphs/{new_graph_subdir}/{spectrogram_filename}"
-        # "genres": {}
-        }
-    })
+    # Complete and return response data
+    response_data["audio"] = (
+        f"{request.host_url.rstrip('/')}/api/audio/{filepath.parent.name}/{filename}"
+    )
 
+    return jsonify(response_data)
 
 if __name__ == '__main__':
     delete_old_subdirs(GRAPH_DIR)
