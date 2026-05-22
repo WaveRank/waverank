@@ -55,29 +55,36 @@ export default function AudioPlayer({ audioFile }) {
     };
 
     return (
-        <div>
+        <div className="audioPlayer">
             <audio ref={audioRef} src={src} onTimeUpdate={onTimeUpdate}/>
 
-            <button className="playButton" onClick={togglePlay}>
-                {isPlaying ? "Pause" : "Play"}
-            </button>
+                <div className="audioRow">
+                    {/* TODO: File name display, CURRENTLY STATIC */}
+                    <div className="audioTitle">demo_song.mp3</div>
 
-            <input
-                className="playbackBar"
-                type="range"
-                min="0"
-                max={audioRef.current?.duration || 0}
-                value={currentTime}
-                onChange={onSeek}
-            />
+                    <div className="audioScrubber">
+                        {/* Progress slider for song, scrubbable */}
+                        <input
+                            className="playbackBar"
+                            type="range"
+                            min="0"
+                            max={audioRef.current?.duration || 0}
+                            value={currentTime}
+                            onChange={onSeek}
+                        />
+                        {/* Audio timestamps, shows current time and total length */}
+                        <div className="audioTimes">
+                            <span>{formatTime(currentTime)}</span>
+                            <span>{formatTime(audioRef.current?.duration)}</span>
+                        </div>
 
-            <div className="playbackTimestamps">
-                <div className="playbackCurrent">
-                    {formatTime(currentTime)}
-                </div>
-                <div className="playbackEnd">
-                    {formatTime(audioRef.current?.duration)}
-                </div>
+                    </div>
+
+                {/* Play button to play/pause song */}
+                <button className="playButton" onClick={togglePlay}>
+                    {isPlaying ? "❚❚" : "▶"}
+                </button>
+
             </div>
         </div>
     );

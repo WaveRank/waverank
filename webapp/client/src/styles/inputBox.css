@@ -1,0 +1,38 @@
+/* ----- INPUT BOX ----- */
+.inputBox {
+    display: flex;
+    align-items: center;
+    padding-top: 15px;
+}
+
+.inputButtons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.inputButtons p {
+    margin: 0;
+    color: #b0b0b0;
+    font-size: 0.95rem;
+}
+
+.inputButtons button:first-child {
+    background-color: #3a3a3a;
+    color: white;
+    border: 1px solid #6a6a6a;
+    border-radius: 6px;
+    padding: 0.55rem 0.9rem;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.inputButtons button:last-child {
+    background: none;
+    border: none;
+    color: #b0b0b0;
+    text-decoration: underline;
+    font-size: 1.05rem;
+    padding: 0;
+    cursor: pointer;
+}
