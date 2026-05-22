@@ -16,9 +16,9 @@ os.environ["TF_DETERMINISTIC_OPS"] = "1"
 import optuna
 import src.config as cfg
 import tensorflow as tf
-from model import build_model
-from dataset import get_datasets
-from training import initial_train, fine_tune
+from src.model import build_model
+from src.dataset import get_datasets
+from src.training import initial_train, fine_tune
 
 
 def tuning_pipeline():
