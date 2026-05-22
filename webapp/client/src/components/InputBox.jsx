@@ -15,7 +15,7 @@ import { uploadFile, uploadLink } from "../services/api";
 import { MAX_CONTENT_SIZE, ALLOWED_EXTENSIONS } from "../config/uploadConfig";
 
 
-export default function InputBox( {onUploadResult} ) {
+export default function InputBox( {onUploadResult, onStatusChange}) {
     const [selectedFile, setSelectedFile] = useState(null);
     const [sentLink, setSentLink] = useState(null);
 
@@ -37,17 +37,19 @@ export default function InputBox( {onUploadResult} ) {
     // Redundant validation helps safeguard against UI bypass
     const onUploadFile = async () => {
         if (!canUpload) return;
+        onStatusChange("Processing Audio from File Upload")
         const responseData = await uploadFile(selectedFile);
         if (responseData && onUploadResult) {
             onUploadResult(responseData);
         }
     };
 
-    // TODO: start backend->inference pipeline from a URL rather than file upload
+    // Start backend->inference pipeline from a URL rather than file upload
     const onPasteLink = async () => {
         // Validate link is a real YouTube
         if (!isValidLink) return;
         // send it to new flask route
+        onStatusChange("Processing Audio from Youtube")
         const responseData = await uploadLink(sentLink);
         // handle response
         if (responseData && onUploadResult) {
