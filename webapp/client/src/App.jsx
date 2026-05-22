@@ -1,4 +1,4 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, NavLink } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import ContributorsPage from "./pages/ContributorsPage";
@@ -15,22 +15,14 @@ export default function App() {
                     <h2>WaveRank</h2>
 
                     <div className="navButtons">
-                        <Link to="/about"><button>About</button></Link>
-                        <Link to="/contributors"><button>Contributors</button></Link>
-                        <Link to="/credits"><button>Credits</button></Link>
-                        <Link to="/"><button className="homeButton">Return to Home</button></Link>
+                        <NavLink to="/about" className={({ isActive }) => isActive ? "navButton active" : "navButton"}>About</NavLink>
+                        <NavLink to="/contributors" className={({ isActive }) => isActive ? "navButton active" : "navButton"}>Contributors</NavLink>
+                        <NavLink to="/credits" className={({ isActive }) => isActive ? "navButton active" : "navButton"}>Credits</NavLink>
+                        <NavLink to="/" className="homeButton">Return to Home</NavLink>
                     </div>
                 </div>
 
                 <div className="navDivider"></div>
-
-                <div className="header">
-                    <div className="headerTitle">
-                        <h1>WaveRank</h1>
-                        <h1>Audio Classifier</h1>
-                    </div>
-                    <p>AI-powered audio analysis and music genre classification from sound clips.</p>
-                </div>
 
                 <Routes>
                     <Route path="/" element={<HomePage/>}/>

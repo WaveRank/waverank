@@ -1,9 +1,9 @@
+import { useEffect, useState } from 'react';
 import { prepareGenreData, getMagmaColor, formatPercentage } from '../utils/analysisHelpers';
 // Temporary static data from the demo song
-import demo_data from '../../public/demo_test_results.json';
-import waveform from '../../public/demo_waveform.png';
-import frequency from '../../public/demo_frequency_spectrum.png';
-import spectrogram from '../../public/demo_spectrogram.png';
+const waveform = '/demo_waveform.png';
+const frequency = '/demo_frequency_spectrum.png';
+const spectrogram = '/demo_spectrogram.png';
 
 // Helper for genre analysis bar graph
 function GenreBar({ genre, value }) {
@@ -33,7 +33,19 @@ function GenreBar({ genre, value }) {
 
 // Analysis Summary Box: Contains input song's percentage results for genres
 export function AnalysisSummary({ status }) {
-    const sortedGenres = prepareGenreData(demo_data, "demo_song.mp3");
+    const [demoData, setDemoData] = useState(null);
+
+    useEffect(() => {
+        fetch('/demo_test_results.json')
+            .then((response) => response.json())
+            .then((data) => setDemoData(data));
+    }, []);
+
+    if (!demoData) {
+        return <div className="boxContainer">Loading...</div>;
+    }
+
+    const sortedGenres = prepareGenreData(demoData, "demo_song.mp3");
 
     return (
         <div className="boxContainer">

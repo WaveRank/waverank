@@ -1,5 +1,5 @@
 /* ----- POPUP ----- */
-.popupOverlay {
+/* .popupOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -31,4 +31,120 @@
     color: #b0b0b0;
     font-size: 1rem;
     cursor: pointer;
+} */
+
+/* ----- POPUP OVERLAY ----- */
+.popupOverlay {
+    position: fixed;
+    inset: 0;
+    background: #1a1a1a85;
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* ----- POPUP ----- */
+.popupBox {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    padding: 2rem;
+    border-radius: 20px;
+    background: #1a1a1a;
+    border: 1px solid #444444;
+}
+
+/* ----- TEXT ----- */
+.popupBox h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+}
+
+.popupBox p {
+    margin-bottom: 1.5rem;
+    color: #b0b0b0;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* ----- FILE INPUT ----- */
+.fileInput {
+    width: 100%;
+    margin-bottom: 1.25rem;
+    padding: 0.9rem 1rem;
+    border-radius: 14px;
+    border: 1px solid #44444477;
+    background: rgba(255, 255, 255, 0.04);
+    color: #b0b0b0;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
+.fileInput:hover {
+    border-color: #721f81;
+    background: #38383885;
+}
+
+.fileInput::file-selector-button {
+    margin-right: 1rem;
+    border: none;
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    background: #721f8179;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.fileInput::file-selector-button:hover {
+    background: #a147b179;
+}
+
+/* ----- UPLOAD BUTTON ----- */
+.uploadButton {
+    width: 100%;
+    border: none;
+    border-radius: 14px;
+    padding: 0.95rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background: #721f8179;
+    cursor: pointer;
+}
+
+.uploadButton:hover:not(:disabled) {
+    background: #a147b179;
+}
+
+.uploadButton:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* ----- CLOSE BUTTON ----- */
+.closeButton {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    color: #b0b0b0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.closeButton:hover {
+    background: rgba(255, 255, 255, 0.116);
+    color: white;
 }

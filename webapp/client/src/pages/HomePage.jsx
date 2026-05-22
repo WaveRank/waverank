@@ -22,21 +22,30 @@ export default function HomePage() {
     };
 
     return (
-        <div>
-            <div className="body">
-
-                <InputBox onUploadResult={handleUploadResult}/>
-
-                {/* NOTE: AUDIOPLAYER STATIC AT THE MOMENT, SET TO demo_song.mp3 */}
-                <AudioPlayer audioFile="/demo_song.mp3"/>
-
-                <div className="bodyOutput">
-                    <AnalysisSummary status={status}></AnalysisSummary>
-                    <WaveformSpectrumData></WaveformSpectrumData>
-                    <MelSpectrogramData></MelSpectrogramData>
+        <>
+            <div className="header">
+                <div className="headerTitle">
+                    <h1>WaveRank</h1>
+                    <h1>Audio Classifier</h1>
                 </div>
-
+                <p>AI-powered audio analysis and music genre classification from sound clips.</p>
             </div>
-        </div>
+            <div>
+                <div className="body">
+
+                    <InputBox onUploadResult={handleUploadResult}/>
+
+                    {/* NOTE: AUDIOPLAYER STATIC AT THE MOMENT, SET TO demo_song.mp3 */}
+                    <AudioPlayer audioFile="/demo_song.mp3"/>
+
+                    <div className="bodyOutput">
+                        <AnalysisSummary status={status}></AnalysisSummary>
+                        <WaveformSpectrumData></WaveformSpectrumData>
+                        <MelSpectrogramData></MelSpectrogramData>
+                    </div>
+
+                </div>
+            </div>
+        </>
     );
 };
