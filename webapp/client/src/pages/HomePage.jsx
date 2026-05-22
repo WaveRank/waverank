@@ -1,7 +1,11 @@
 import InputBox from "../components/InputBox";
-import "../App.css";
+import AudioPlayer from "../components/AudioPlayer";
+import { AnalysisSummary, WaveformSpectrumData, MelSpectrogramData } from '../components/AnalysisData';
+import "../styles/inputBox.css";
+import "../styles/audioPlayer.css";
+import "../styles/popup.css";
+import "../styles/analysisBoxes.css";
 import React, { useState } from "react";
-
 
 export default function HomePage() {
     const [status, setStatus] = useState('Awaiting file')
@@ -22,31 +26,27 @@ export default function HomePage() {
     const graphs = data?.graphs;
 
     return (
-        <div>
-            <div className="body">
-
-                <div className="bodyLeft">
-                    <InputBox onUploadResult={handleUploadResult} onStatusChange = {setStatus}/>
-                    <div className="analysisBox">
-                        <h2>Analysis</h2>
-                        <p>Status: {status}</p>
-                        <p>Bar chart here</p>
-                    </div>
+        <>
+            <div className="header">
+                <div className="headerTitle">
+                    <h1>WaveRank</h1>
+                    <h1>Audio Classifier</h1>
                 </div>
-
-                <div className="bodyRight">
-                    <div className="dataBox">
-                        <h2>Data</h2>
-                        <p>Graphs here</p>
-                        <>
-                            {graphs?.waveform && <img src={graphs.waveform} />}
-                            {graphs?.spectrum && <img src={graphs.spectrum} />}
-                            {graphs?.spectrogram && <img src={graphs.spectrogram} />}
-                        </>
-                    </div>
-                </div>
-
+                <p>AI-powered audio analysis and music genre classification from sound clips.</p>
             </div>
-        </div>
+            <div>
+                <div className="body">
+
+                    <InputBox onUploadResult={handleUploadResult} onStatusChange = {setStatus}/>
+
+                    <div className="bodyOutput">
+                        <AnalysisSummary status={status}></AnalysisSummary>
+                        <WaveformSpectrumData waveform={graphs?.waveform} spectrum={graphs?.spectrum} />
+                        <MelSpectrogramData spectrogram={graphs?.spectrogram}></MelSpectrogramData>
+                    </div>
+
+                </div>
+            </div>
+        </>
     );
 };

@@ -14,7 +14,7 @@ export default function AudioFileDetails( {selectedFile, isValidSize, maxContent
         content = 
             <>
                 <p>File Name: Your_File_Here</p>
-                <AudioPlayer audioFile={"/demo_song.mp3"}/>
+                <AudioPlayer audioFile={"/demo_song.mp3"} title={"demo_song.mp3"}/>
             </>
     }
     else if (selectedFile && !isValidSize) {
@@ -33,14 +33,14 @@ export default function AudioFileDetails( {selectedFile, isValidSize, maxContent
         content =  (
             <>
                 <p>File Name: {selectedFilename}</p>
-                <AudioPlayer audioFile={selectedFile}/>
+                <AudioPlayer audioFile={selectedFile} title={selectedFilename}/>
             </>
         );
     } else {
         content =  (
             <>
                 <p>File Name: {selectedFilename}</p>
-                <AudioPlayer audioFile={selectedFilepath}/>
+                <AudioPlayer audioFile={selectedFilepath} title={selectedFilename}/>
             </>
         );
     };

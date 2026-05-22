@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 
 // Citation (4/29/26): https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds
-export default function AudioPlayer({ audioFile }) {
+export default function AudioPlayer({ audioFile, title }) {
     const audioRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
@@ -55,29 +55,36 @@ export default function AudioPlayer({ audioFile }) {
     };
 
     return (
-        <div>
+        <div className="audioPlayer">
             <audio ref={audioRef} src={src} onTimeUpdate={onTimeUpdate}/>
 
-            <button className="playButton" onClick={togglePlay}>
-                {isPlaying ? "Pause" : "Play"}
-            </button>
+                <div className="audioRow">
 
-            <input
-                className="playbackBar"
-                type="range"
-                min="0"
-                max={audioRef.current?.duration || 0}
-                value={currentTime}
-                onChange={onSeek}
-            />
+                    <div className="audioTitle">{title}</div>
 
-            <div className="playbackTimestamps">
-                <div className="playbackCurrent">
-                    {formatTime(currentTime)}
-                </div>
-                <div className="playbackEnd">
-                    {formatTime(audioRef.current?.duration)}
-                </div>
+                    <div className="audioScrubber">
+                        {/* Progress slider for song, scrubbable */}
+                        <input
+                            className="playbackBar"
+                            type="range"
+                            min="0"
+                            max={audioRef.current?.duration || 0}
+                            value={currentTime}
+                            onChange={onSeek}
+                        />
+                        {/* Audio timestamps, shows current time and total length */}
+                        <div className="audioTimes">
+                            <span>{formatTime(currentTime)}</span>
+                            <span>{formatTime(audioRef.current?.duration)}</span>
+                        </div>
+
+                    </div>
+
+                {/* Play button to play/pause song */}
+                <button className="playButton" onClick={togglePlay}>
+                    {isPlaying ? "❚❚" : "▶"}
+                </button>
+
             </div>
         </div>
     );
