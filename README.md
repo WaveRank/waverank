@@ -14,9 +14,24 @@ npm run dev
 
 #### backend
 ```
-cd webapp/server
 python3 -m venv env
-source env/bin/activate
-# pip install -r requirements.txt
-python app.py
+source webapp/server/env/bin/activate
+# pip install -r webapp/server/requirements.txt
+python run_server.py
+```
+
+## Server testing
+Automated testing of server API surface. 
+Three scripts run in parallel to simulate simultaneous requests (and finish faster).
+Needs to be run from project root, with server running.
+```
+newman run tests/postman/WaveRank-1.postman_collection.json -e tests/postman/WaveRank-Local.postman_environment.json &
+newman run tests/postman/WaveRank-2.postman_collection.json -e tests/postman/WaveRank-Local.postman_environment.json &
+newman run tests/postman/WaveRank-3.postman_collection.json -e tests/postman/WaveRank-Local.postman_environment.json &
+wait
+
+```
+Single-threaded version:
+```
+newman run tests/postman/WaveRank-single-threaded.postman_collection.json -e tests/postman/WaveRank-Local.postman_environment.json
 ```

@@ -1,6 +1,8 @@
 """
 Splits the GTZAN dataset into training, validation, and testing sets.
 """
+
+# ----- IMPORTS -----
 import os
 import shutil
 
