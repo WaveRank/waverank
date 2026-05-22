@@ -44,6 +44,7 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         if (responseData && onUploadResult) {
             onUploadResult(responseData);
             setFilename(responseData.filename);
+            setFilepath(null)
         }
     };
 
@@ -59,6 +60,7 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
             onUploadResult(responseData);
             setFilename(responseData.filename);
             setFilepath(responseData.audio);
+            setSelectedFile(null)
         }
     };
 
