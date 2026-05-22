@@ -20,7 +20,7 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 for split_path in INPUT_DIR.iterdir():
     for genre_in in split_path.iterdir():
         genre_out = OUTPUT_DIR / split_path.name / genre_in.name
-        genre_out.mkdir(exist_ok=True)
+        genre_out.mkdir(parents=True, exist_ok=True)
 
         # Get all .wav files in this genre folder
         wav_files = []
