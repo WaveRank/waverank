@@ -8,10 +8,9 @@ This visualization is tailored for human viewing, not CNN input.
 Citation (5/14):
 https://medium.com/analytics-vidhya/understanding-the-mel-spectrogram-fca2afa2ce53
 """
-from pathlib import Path
 import matplotlib.pyplot as plt
 import librosa.display
-from shared.audio_utils import load_audio, make_spectrogram
+from shared.audio_utils import make_spectrogram
 from visualizations.config import SPECTROGRAM_IMG_SIZE, SPECTROGRAM_N_FFT, SPECTROGRAM_HOP_LEN, SPECTROGRAM_N_MELS
 
 
@@ -27,9 +26,6 @@ def generate_spectrogram(y, sr, output_path):
     Side Effects:
         Graph saved to disk at output_path
     """
-    # output_filename = filepath.stem + "_spectrogram.png"
-    # output_path = output_dir / output_filename
-    
     mel_spectrogram = make_spectrogram(y, sr, SPECTROGRAM_N_FFT, SPECTROGRAM_HOP_LEN, SPECTROGRAM_N_MELS)
 
     # Plot graph
@@ -49,5 +45,3 @@ def generate_spectrogram(y, sr, output_path):
 
     fig.savefig(output_path)
     plt.close(fig)
-
-    # return output_filename
