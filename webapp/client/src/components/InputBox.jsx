@@ -51,7 +51,10 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
     // Start backend->inference pipeline from a URL rather than file upload
     const onPasteLink = async () => {
         // Validate link is a real YouTube
-        if (!isValidLink) return;
+        if (!isValidLink) {
+            onStatusChange("Invalid YouTube link!")
+            return;
+        }
         // send it to new flask route
         onStatusChange("Processing Audio from Youtube")
         const responseData = await uploadLink(sentLink);

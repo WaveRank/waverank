@@ -1,7 +1,6 @@
 const API_PREDICT_PATH = "/api/predict"
 const API_LINK_PATH = "/api/sentLink"
 
-
 /**
  * Sends an audio file to the backend prediction endpoint.
  * Constructs a form-data request and POSTs it to the Flask API.
@@ -40,7 +39,6 @@ export async function uploadFile(file) {
  * Returns JSON.
  */
 export async function uploadLink(link) {
-    
 
     const response = await fetch(API_LINK_PATH, {
         method: "POST",
