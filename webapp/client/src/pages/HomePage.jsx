@@ -26,7 +26,7 @@ export default function HomePage() {
             <div className="body">
 
                 <div className="bodyLeft">
-                    <InputBox onUploadResult={handleUploadResult}/>
+                    <InputBox onUploadResult={handleUploadResult} onStatusChange = {setStatus}/>
                     <div className="analysisBox">
                         <h2>Analysis</h2>
                         <p>Status: {status}</p>
