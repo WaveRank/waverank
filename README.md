@@ -22,8 +22,8 @@ python run_server.py
 
 ## Server testing
 Automated testing of server API surface. 
-Three scripts run in parallel to simulate simultaneous accesses (and finish faster).
-Needs to be run from project root.
+Three scripts run in parallel to simulate simultaneous requests (and finish faster).
+Needs to be run from project root, with server running.
 ```
 newman run tests/postman/WaveRank-1.postman_collection.json -e tests/postman/WaveRank-Local.postman_environment.json &
 newman run tests/postman/WaveRank-2.postman_collection.json -e tests/postman/WaveRank-Local.postman_environment.json &
