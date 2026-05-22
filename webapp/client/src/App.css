@@ -1,116 +1,143 @@
-:root {
-    --light-orange: #F6A97A;
-    --dark-gray: #1b1b1b;
-    --light-gray: #fafafa;
-    --light-purple: #cfc3ce;
-    --medium-purple: #b187ab;
-    --dark-purple: #281d30;
+/* ----- BASE AND TYPOGRAPHY ----- */
+@font-face {
+    font-family: 'YDGothic';
+    src: url('/YDGothcic 120 Pro.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }
 
-body {
-    background-color: var(--dark-gray);
+html, body {
+    background-color: #1a1a1a;
+    color: white;
+    font-family: 'YDGothic', sans-serif;
     margin: 0;
     padding: 0;
-    font-family: "Roboto";
-    color: white;
+    font-size: 125%;
+}
+
+/* ----- PAGE LAYOUT ----- */
+.page {
+    min-height: 100vh;
+    margin: 0;
+    padding-left: 10vw;
+    padding-right: 10vw;
+    box-sizing: border-box;
+}
+
+.frame {
+    position: relative;
+    min-height: 100vh;
+    border-left: 1px solid #444444;
+    border-right: 1px solid #444444;
+    box-sizing: border-box;
+    padding: 2rem 2rem;
+}
+
+/* ----- DECORATIVE BORDERS FOR FRAME ----- */
+.frame::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -3vw;
+    border-left: 1px dashed #444444;
+}
+
+.frame::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -3vw;
+    border-right: 1px dashed #444444;
+}
+
+/* ----- NAVIGATION BAR ----- */
+.navDivider {
+    height: 1px;
+    background-color: #444444;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .navBar {
     display: flex;
-    align-items:center;
-    justify-content: space-between;
-    padding: 0px 12px;
-    border-bottom: 1px solid black;
-    background-color: var(--dark-purple);
-}
-
-.navBar h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    padding: 6px 12px;
-    border-radius: 10px;
-    letter-spacing: -0.02em;
-}
-
-.navButtons { 
-    display: flex;
-    gap: 10px;
-}
-
-.navButtons button {
-    background: white;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.navButtons .homeButton {
-    background: var(--light-purple);
-    border-radius: 8px;
-    font-weight: 600;
-}
-
-.navButtons button:hover {
-    background: var(--medium-purple);
-}
-
-.header {
-    position: relative;
-    flex-direction: column;
-    justify-content: center;
-    padding: 40px 24px;
-    box-sizing: border-box;
-
-    background-image: url('/background.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    backdrop-filter: blur(6px);
-
-    display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    gap: 1rem;
+    height: 40px;
+    transform: translateY(-45%);
+}
+
+.navBar h2 {
+    color: white;
+    margin: 0;
+}
+
+.navButtons {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-left: 1rem;
+    width: 100%;
+}
+
+.navButtons a:last-child {
+    margin-left: auto;
+}
+
+.navButtons a {
+    background: none;
+    border: none;
+    color: #b0b0b0;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: none;
+}
+
+.navButtons a:hover {
     color: white;
 }
 
-.header::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.35); 
+.homeButton {
+    margin-left: auto !important;
+    background-color: white !important;
+    color: black !important;
+    border: 1px solid #6a6a6a;
+    border-radius: 6px;
+    padding: 0.55rem 0.8rem !important;
 }
 
-.header > * {
-    position: relative;
-    z-index: 1;
+.navButton.active {
+    color: #bb7ac7;
+    text-decoration: underline;
 }
 
-.header h1 {
+/* ----- HEADER SECTION ----- */
+.headerTitle {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
     margin: 0;
-    font-size: 4rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+}
+
+.headerTitle h1 {
+    margin-bottom: 0.5rem;
+}
+
+.headerTitle h1:first-child {
+    font-weight: 700;
+}
+
+.headerTitle h1:last-child {
+    font-weight: 100;
 }
 
 .header p {
-    margin-top: 8px;
-    font-size: 1.5rem;
-    opacity: 0.9;
-    max-width: 600px;
-}
-
-.body {
-    display:flex;
-    gap: 20px;
-    padding: 20px;
-}
-
-.bodyLeft, .bodyRight {
-    flex: 1;
-    box-sizing: border-box;
+    color: #b0b0b0;
+    margin-top: 0;
+    margin-bottom: 0;
 }
