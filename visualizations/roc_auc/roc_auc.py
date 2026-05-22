@@ -20,7 +20,8 @@ https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html
 https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html
 """
 
-import os
+# ----- IMPORTS -----
+from pathlib import Path
 import json
 import numpy as np
 import pandas as pd
@@ -77,7 +78,7 @@ def generate_roc_auc(confidences_path, class_names_path, output_path):
         plt.title(f"{genre_names[genre]}; AUC={auc_score:.2f}")
 
     plt.tight_layout(pad=1.5, h_pad=1.5)
-    plt.savefig(os.path.join(output_path, f"roc_auc.png"), dpi=300)
+    plt.savefig(output_path / "roc_auc.png", dpi=300)
     plt.close()
 
 

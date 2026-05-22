@@ -1,7 +1,7 @@
-import os
+from pathlib import Path
 import numpy as np
 import pandas as pd 
-import config as cfg
+import src.config as cfg
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
@@ -70,7 +70,7 @@ def save_embeddings(test_ds, emb_model, clf_model, class_names):
     emb_df["pred_name"] = [class_names[i] for i in y_pred]
 
     # Save to CSV
-    emb_df.to_csv(os.path.join(cfg.BASE_PATH, "embeddings.csv"), index=False)
+    emb_df.to_csv(cfg.BASE_PATH / "embeddings.csv", index=False)
     print("Saved embeddings.csv")
 
     conf_df = pd.DataFrame(conf)
@@ -79,7 +79,7 @@ def save_embeddings(test_ds, emb_model, clf_model, class_names):
     conf_df["label_name"] = [class_names[i] for i in y_true]
 
     # Save to CSV
-    conf_df.to_csv(os.path.join(cfg.BASE_PATH, "confidences.csv"), index=False)
+    conf_df.to_csv(cfg.BASE_PATH / "confidences.csv", index=False)
     print("Saved confidences.csv")
 
     return y_true, y_pred
@@ -96,7 +96,7 @@ def save_curves(history):
     plt.plot(history.history['val_accuracy'], label='val')
     plt.legend()
     plt.title("Accuracy")
-    plt.savefig(os.path.join(cfg.BASE_PATH, "accuracy_curve.png"), dpi=300)
+    plt.savefig(cfg.BASE_PATH / "accuracy_curve.png", dpi=300)
     print("Saved accuracy_curve.png")
     plt.close()
 
@@ -105,6 +105,6 @@ def save_curves(history):
     plt.plot(history.history['val_loss'], label='val')
     plt.legend()
     plt.title("Loss")
-    plt.savefig(os.path.join(cfg.BASE_PATH, "loss_curve.png"), dpi=300)
+    plt.savefig(cfg.BASE_PATH / "loss_curve.png", dpi=300)
     print("Saved loss_curve.png")
     plt.close()

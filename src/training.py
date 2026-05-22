@@ -1,4 +1,4 @@
-import config as cfg
+import src.config as cfg
 import tensorflow as tf
 
 
