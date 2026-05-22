@@ -43,6 +43,10 @@ def handle_large_file(error):
     print(f'rejected file: file exceeds maximum size')
     return jsonify({"error": "File exceeds maximum size"}), 413
 
+@app.route("/api/audio/<path:audio_path>")
+def serve_audio(audio_path):
+    return send_from_directory(UPLOAD_DIR, audio_path)
+
 @app.route("/api/sentLink", methods=["POST"])
 def handle_youtube_link():
     # Extract URL from request
@@ -81,9 +85,9 @@ def handle_youtube_link():
     # TODO maybe look into handling this asynchronously, graph generation too
 
     # Clean up the uploaded file and graphs older than the age limit
-    filepath.unlink()
     try:
         delete_old_subdirs(GRAPH_DIR)
+        delete_old_subdirs(UPLOAD_DIR)
     except Exception as e:
         print("Cleanup failed:", repr(e))
     
@@ -95,9 +99,10 @@ def handle_youtube_link():
         "graphs": {
             "waveform": f"{base_url}/api/graphs/{new_graph_subdir}/{waveform_filename}",
             "spectrum": f"{base_url}/api/graphs/{new_graph_subdir}/{spectrum_filename}",
-            "spectrogram": f"{base_url}/api/graphs/{new_graph_subdir}/{spectrogram_filename}"
+            "spectrogram": f"{base_url}/api/graphs/{new_graph_subdir}/{spectrogram_filename}",
+        },
+        "audio": f"{base_url}/api/audio/{filepath.parent.name}/audio.mp3",
         # "genres": {}
-        }
     })
 
 
