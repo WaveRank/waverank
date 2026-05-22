@@ -16,10 +16,12 @@ import { MAX_CONTENT_SIZE, ALLOWED_EXTENSIONS } from "../config/uploadConfig";
 
 
 export default function InputBox( {onUploadResult, onStatusChange}) {
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null); 
     const [sentLink, setSentLink] = useState(null);
     const [filename, setFilename] = useState(null);
     const [filepath, setFilepath] = useState(null);
+    const [showUploadPopup, setShowUploadPopup] = useState(false);
+    const [showURLPopup, setShowURLPopup] = useState(false);
 
     // Validation flags used to gate upload button and prevent invalid requests
     const isValidType = !!selectedFile && isValidFileType(selectedFile);
@@ -46,6 +48,7 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
             setFilename(responseData.filename);
             setFilepath(null)
         }
+        setShowUploadPopup(false);
     };
 
     // Start backend->inference pipeline from a URL rather than file upload
@@ -67,33 +70,54 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         }
     };
 
-    
     return (
-        <div className="inputBox">
-            <h2>Input</h2>
-            <p>
-                Upload an audio clip to classify its top_N music genres using 
-                a CNN trained on spectrogram features. 
-                Max size {formatMB(MAX_CONTENT_SIZE, 0)}.
-            </p>
-            <div className="inputButtons">
-                <div>
-                    <input type="file" accept={ALLOWED_EXTENSIONS.join(',')} onChange={onFileChange} />
-                    <button onClick={onUploadFile} disabled={!canUpload}>Upload!</button>
+        <>
+            {/* Buttons for uploading audio files and pasting URLs */}
+            <div className="inputBox">
+                <div className="inputButtons">
+                    <button onClick={() => setShowUploadPopup(true)}>Upload Audio File</button>
+                    <p>or</p>
+                    <button onClick={() => setShowURLPopup(true)}>Paste URL</button>
                 </div>
-                <div>
-                    <input type="url" id="homepage" name="homepage" onChange={onLinkChange}></input>
-                    <button onClick={onPasteLink}>Paste URL</button>
-                </div>
-                
             </div>
-            <AudioFileDetails 
-                selectedFile={selectedFile} 
-                isValidSize={isValidSize} 
-                maxContentSize = {MAX_CONTENT_SIZE}
-                selectedFilename = {filename}
-                selectedFilepath = {filepath}
+
+            {/* Conditional: Popup for uploading audio file */}
+            {showUploadPopup && (
+                <div className="popupOverlay">
+                    <div className="popupBox">
+                        <h2>Upload Audio File</h2>
+                        <button className="closeButton" onClick={() => setShowUploadPopup(false)}>X</button>
+                        <p>
+                            Upload an audio clip to classify its top_N music genres using
+                            a CNN trained on spectrogram features.
+                            Max size {formatMB(MAX_CONTENT_SIZE, 0)}.
+                        </p>
+                        <input className="fileInput" type="file" accept={ALLOWED_EXTENSIONS.join(',')} onChange={onFileChange} />
+                        <button className="uploadButton" onClick={onUploadFile} disabled={!canUpload}>Upload!</button>
+                    </div>
+                </div>
+            )}
+
+            {/* Conditional: Popup for pasting URL */}
+            {showURLPopup && (
+                <div className="popupOverlay">
+                    <div className="popupBox">
+                        <h2>Paste URL</h2>
+                        <button className="closeButton" onClick={() => setShowURLPopup(false)}>X</button>
+                        <input type="url" id="homepage" name="homepage" onChange={onLinkChange}></input>
+                        <button onClick={onPasteLink}>Paste URL</button>
+                    </div>
+                </div>
+            )}
+            <AudioFileDetails
+                selectedFile={selectedFile}
+                isValidSize={isValidSize}
+                maxContentSize={MAX_CONTENT_SIZE}
+                selectedFilename={filename}
+                selectedFilepath={filepath}
             />
-        </div>
+        </>
+
+
     )
 }
