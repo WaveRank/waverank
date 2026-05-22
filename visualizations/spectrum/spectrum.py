@@ -12,12 +12,10 @@ from visualizations.config import GRAPH_COLOR
 
 def generate_spectrum(y, output_path):
     """
-    Generate a spectrum graph of the audio file at the given path.
+    Generate a spectrum graph of the given audio time series.
     Args:
-        filepath (PosixPath): path of audio file
-        output_dir (PosixPath): path of directory to save graph into
-    Returns:
-        output_filename (str): name of created graph
+        y (np.ndarray): audio time series
+        output_dir (Path): path of directory to save graph into
     Side Effects:
         Graph saved to disk at output_path
     """

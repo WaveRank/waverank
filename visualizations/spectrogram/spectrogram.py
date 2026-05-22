@@ -16,13 +16,12 @@ from visualizations.config import SPECTROGRAM_IMG_SIZE, SPECTROGRAM_N_FFT, SPECT
 
 def generate_spectrogram(y, sr, output_path):
     """
-    Generate mel spectrogram graph of audio file at given path.
+    Generate a mel spectrogram graph of the given audio time series.
     This visualization is tailored for human viewing, not CNN input.
     Args:
-        filepath (PosixPath): path of audio file
-        output_dir (PosixPath): path of directory to save graph into
-    Returns:
-        output_filename (str): name of created graph
+        y (np.ndarray): audio time series
+        sr (int): sample rate
+        output_dir (Path): path of directory to save graph into
     Side Effects:
         Graph saved to disk at output_path
     """
