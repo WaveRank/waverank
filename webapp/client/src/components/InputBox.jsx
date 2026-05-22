@@ -66,9 +66,8 @@ export default function InputBox( {onUploadResult} ) {
                             a CNN trained on spectrogram features.
                             Max size {formatMB(MAX_CONTENT_SIZE, 0)}.
                         </p>   
-                        <input type="file" accept={ALLOWED_EXTENSIONS.join(',')} onChange={onFileChange}/>
-                        <button onClick={onUploadFile} disabled={!canUpload}>Upload!</button>
-                        <AudioFileDetails selectedFile={selectedFile} isValidSize={isValidSize} maxContentSize = {MAX_CONTENT_SIZE}/>   
+                        <input className="fileInput" type="file" accept={ALLOWED_EXTENSIONS.join(',')} onChange={onFileChange}/>
+                        <button className="uploadButton" onClick={onUploadFile} disabled={!canUpload}>Upload!</button>
                     </div>
                 </div>
             )}
