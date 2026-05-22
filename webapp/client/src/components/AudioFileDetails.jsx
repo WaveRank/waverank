@@ -2,7 +2,7 @@ import AudioPlayer from "./AudioPlayer"
 import { formatMB } from "../utils/fileSize";
 
 
-export default function AudioFileDetails( {selectedFile, isValidSize, maxContentSize} ) {
+export default function AudioFileDetails( {selectedFile, isValidSize, maxContentSize, selectedFilename, selectedFilepath} ) {
    /**
     * Shows metadata and audio preview of user's selected file.
     * Displays validation feedback for oversized files.
@@ -10,14 +10,14 @@ export default function AudioFileDetails( {selectedFile, isValidSize, maxContent
     */
     let content;
 
-    if (!selectedFile) {
+    if (!selectedFile && !selectedFilename) {
         content = 
             <>
                 <p>File Name: Your_File_Here</p>
                 <AudioPlayer audioFile={"/demo_song.mp3"}/>
             </>
     }
-    else if (!isValidSize) {
+    else if (selectedFile && !isValidSize) {
         const fileSizeMB = formatMB(selectedFile.size)
         const maxContentMB = formatMB(maxContentSize, 0)
 
@@ -25,14 +25,22 @@ export default function AudioFileDetails( {selectedFile, isValidSize, maxContent
             <>
                 <h3>Please select smaller file.</h3>
                 <h4>File size {fileSizeMB} exceeds maximum ({maxContentMB})</h4>
-                <p>File Name: {selectedFile.name}</p>
+                <p>File Name: {selectedFilename}</p>
             </>
         )
+    }
+    else if (selectedFile) {
+        content =  (
+            <>
+                <p>File Name: {selectedFilename}</p>
+                <AudioPlayer audioFile={selectedFile}/>
+            </>
+        );
     } else {
         content =  (
             <>
-                <p>File Name: {selectedFile.name}</p>
-                <AudioPlayer audioFile={selectedFile}/>
+                <p>File Name: {selectedFilename}</p>
+                <AudioPlayer audioFile={selectedFilepath}/>
             </>
         );
     };

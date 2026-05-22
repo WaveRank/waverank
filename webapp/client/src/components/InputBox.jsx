@@ -18,6 +18,8 @@ import { MAX_CONTENT_SIZE, ALLOWED_EXTENSIONS } from "../config/uploadConfig";
 export default function InputBox( {onUploadResult, onStatusChange}) {
     const [selectedFile, setSelectedFile] = useState(null);
     const [sentLink, setSentLink] = useState(null);
+    const [filename, setFilename] = useState(null);
+    const [filepath, setFilepath] = useState(null);
 
     // Validation flags used to gate upload button and prevent invalid requests
     const isValidType = !!selectedFile && isValidFileType(selectedFile);
@@ -41,6 +43,7 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         const responseData = await uploadFile(selectedFile);
         if (responseData && onUploadResult) {
             onUploadResult(responseData);
+            setFilename(responseData.filename);
         }
     };
 
@@ -54,6 +57,8 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         // handle response
         if (responseData && onUploadResult) {
             onUploadResult(responseData);
+            setFilename(responseData.filename);
+            setFilepath(responseData.audio);
         }
     };
 
@@ -81,6 +86,8 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
                 selectedFile={selectedFile} 
                 isValidSize={isValidSize} 
                 maxContentSize = {MAX_CONTENT_SIZE}
+                selectedFilename = {filename}
+                selectedFilepath = {filepath}
             />
         </div>
     )
