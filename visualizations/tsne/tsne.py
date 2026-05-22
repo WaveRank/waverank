@@ -8,7 +8,7 @@ https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
 https://www.datacamp.com/tutorial/introduction-t-sne
 """
 
-import os
+from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -66,7 +66,7 @@ def plot_tsne(data_tsne, values, mode, output_path, genre_names=None):
         plt.colorbar(scatter, label="Confidence")
 
     # Save plot
-    plt.savefig(os.path.join(output_path, f"tsne_{mode}.jpeg"), dpi=100)
+    plt.savefig((output_path / f"tsne_{mode}.jpeg"), dpi=100)
     plt.close()
 
 

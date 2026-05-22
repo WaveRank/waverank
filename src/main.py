@@ -33,16 +33,16 @@ Things to try to improve the model:
 - And more! These are just some ideas
 """
 
+# ----- IMPORTS -----
 import os
-
 os.environ["TF_DETERMINISTIC_OPS"] = "1"
-
-import config as cfg
-from dataset import get_datasets
-from model import build_model
+from pathlib import Path
+import src.config as cfg
+from src.dataset import get_datasets
+from src.model import build_model
 from sklearn.metrics import f1_score
-from training import initial_train, fine_tune
-from evaluate import *
+from src.training import initial_train, fine_tune
+from src.evaluate import *
 
 
 # ----- MAIN PIPELINE -----
@@ -68,8 +68,8 @@ test_loss, test_acc = model.evaluate(test_ds)
 print("Test accuracy after fine-tuning:", test_acc)
 
 # Save entire model for future use
-os.makedirs(cfg.SAVE_PATH, exist_ok=True)
-model.save(os.path.join(cfg.SAVE_PATH, 'final_model.keras'))
+cfg.SAVE_PATH.mkdir(parents=True, exist_ok=True)
+model.save(cfg.SAVE_PATH / "final_model.keras")
 
 # Extract embeddings
 emb_model = embedding_model(model)

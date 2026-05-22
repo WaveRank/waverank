@@ -1,4 +1,4 @@
-import config as cfg
+import src.config as cfg
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.applications import ResNet50

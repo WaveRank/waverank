@@ -1,7 +1,7 @@
-import os
+from pathlib import Path
 import json
 import numpy as np
-import config as cfg
+import src.config as cfg
 import tensorflow as tf
 from tensorflow.keras.applications.resnet50 import preprocess_input
 
@@ -15,7 +15,7 @@ def load_dataset(set, shuffle=False):
     print(f"Loading {set} set...")
     
     return tf.keras.utils.image_dataset_from_directory(
-    	cfg.DATASET_PATH + set,
+    	cfg.DATASET_PATH / set,
     	image_size=cfg.IMG_SIZE,
     	batch_size=None,
     	shuffle=shuffle,
@@ -42,7 +42,7 @@ def get_datasets():
     # Extract class (genre) names, save for reference
     class_names = train_ds.class_names
     print("Classes:", class_names)
-    with open(os.path.join(cfg.BASE_PATH, "class_names.json"), "w") as f:
+    with open(cfg.BASE_PATH / "class_names.json", "w") as f:
         json.dump(class_names, f)
 
     if cfg.USE_CUTMIX:

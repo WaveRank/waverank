@@ -10,7 +10,8 @@ Uses CLASS_NAMES_PATH to extract genre_names that label colors, outputs
 a PNG image representing the UMAP
 """
 
-import os
+# ----- IMPORTS -----
+from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 import umap
@@ -66,7 +67,7 @@ def generate_umap(embeddings_path, class_names_path, output_path):
     )
     plt.tight_layout(rect=[0, 0, 1, 0.95])
     plt.title("UMAP")
-    plt.savefig(os.path.join(output_path, f"umap.png"))
+    plt.savefig((output_path / f"umap.png"))
     plt.close()
 
 

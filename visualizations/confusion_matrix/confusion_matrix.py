@@ -7,7 +7,9 @@ Expected CSV columns:
 
 Uses GENRE_NAMES to label axes, outputs a PNG image.
 """
-import os
+
+# ----- IMPORTS -----
+from pathlib import Path
 import pandas as pd
 import json
 import matplotlib.pyplot as plt
@@ -46,7 +48,7 @@ def generate_confusion_matrix(predictions_path, class_names_path, output_path):
     ax.set_title("Confusion Matrix")
     plt.setp(ax.get_xticklabels(), rotation=45)
     plt.tight_layout()
-    plt.savefig(os.path.join(output_path, f"confusion_matrix.png"))
+    plt.savefig(output_path / "confusion_matrix.png")
     plt.close(fig)
 
 

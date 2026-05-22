@@ -13,7 +13,8 @@ Citations:
 https://scikit-learn.org/stable/modules/generated/sklearn.metrics.top_k_accuracy_score.html
 """
 
-import os
+# ----- IMPORTS -----
+from pathlib import Path
 from sklearn.metrics import top_k_accuracy_score
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -54,7 +55,7 @@ def generate_topk(conf_path, class_names_path, output_path):
     plt.ylabel("Accuracy")
     plt.xticks(k_val)
     plt.yticks(np.arange(0.6, 1.02, 0.02))
-    plt.savefig(os.path.join(output_path, f"top-k.png"))
+    plt.savefig(output_path / "top-k.png")
     plt.close()
 
 
