@@ -9,10 +9,10 @@ import {ALLOWED_LINKS} from "../config/uploadConfig";
 
 export function isValidYoutubeLink(link) {
     if (!link) return false;
-    // (= or /) (11 alphanum) (end of link or & or ?)
-    const regex = /([=/])[\w-]{11}($|[&?])/;
+    // (= or /) (11 alphanum or -) (end of link or & or ?)
+    const videoIDRegex = /([=/])[\w-]{11}($|[&?])/;
     return (
         ALLOWED_LINKS.some(domain => link.includes(domain))
-        && regex.test(link)
+        && videoIDRegex.test(link)
     );
 };
