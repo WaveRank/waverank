@@ -55,9 +55,9 @@ export function AnalysisSummary({ status }) {
             {/* Section content */}
             <div className="boxContent">
                 {/* TODO: Status of uploaded song, CURRENTLY STATIC */}
-                <p>Status:</p>
-                <h3>FINISHED</h3>
-                {/* <h3>{status.toUpperCase()}</h3> */}
+                {/* <p>Status:</p>
+                <h3>FINISHED</h3> */}
+                <h3>{status.toUpperCase()}</h3>
 
                 <div className="boxDivider"/>
 
@@ -74,7 +74,7 @@ export function AnalysisSummary({ status }) {
     );
 }
 
-export function WaveformSpectrumData() {
+export function WaveformSpectrumData({ waveform, spectrum }) {
     return (
         <div className="boxContainer">
             {/* Section header */}
@@ -87,7 +87,7 @@ export function WaveformSpectrumData() {
                 <div className="boxSection">
                     <p className="boxLabel">WAVEFORM</p>
                     <div className="boxGraph">
-                        <img className="boxImage" src={waveform}></img>
+                        <img className="boxImage" src={waveform || '/demo_waveform.png'}></img>
                     </div>
                 </div>
 
@@ -97,7 +97,7 @@ export function WaveformSpectrumData() {
                 <div className="boxSection">
                     <p className="boxLabel">FREQUENCY SPECTRUM</p>
                     <div className="boxGraph">
-                        <img className="boxImage" src={frequency}></img>
+                        <img className="boxImage" src={spectrum || '/demo_frequency_spectrum.png'}></img>
                     </div>
                 </div>
 
@@ -106,7 +106,7 @@ export function WaveformSpectrumData() {
     );
 }
 
-export function MelSpectrogramData() {
+export function MelSpectrogramData({ spectrogram }) {
     return (
         <div className="boxContainer">
             {/* Section header */}
@@ -119,7 +119,7 @@ export function MelSpectrogramData() {
                 <div className="boxSection">
                     <p className="boxLabel">MEL SPECTROGRAM</p>
                     <div className="boxGraph">
-                        <img className="boxImage" src={spectrogram}></img>
+                        <img className="boxImage" src={spectrogram || 'demo_spectrogram.png'}></img>
                     </div>
                 </div>
             </div>

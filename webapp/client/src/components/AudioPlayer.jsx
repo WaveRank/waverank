@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 
 // Citation (4/29/26): https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds
-export default function AudioPlayer({ audioFile }) {
+export default function AudioPlayer({ audioFile, title }) {
     const audioRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
@@ -59,8 +59,8 @@ export default function AudioPlayer({ audioFile }) {
             <audio ref={audioRef} src={src} onTimeUpdate={onTimeUpdate}/>
 
                 <div className="audioRow">
-                    {/* TODO: File name display, CURRENTLY STATIC */}
-                    <div className="audioTitle">demo_song.mp3</div>
+
+                    <div className="audioTitle">{title}</div>
 
                     <div className="audioScrubber">
                         {/* Progress slider for song, scrubbable */}
