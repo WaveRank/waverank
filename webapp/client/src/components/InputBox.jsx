@@ -22,6 +22,7 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
     const [filepath, setFilepath] = useState(null);
     const [showUploadPopup, setShowUploadPopup] = useState(false);
     const [showURLPopup, setShowURLPopup] = useState(false);
+    const [requestActive, setRequestActive] = useState(false)
 
     // Validation flags used to gate upload button and prevent invalid requests
     const isValidType = !!selectedFile && isValidFileType(selectedFile);
@@ -40,7 +41,14 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
     // Triggers file upload to backend, forwards response via callback.
     // Redundant validation helps safeguard against UI bypass
     const onUploadFile = async () => {
-        if (!canUpload) return;
+        // Close popup and disable buttons
+        setShowUploadPopup(false);
+        setRequestActive(true)
+        // Validate upload
+        if (!canUpload) {
+            setRequestActive(false)
+            return;
+        }
         onStatusChange("Processing Audio from File Upload")
         const responseData = await uploadFile(selectedFile);
         if (responseData && onUploadResult) {
@@ -48,14 +56,18 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
             setFilename(responseData.filename);
             setFilepath(null)
         }
-        setShowUploadPopup(false);
+        setRequestActive(false);
     };
 
     // Start backend->inference pipeline from a URL rather than file upload
     const onPasteLink = async () => {
+        // Close pop up and disable buttons
+        setShowURLPopup(false)
+        setRequestActive(true)
         // Validate link is a real YouTube
         if (!isValidLink) {
             onStatusChange("Invalid YouTube link!")
+            setRequestActive(false)
             return;
         }
         // send it to new flask route
@@ -68,6 +80,7 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
             setFilepath(responseData.audio);
             setSelectedFile(null)
         }
+        setRequestActive(false)
     };
 
     return (
@@ -75,9 +88,9 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
             {/* Buttons for uploading audio files and pasting URLs */}
             <div className="inputBox">
                 <div className="inputButtons">
-                    <button onClick={() => setShowUploadPopup(true)}>Upload Audio File</button>
+                    <button onClick={() => setShowUploadPopup(true)} disabled={requestActive}>Upload Audio File</button>
                     <p>or</p>
-                    <button onClick={() => setShowURLPopup(true)}>Paste URL</button>
+                    <button onClick={() => setShowURLPopup(true)} disabled={requestActive}>Paste URL</button>
                 </div>
             </div>
 
