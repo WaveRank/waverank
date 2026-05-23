@@ -11,8 +11,12 @@
 }
 
 .audioTitle {
+    min-width: 0;
+    max-width: 40%;
     white-space: nowrap;
     font-size: 0.95rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .audioRow {

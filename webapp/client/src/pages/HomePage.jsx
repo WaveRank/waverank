@@ -37,15 +37,12 @@ export default function HomePage() {
             <div>
                 <div className="body">
 
-                    <InputBox onUploadResult={handleUploadResult}/>
-
-                    {/* NOTE: AUDIOPLAYER STATIC AT THE MOMENT, SET TO demo_song.mp3 */}
-                    <AudioPlayer audioFile="/demo_song.mp3"/>
+                    <InputBox onUploadResult={handleUploadResult} onStatusChange = {setStatus}/>
 
                     <div className="bodyOutput">
                         <AnalysisSummary status={status}></AnalysisSummary>
-                        <WaveformSpectrumData></WaveformSpectrumData>
-                        <MelSpectrogramData></MelSpectrogramData>
+                        <WaveformSpectrumData waveform={graphs?.waveform} spectrum={graphs?.spectrum} />
+                        <MelSpectrogramData spectrogram={graphs?.spectrogram}></MelSpectrogramData>
                     </div>
 
                 </div>
