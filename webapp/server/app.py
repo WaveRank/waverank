@@ -62,8 +62,8 @@ def handle_youtube_link():
         filepath, filename = download_youtube_audio(data['URL'])
     except Exception as e:
         print("YouTube download failed:", repr(e))
-        return jsonify({"error": "Invalid audio file"}), 400
-    
+        return jsonify({"error": str(e)}), 400
+        
     # Process the file
     response_data, status = process_audio_file(filepath, filename)
     if status != 200:
@@ -103,7 +103,6 @@ def handle_uploaded_file():
     new_upload_subdir = create_unique_dir(UPLOAD_DIR)
     filepath = UPLOAD_DIR / new_upload_subdir / filename
     file.save(filepath)
-
     
     # Process the file
     response_data, status = process_audio_file(filepath, filename)

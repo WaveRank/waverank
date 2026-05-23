@@ -104,7 +104,7 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
                     <div className="popupBox">
                         <h2>Paste URL</h2>
                         <button className="closeButton" onClick={() => setShowURLPopup(false)}>X</button>
-                        <input type="url" id="homepage" name="homepage" onChange={onLinkChange}></input>
+                        <input type="url" id="youtube-url-input" name="youtube-url-input" onChange={onLinkChange}></input>
                         <button onClick={onPasteLink}>Paste URL</button>
                     </div>
                 </div>
