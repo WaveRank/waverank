@@ -23,15 +23,17 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
     const [showUploadPopup, setShowUploadPopup] = useState(false);
     const [showURLPopup, setShowURLPopup] = useState(false);
     const [requestActive, setRequestActive] = useState(false)
+    const [uploadComplete, setUploadComplete] = useState(false)
 
     // Validation flags used to gate upload button and prevent invalid requests
     const isValidType = !!selectedFile && isValidFileType(selectedFile);
     const isValidSize = !!selectedFile && isValidFileSize(selectedFile);
-    const canUpload = !!selectedFile && isValidSize && isValidType;
+    const canUpload = !!selectedFile && isValidSize && isValidType && !uploadComplete;
     const isValidLink = isValidYoutubeLink(sentLink);
 
     const onFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
+        setUploadComplete(false);
     };
 
     const onLinkChange = (event) => {
@@ -47,6 +49,7 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         // Validate upload
         if (!canUpload) {
             setRequestActive(false)
+            setSelectedFile(null);
             return;
         }
         onStatusChange("Processing Audio from File Upload")
@@ -57,6 +60,7 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
             setFilepath(null)
         }
         setRequestActive(false);
+        setUploadComplete(true);
     };
 
     // Start backend->inference pipeline from a URL rather than file upload
@@ -66,8 +70,9 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         setRequestActive(true)
         // Validate link is a real YouTube
         if (!isValidLink) {
-            onStatusChange("Invalid YouTube link!")
-            setRequestActive(false)
+            onStatusChange("Invalid YouTube link!");
+            setRequestActive(false);
+            setSentLink(null);
             return;
         }
         // send it to new flask route
@@ -78,9 +83,10 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
             onUploadResult(responseData);
             setFilename(responseData.filename);
             setFilepath(responseData.audio);
-            setSelectedFile(null)
+            setSelectedFile(null);
         }
-        setRequestActive(false)
+        setRequestActive(false);
+        setSentLink(null);
     };
 
     return (
