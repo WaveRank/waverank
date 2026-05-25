@@ -21,9 +21,9 @@ https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html
 https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html
 """
 
+# ----- IMPORTS -----
 import sys
-
-import os
+from pathlib import Path
 import json
 import numpy as np
 import pandas as pd
@@ -45,19 +45,16 @@ def load_runs(base_path):
     runs = []
 
     # Loop over each folder in base_path
-    for run_name in sorted(os.listdir(base_path)):
-        run_dir = os.path.join(base_path, run_name)
-        conf_path = os.path.join(run_dir, "confidences.csv")
-        names_path = os.path.join(run_dir, "class_names.json")
-
-        # Only works on folders with both files
-        if os.path.isfile(conf_path) and os.path.isfile(names_path):
+    for run_dir in sorted(base_path.iterdir()):
+        conf_path = run_dir / "confidences.csv"
+        names_path = run_dir / "class_names.json"
+        if conf_path.is_file() and names_path.is_file():
             with open(names_path) as f:
                 genre_names = json.load(f)
             df = pd.read_csv(conf_path)
 
             # Store run name, confidences, and genres as tuple in runs list
-            runs.append((run_name, df, genre_names))
+            runs.append((run_dir.name, df, genre_names))
 
     return runs
 
@@ -122,13 +119,13 @@ def generate_comparison_roc(base_path, output_path, models=None):
         ax.legend(fontsize=8, loc="lower right")
     
     plt.tight_layout(pad=1.5, h_pad=1.5)
-    out = os.path.join(output_path, "comparison_roc_auc.png")
+    out = output_path / "comparison_roc_auc.png"
     plt.savefig(out, dpi=300)
     plt.close()
     print(f"Saved comparison plot to {out}")
 
 
 if __name__ == "__main__":
-    BASE_OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "../../visualizations_output")
+    BASE_OUTPUT_PATH = Path(__file__).resolve().parents[2] / "visualizations_output"
     requested = sys.argv[1:] or None
     generate_comparison_roc(BASE_OUTPUT_PATH, BASE_OUTPUT_PATH, models=requested)
