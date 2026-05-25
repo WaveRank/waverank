@@ -8,40 +8,33 @@ https://medium.com/analytics-vidhya/understanding-the-mel-spectrogram-fca2afa2ce
 """
 
 # ----- IMPORTS -----
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from pathlib import Path
 from shared.audio_utils import load_audio, make_spectrogram, spectrogram_to_image
 
 # ----- CONFIGURATION -----
-BASE_PATH = "./"
-INPUT_DIR = os.path.join(BASE_PATH, "Data/segmented_dataset")
-OUTPUT_DIR = os.path.join(BASE_PATH, "dataset")
+INPUT_DIR = Path("Data/segmented_dataset")
+OUTPUT_DIR = Path("dataset")
 
 # ----- MAIN PIPELINE -----
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-for split_name in os.listdir(INPUT_DIR):
-    split_path = os.path.join(INPUT_DIR, split_name)
-
-    for genre in os.listdir(split_path):
-        genre_in = os.path.join(split_path, genre)
-        genre_out = os.path.join(OUTPUT_DIR, split_name, genre)
-        os.makedirs(genre_out, exist_ok=True)
+OUTPUT_DIR.mkdir(exist_ok=True)
+for split_path in INPUT_DIR.iterdir():
+    for genre_in in split_path.iterdir():
+        genre_out = OUTPUT_DIR / split_path.name / genre_in.name
+        genre_out.mkdir(parents=True, exist_ok=True)
 
         # Get all .wav files in this genre folder
         wav_files = []
-        for file in os.listdir(genre_in):
-            if file.lower().endswith(".wav"):
+        for file in genre_in.iterdir():
+            if file.suffix.lower() == ".wav":
                 wav_files.append(file)
 
+        # Process each .wav file
         for wav_file in wav_files:
 
             # Load audio
-            wav_path = os.path.join(genre_in, wav_file)
-            y, sr = load_audio(wav_path)
+            y, sr = load_audio(wav_file)
             if y is None:
-                print(f"Skipping {wav_file}: failed to load")
+                print(f"Skipping {wav_file.name}: failed to load")
                 continue
 
             # Extract spectrogram and convert to image
@@ -49,8 +42,7 @@ for split_name in os.listdir(INPUT_DIR):
             img = spectrogram_to_image(mel_db)
 
             # Save output image
-            output_name = os.path.splitext(wav_file)[0] + ".png"
-            output_path = os.path.join(genre_out, output_name)
+            output_path = genre_out / f"{wav_file.stem}.png"
             img.save(output_path)
 
 # ----- SUMMARY -----

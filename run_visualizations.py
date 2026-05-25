@@ -6,8 +6,8 @@ Also preserves "Model.py", output CSVs, and class_names.json for future referenc
 The output folder can be either user-defined (via input prompt) or automatically generated
 as sequential run folders (e.g., run_1, run_2, ...) under the base output path.
 """
-
-import os
+# ----- IMPORTS -----
+from pathlib import Path
 import shutil
 from visualizations.confusion_matrix.confusion_matrix import (
     generate_confusion_matrix,
@@ -18,35 +18,52 @@ from visualizations.tsne.tsne import generate_tsne
 from visualizations.umap.umap_visual import generate_umap
 
 # ----- CONFIGURATION -----
-BASE_OUTPUT_PATH = "visualizations_output"
-CLASS_NAMES_PATH = "class_names.json"
-CONFIDENCES_PATH = "confidences.csv"
-PREDICTIONS_PATH = "embeddings.csv"
+BASE_OUTPUT_PATH = Path("visualizations_output")
+CLASS_NAMES_PATH = Path("class_names.json")
+CONFIDENCES_PATH = Path("confidences.csv")
+PREDICTIONS_PATH = Path("embeddings.csv")
 
 
 # ----- HELPER FUNCTIONS -----
 def run_visualization(function, visualization):
+    """
+    Runs a visualization function and prints status messages.
+    Args:
+        function (callable): visualization function to call
+        visualization (str): name of the visualization for display
+    """
+    
     print(f"Generating {visualization}...")
     function()
     print(f"\033[1m{visualization} done!\033[0m")
 
 
 def get_output_dir(base_output_path):
+    """
+    Determines the output directory for a visualization run.
+    Prompts the user for a run name; if blank, auto-generates a
+    sequential folder name (run_1, run_2, ...) under base_output_path.
+    Args:
+        base_output_path (Path): base directory to create the run folder in
+    Returns:
+        Path: path to the created output directory
+    """
+
     user_input = input("Enter a run name (or leave blank for auto): ").strip()
 
     # Case 1: User provides a run name
     if user_input:
-        run_path = os.path.join(base_output_path, user_input)
-        os.makedirs(run_path, exist_ok=True)
+        run_path = base_output_path / user_input
+        run_path.mkdir(parents=True, exist_ok=True)
         return run_path
 
     # Case 2: Automatically name output folder if no run name provided
     else:
         i = 1
         while True:
-            run_path = os.path.join(base_output_path, f"run_{i}")
-            if not os.path.exists(run_path):
-                os.makedirs(run_path)
+            run_path = base_output_path / f"run_{i}"
+            if not run_path.exists():
+                run_path.makedir(parents=True)
                 return run_path
             i += 1
 
@@ -60,16 +77,12 @@ run_visualization(lambda: generate_confusion_matrix(PREDICTIONS_PATH, CLASS_NAME
 run_visualization(lambda: generate_roc_auc(CONFIDENCES_PATH, CLASS_NAMES_PATH, OUTPUT_PATH),"ROC and AUC Curves")
 run_visualization(lambda: generate_topk(CONFIDENCES_PATH, CLASS_NAMES_PATH, OUTPUT_PATH),"Top-k Accuracy Score")
 run_visualization(lambda: generate_tsne(PREDICTIONS_PATH, CLASS_NAMES_PATH, OUTPUT_PATH), "t-SNE Plot")
-
-run_visualization(
-    lambda: generate_umap(PREDICTIONS_PATH, CLASS_NAMES_PATH, OUTPUT_PATH),
-    "UMAP Plot",
-)
+run_visualization(lambda: generate_umap(PREDICTIONS_PATH, CLASS_NAMES_PATH, OUTPUT_PATH), "UMAP Plot")
 
 # Copy over CSVs, json, and model.py
-shutil.copy(CONFIDENCES_PATH, os.path.join(OUTPUT_PATH, "confidences.csv"))
-shutil.copy(PREDICTIONS_PATH, os.path.join(OUTPUT_PATH, "embeddings.csv"))
-shutil.copy(CLASS_NAMES_PATH, os.path.join(OUTPUT_PATH, "class_names.json"))
-shutil.copytree("src", os.path.join(OUTPUT_PATH, os.path.basename("src")), dirs_exist_ok=True)
+shutil.copy(CONFIDENCES_PATH, OUTPUT_PATH / CONFIDENCES_PATH.name)
+shutil.copy(PREDICTIONS_PATH, OUTPUT_PATH / PREDICTIONS_PATH.name)
+shutil.copy(CLASS_NAMES_PATH, OUTPUT_PATH / CLASS_NAMES_PATH.name)
+shutil.copytree("src", OUTPUT_PATH / "src", dirs_exist_ok=True)
 
 print("\033[32m\nAll done! :)\n\033[0m")
