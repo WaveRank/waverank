@@ -8,7 +8,7 @@ import json
 from webapp.server.inference import predict_genre
 
 BASE_DIR = Path(__file__).resolve().parent
-SONG_DIR = BASE_DIR / "../../Data/test_songs"
+SONG_DIR = BASE_DIR.parent.parent / "Data" / "test_songs"
 
 # Walk directory to find each song and process it
 songs = [f for f in SONG_DIR.iterdir()

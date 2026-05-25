@@ -7,7 +7,6 @@ from pathlib import Path
 import shutil
 
 # ----- CONFIGURATION -----
-BASE_PATH = "./"
 INPUT_DIR = Path("Data/genres_original")
 OUTPUT_DIR = Path("Data/distributed_dataset")
 SPLITS = {"train": 0.8, "val": 0.1, "test": 0.1}
