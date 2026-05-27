@@ -5,11 +5,16 @@ export default function AudioPlayer({ audioFile, title }) {
     const audioRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
     const [src, setSrc] = useState(null);
 
     // Handle file vs string audioFile
     useEffect(() => {
         if (!audioFile) return;
+
+        setCurrentTime(0);
+        setDuration(0);
+        setIsPlaying(false);
 
         if (audioFile instanceof File) {
             const url = URL.createObjectURL(audioFile);
@@ -39,6 +44,16 @@ export default function AudioPlayer({ audioFile, title }) {
         setCurrentTime(audioRef.current.currentTime);
     };
 
+    const onLoadedMetadata = () => {
+        setDuration(audioRef.current.duration);
+    };
+
+    const onEnded = () => {
+        setIsPlaying(false);
+        setCurrentTime(0);
+        audioRef.current.currentTime = 0;
+    };
+
     // Allows scrubbing of the playback bar
     const onSeek = (e) => {
         const time = Number(e.target.value);
@@ -56,7 +71,13 @@ export default function AudioPlayer({ audioFile, title }) {
 
     return (
         <div className="audioPlayer">
-            <audio ref={audioRef} src={src} onTimeUpdate={onTimeUpdate}/>
+            <audio 
+                ref={audioRef} 
+                src={src} 
+                onTimeUpdate={onTimeUpdate}
+                onLoadedMetadata={onLoadedMetadata}
+                onEnded={onEnded}
+            />
 
                 <div className="audioRow">
 
@@ -68,14 +89,14 @@ export default function AudioPlayer({ audioFile, title }) {
                             className="playbackBar"
                             type="range"
                             min="0"
-                            max={audioRef.current?.duration || 0}
+                            max={duration}
                             value={currentTime}
                             onChange={onSeek}
                         />
                         {/* Audio timestamps, shows current time and total length */}
                         <div className="audioTimes">
                             <span>{formatTime(currentTime)}</span>
-                            <span>{formatTime(audioRef.current?.duration)}</span>
+                            <span>{formatTime(duration)}</span>
                         </div>
 
                     </div>
