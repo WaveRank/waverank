@@ -1,6 +1,12 @@
+/* 
+*Citations (05/27/26): 
+*   https://www.w3schools.com/CSSref/atrule_keyframes.php
+*   https://www.w3schools.com/CSSref/css3_pr_transform.php
+*/
+
 /* ----- AUDIO PLAYER ----- */
 .audioPlayer {
-    width: 35vw;
+    width: 50vw;
     background-color: #3a3a3a;
     color: white;
     border: 1px solid #6a6a6a;
@@ -10,13 +16,22 @@
     margin-top: 20px;
 }
 
-.audioTitle {
-    min-width: 0;
-    max-width: 40%;
+.audioTitleContainer {
+    width: 260px;
+    min-width: 260px;
     white-space: nowrap;
     font-size: 0.95rem;
     overflow: hidden;
-    text-overflow: ellipsis;
+}
+
+.audioTitleText {
+    display: inline-flex;
+    gap: 2rem;
+    white-space: nowrap;
+}
+
+.audioTitleText.scrolling {
+    animation: scrollTitle 12s linear infinite
 }
 
 .audioRow {
@@ -62,4 +77,11 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+}
+
+@keyframes scrollTitle {
+    0% {transform: translateX(0%);}
+    15% {transform: translateX(0%);}
+    85% {transform: translateX(-52.6%);}
+    100% {transform: translateX(-52.6%);}
 }

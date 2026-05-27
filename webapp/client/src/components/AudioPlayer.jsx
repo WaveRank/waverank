@@ -3,7 +3,10 @@ import { useRef, useState, useEffect } from "react";
 // Citation (4/29/26): https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds
 export default function AudioPlayer({ audioFile, title }) {
     const audioRef = useRef(null);
+    const titleContainerRef = useRef(null);
+    const titleTextRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [isLongTitle, setIsLongTitle] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [src, setSrc] = useState(null);
@@ -25,6 +28,14 @@ export default function AudioPlayer({ audioFile, title }) {
         }
     }, [audioFile]);
 
+    // Checks whether the title is longer than container
+    useEffect(() => {
+        if (titleContainerRef.current && titleTextRef.current) {
+            setIsLongTitle(
+                titleTextRef.current.scrollWidth > titleContainerRef.current.clientWidth
+            );
+        }
+    }, [title]);
 
     // Handles play and pause
     const togglePlay = () => {
@@ -80,8 +91,16 @@ export default function AudioPlayer({ audioFile, title }) {
             />
 
                 <div className="audioRow">
-
-                    <div className="audioTitle">{title}</div>
+                    {/* Adds scrolling animation if the title is long */}
+                    <div className="audioTitleContainer" ref={titleContainerRef}> 
+                        <span
+                            className={`audioTitleText ${isLongTitle ? "scrolling" : ""}`}
+                            ref={titleTextRef}
+                        >
+                            {title}
+                            {isLongTitle && <span className="titleSpacer">{title}</span>}
+                        </span>
+                    </div>
 
                     <div className="audioScrubber">
                         {/* Progress slider for song, scrubbable */}

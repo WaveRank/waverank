@@ -17,6 +17,7 @@ import { MAX_CONTENT_SIZE, ALLOWED_EXTENSIONS } from "../config/uploadConfig";
 
 export default function InputBox( {onUploadResult, onStatusChange}) {
     const [selectedFile, setSelectedFile] = useState(null); 
+    const [uploadedFile, setUploadedFile] = useState(null);
     const [sentLink, setSentLink] = useState(null);
     const [filename, setFilename] = useState(null);
     const [filepath, setFilepath] = useState(null);
@@ -54,10 +55,16 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         }
         onStatusChange("Processing Audio from File Upload")
         const responseData = await uploadFile(selectedFile);
+        if (responseData?.error) {
+            onStatusChange(responseData.error);
+            setRequestActive(false);
+            return;
+        }
         if (responseData && onUploadResult) {
             onUploadResult(responseData);
             setFilename(responseData.filename);
             setFilepath(null)
+            setUploadedFile(selectedFile)
         }
         setRequestActive(false);
         setUploadComplete(true);
@@ -78,12 +85,20 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         // send it to new flask route
         onStatusChange("Processing Audio from Youtube")
         const responseData = await uploadLink(sentLink);
+        // handle error
+        if (responseData?.error) {
+            onStatusChange(responseData.error);
+            setRequestActive(false);
+            setSentLink(null);
+            return;
+        }
         // handle response
         if (responseData && onUploadResult) {
             onUploadResult(responseData);
             setFilename(responseData.filename);
             setFilepath(responseData.audio);
             setSelectedFile(null);
+            setUploadedFile(null);
         }
         setRequestActive(false);
         setSentLink(null);
@@ -105,13 +120,20 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
                 <div className="popupOverlay">
                     <div className="popupBox">
                         <h2>Upload Audio File</h2>
-                        <button className="closeButton" onClick={() => setShowUploadPopup(false)}>X</button>
+                        <button className="closeButton" onClick={() => {
+                            setShowUploadPopup(false); 
+                            setSelectedFile(null);}}>X</button>
                         <p>
                             Upload an audio clip to classify its top_N music genres using
                             a CNN trained on spectrogram features.
                             Max size {formatMB(MAX_CONTENT_SIZE, 0)}.
                         </p>
                         <input className="fileInput" type="file" accept={ALLOWED_EXTENSIONS.join(',')} onChange={onFileChange} />
+                        {selectedFile && !isValidSize && (
+                            <p className="popupError">
+                                File size {formatMB(selectedFile.size)} exceeds maximum {formatMB(MAX_CONTENT_SIZE, 0)} limit.
+                            </p>
+                        )}
                         <button className="uploadButton" onClick={onUploadFile} disabled={!canUpload}>Upload!</button>
                     </div>
                 </div>
@@ -129,9 +151,7 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
                 </div>
             )}
             <AudioFileDetails
-                selectedFile={selectedFile}
-                isValidSize={isValidSize}
-                maxContentSize={MAX_CONTENT_SIZE}
+                selectedFile={uploadedFile}
                 selectedFilename={filename}
                 selectedFilepath={filepath}
             />
