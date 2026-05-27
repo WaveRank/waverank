@@ -1,5 +1,5 @@
-import src.config as cfg
 import tensorflow as tf
+import model.config as cfg
 
 
 # ----- TRAINING -----

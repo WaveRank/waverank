@@ -8,17 +8,16 @@ explore and adaptively select the best hyperparameter combinations per trial.
 The tunable parameters include the initial LR, fine-tune LR, dropout rate,
 depth, spec augmentation masking widths, cutmix probability...
 """
-
 import os
-
 os.environ["TF_DETERMINISTIC_OPS"] = "1"
 
 import optuna
-import src.config as cfg
 import tensorflow as tf
-from src.model import build_model
-from src.dataset import get_datasets
-from src.training import initial_train, fine_tune
+
+import model.config as cfg
+from model.src.model_training.model import build_model
+from model.src.model_training.dataset import get_datasets
+from model.src.model_training.training import initial_train, fine_tune
 
 
 def tuning_pipeline():

@@ -7,7 +7,8 @@ Citations (5/20):
 https://github.com/yt-dlp/yt-dlp
 """
 import yt_dlp
-from webapp.server.config import UPLOAD_DIR, MAX_YOUTUBE_LENGTH
+from shared.paths import UPLOAD_DIR
+from webapp.server.config import MAX_YOUTUBE_LENGTH
 from webapp.server.services.file_io import create_unique_dir
 
 def download_youtube_audio(link):

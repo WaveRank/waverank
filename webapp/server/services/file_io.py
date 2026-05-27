@@ -11,7 +11,8 @@ import shutil
 from pathlib import Path
 import time
 import uuid
-from webapp.server.config import UPLOAD_DIR, GRAPH_DIR, HOURS_TO_LIVE
+from shared.paths import UPLOAD_DIR, GRAPH_DIR
+from webapp.server.config import HOURS_TO_LIVE
 
 
 def create_unique_dir(dir):
