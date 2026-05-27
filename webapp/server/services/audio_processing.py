@@ -6,18 +6,16 @@ upload and YouTube endpoints, including:
 - file cleanup
 - response metadata generation
 """
+
 from pathlib import Path
-
 from flask import request
-
+from werkzeug.utils import secure_filename
 from webapp.server.config import GRAPH_DIR, UPLOAD_DIR
 from webapp.server.services.file_io import (
     create_unique_dir,
     delete_old_subdirs,
 )
-
 from shared.audio_utils import load_audio
-
 from visualizations.waveform.waveform import generate_waveform
 from visualizations.spectrum.spectrum import generate_spectrum
 from visualizations.spectrogram.spectrogram import generate_spectrogram
@@ -43,7 +41,7 @@ def process_audio_file(filepath, filename):
     # Generate graphs and save to disk
     new_graph_subdir = create_unique_dir(GRAPH_DIR)
     output_dir = GRAPH_DIR / new_graph_subdir
-    file_basename = Path(filename).stem
+    file_basename = Path(secure_filename(filename)).stem
 
     waveform_filename = file_basename + "_waveform.png"
     spectrum_filename = file_basename + "_spectrum.png"

@@ -8,11 +8,7 @@ import {ALLOWED_LINKS} from "../config/uploadConfig";
 
 
 export function isValidYoutubeLink(link) {
+    // Checks if the supplied link is from an allowed domain
     if (!link) return false;
-    // (= or /) (11 alphanum or -) (end of link or & or ?)
-    const videoIDRegex = /([=/])[\w-]{11}($|[&?])/;
-    return (
-        ALLOWED_LINKS.some(domain => link.includes(domain))
-        && videoIDRegex.test(link)
-    );
+    return (ALLOWED_LINKS.some(domain => link.includes(domain)));
 };
