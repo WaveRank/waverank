@@ -1,7 +1,8 @@
-import src.config as cfg
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.applications import ResNet50
+
+import model.config as cfg
 
 
 def build_model(class_names):
