@@ -33,9 +33,9 @@ def download_youtube_audio(link):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(link, download=False)
         info = ydl.sanitize_info(info)
-        
+
         # Safeguard against long videos
-        if info['duration'] > MAX_YOUTUBE_LENGTH:
+        if info and info['duration'] > MAX_YOUTUBE_LENGTH:
             raise ValueError(f"Video exceeds maximum duration ({MAX_YOUTUBE_LENGTH // 60} min)")
         filename = info['title']
         ydl.download([link])
