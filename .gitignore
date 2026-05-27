@@ -14,7 +14,7 @@ top_k.png
 visualizations/*/output/
 visualizations/output/
 webapp/server/artifacts/
-# *.keras
+model/artifacts/*.csv
 
 # Misc
 .git
