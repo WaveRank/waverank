@@ -9,11 +9,12 @@ https://medium.com/analytics-vidhya/understanding-the-mel-spectrogram-fca2afa2ce
 
 # ----- IMPORTS -----
 from pathlib import Path
-from shared.audio_utils import load_audio, make_spectrogram, spectrogram_to_image
+from model.src.audio.audio_utils import load_audio, make_spectrogram, spectrogram_to_image
+from shared.paths import DATA_DIR, DATASET_DIR
 
 # ----- CONFIGURATION -----
-INPUT_DIR = Path("Data/segmented_dataset")
-OUTPUT_DIR = Path("dataset")
+INPUT_DIR = DATA_DIR / "segmented_dataset"
+OUTPUT_DIR = DATASET_DIR
 
 # ----- MAIN PIPELINE -----
 OUTPUT_DIR.mkdir(exist_ok=True)

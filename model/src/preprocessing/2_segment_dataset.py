@@ -12,11 +12,12 @@ https://stackoverflow.com/questions/60105626/split-audio-on-timestamps-librosa
 # ----- IMPORTS -----
 from pathlib import Path
 import soundfile as sf
-from shared.audio_utils import load_audio, segment_audio
+from model.src.audio.audio_utils import load_audio, segment_audio
+from shared.paths import DATA_DIR
 
 # ----- CONFIGURATION -----
-INPUT_DIR = Path("Data/distributed_dataset")
-OUTPUT_DIR = Path("Data/segmented_dataset")
+INPUT_DIR = DATA_DIR / "distributed_dataset"
+OUTPUT_DIR = DATA_DIR / "segmented_dataset"
 MAX_SEC = 30
 skipped_files = []
 

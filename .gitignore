@@ -1,34 +1,24 @@
 # Datasets
-Data/
-dataset/
+data/
 
-# Virtual environments
+# Virtual environments and dependencies
 tf-gpu/
 .venv/
 venv/
 env/
+node_modules/
 
 # Outputs
-accuracy_curve.png
-loss_curve.png
-embeddings.csv
-confidences.csv
-roc_auc.png
-confusion_matrix.png
 umap.png
 top_k.png
 visualizations/*/output/
-visualizations_output/
+visualizations/output/
+visualizations/*/*.png
+webapp/server/artifacts/
+model/artifacts/*.csv
 
-# Custom settings
+# Misc
+.git
 .vscode/
 __pycache__
 test.py
-
-# Webapp
-node_modules/
-uploads/
-webapp/server/model/song*.mp3
-webapp/server/test_results.*
-webapp/server/graphs
-final_fma_model.keras

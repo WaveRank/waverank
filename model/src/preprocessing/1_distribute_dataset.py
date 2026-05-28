@@ -5,10 +5,13 @@ Splits the GTZAN dataset into training, validation, and testing sets.
 # ----- IMPORTS -----
 from pathlib import Path 
 import shutil
+from shared.paths import DATA_DIR
+
 
 # ----- CONFIGURATION -----
-INPUT_DIR = Path("Data/genres_original")
-OUTPUT_DIR = Path("Data/distributed_dataset")
+INPUT_DIR = DATA_DIR / "genres_original"
+OUTPUT_DIR = DATA_DIR / "distributed_dataset"
+
 SPLITS = {"train": 0.8, "val": 0.1, "test": 0.1}
 
 # ----- HELPER FUNCTIONS -----
