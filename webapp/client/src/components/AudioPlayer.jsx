@@ -2,6 +2,8 @@ import { useRef, useState, useEffect } from "react";
 
 // Citation (4/29/26): https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds
 // Citation (5/28/26): https://www.w3schools.com/jsref/met_win_settimeout.asp
+// https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties#setting_values_in_javascript
+
 export default function AudioPlayer({ audioFile, title }) {
     const audioRef = useRef(null);
     const titleContainerRef = useRef(null);
@@ -40,6 +42,15 @@ export default function AudioPlayer({ audioFile, title }) {
             );
         }}, 80); return () => clearTimeout(timer);
     }, [title]);
+
+    // Gets the length of the scroll animation
+    useEffect(() => {
+        if (!isLongTitle) return;
+        if (titleContainerRef.current && titleTextRef.current) {
+            const length = titleTextRef.current.scrollWidth - titleContainerRef.current.clientWidth;
+            titleTextRef.current.style.setProperty('--scroll', `-${length}px`);
+        }
+    }, [isLongTitle]);
 
     // Handles play and pause
     const togglePlay = () => {
@@ -102,7 +113,6 @@ export default function AudioPlayer({ audioFile, title }) {
                             ref={titleTextRef}
                         >
                             {title}
-                            {isLongTitle && <span className="titleSpacer">{title}</span>}
                         </span>
                     </div>
 

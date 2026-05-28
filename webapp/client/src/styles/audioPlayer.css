@@ -2,6 +2,7 @@
 *Citations (05/27/26): 
 *   https://www.w3schools.com/CSSref/atrule_keyframes.php
 *   https://www.w3schools.com/CSSref/css3_pr_transform.php
+*   https://www.w3schools.com/cssref/css3_pr_animation-timing-function.php
 */
 
 /* ----- AUDIO PLAYER ----- */
@@ -27,12 +28,11 @@
 
 .audioTitleText {
     display: inline-flex;
-    gap: 2rem;
     white-space: nowrap;
 }
 
 .audioTitleText.scrolling {
-    animation: scrollTitle 12s linear infinite
+    animation: scrollTitle 10s ease-in-out infinite
 }
 
 .audioRow {
@@ -82,7 +82,6 @@
 
 @keyframes scrollTitle {
     0% {transform: translateX(0%);}
-    15% {transform: translateX(0%);}
-    90% {transform: translateX(-52.8%);}
-    100% {transform: translateX(-52.8%);}
+    90% {transform: translateX(var(--scroll));}
+    100% {transform: translateX(0);}
 }
