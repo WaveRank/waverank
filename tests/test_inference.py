@@ -11,6 +11,7 @@ from shared.paths import PROJECT_ROOT, DATA_DIR
 # Configuration
 INPUT_DIR = DATA_DIR / "test_songs"
 OUTPUT_DIR = PROJECT_ROOT / "tests" / "artifacts"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Walk directory to find each song and process it
 songs = [f for f in INPUT_DIR.iterdir()

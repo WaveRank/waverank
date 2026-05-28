@@ -13,6 +13,7 @@ umap.png
 top_k.png
 visualizations/*/output/
 visualizations/output/
+visualizations/*/*.png
 webapp/server/artifacts/
 model/artifacts/*.csv
 

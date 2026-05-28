@@ -26,8 +26,8 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
 CORS(app)
 
-UPLOAD_DIR.mkdir(exist_ok=True)
-GRAPH_DIR.mkdir(exist_ok=True)
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+GRAPH_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ----- ROUTES -----
