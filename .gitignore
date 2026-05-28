@@ -16,6 +16,7 @@ visualizations/output/
 visualizations/*/*.png
 webapp/server/artifacts/
 model/artifacts/*.csv
+tests/artifacts/
 
 # Misc
 .git
