@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 
 // Citation (4/29/26): https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds
+// Citation (5/28/26): https://www.w3schools.com/jsref/met_win_settimeout.asp
 export default function AudioPlayer({ audioFile, title }) {
     const audioRef = useRef(null);
     const titleContainerRef = useRef(null);
@@ -30,11 +31,14 @@ export default function AudioPlayer({ audioFile, title }) {
 
     // Checks whether the title is longer than container
     useEffect(() => {
+    setIsLongTitle(false);
+    // Ensure title measure is done after re-render
+    const timer = setTimeout(() => {
         if (titleContainerRef.current && titleTextRef.current) {
             setIsLongTitle(
                 titleTextRef.current.scrollWidth > titleContainerRef.current.clientWidth
             );
-        }
+        }}, 80); return () => clearTimeout(timer);
     }, [title]);
 
     // Handles play and pause
