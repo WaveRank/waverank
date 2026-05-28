@@ -21,16 +21,13 @@ import tensorflow as tf
 from tensorflow.keras.applications.resnet50 import preprocess_input
 import numpy as np
 import json
-from shared.audio_utils import load_audio, segment_audio, make_spectrogram, spectrogram_to_image
-
-# ----- CONFIGURATION -----
-BASE_DIR = Path(__file__).resolve().parent
-MODEL_PATH = BASE_DIR / "model"
+from model.src.audio.audio_utils import load_audio, segment_audio, make_spectrogram, spectrogram_to_image
+from shared.paths import MODEL_ARTIFACTS_DIR
 
 # ----- MODEL LOADING -----
 # Load the model and class names
-loaded_model = tf.keras.models.load_model(MODEL_PATH / "final_model.keras")
-with open(MODEL_PATH / "class_names.json", "r") as f:
+loaded_model = tf.keras.models.load_model(MODEL_ARTIFACTS_DIR / "final_model.keras")
+with open(MODEL_ARTIFACTS_DIR / "class_names.json", "r") as f:
     class_names = json.load(f)
 
 # ----- INFERENCE -----
@@ -69,5 +66,6 @@ def predict_genre(filepath):
     return dict(zip(class_names, model_results))
 
 if __name__ == "__main__":
-    result = predict_genre((BASE_DIR / "model/song.mp3"))
-    print(result)
+    # result = predict_genre((MODEL_PATH / "model/song.mp3"))
+    # print(result)
+    pass

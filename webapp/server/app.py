@@ -10,12 +10,13 @@ from werkzeug.exceptions import RequestEntityTooLarge
 from flask_cors import CORS
 from pathlib import Path
 
-from webapp.server.config import PORT, UPLOAD_DIR, GRAPH_DIR, MAX_CONTENT_LENGTH
+from shared.paths import UPLOAD_DIR, GRAPH_DIR
+from webapp.server.config import PORT, MAX_CONTENT_LENGTH
 from webapp.server.services.file_io import create_unique_dir, delete_old_subdirs
 from webapp.server.services.audio_validation import allowed_file
 from webapp.server.services.audio_processing import process_audio_file
 from webapp.server.services.youtube import download_youtube_audio
-from shared.audio_utils import load_audio
+from model.src.audio.audio_utils import load_audio
 from visualizations.waveform.waveform import generate_waveform
 from visualizations.spectrum.spectrum import generate_spectrum
 from visualizations.spectrogram.spectrogram import generate_spectrogram
@@ -25,8 +26,8 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
 CORS(app)
 
-UPLOAD_DIR.mkdir(exist_ok=True)
-GRAPH_DIR.mkdir(exist_ok=True)
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+GRAPH_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ----- ROUTES -----

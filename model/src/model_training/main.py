@@ -37,12 +37,14 @@ Things to try to improve the model:
 import os
 os.environ["TF_DETERMINISTIC_OPS"] = "1"
 from pathlib import Path
-import src.config as cfg
-from src.dataset import get_datasets
-from src.model import build_model
 from sklearn.metrics import f1_score
-from src.training import initial_train, fine_tune
-from src.evaluate import *
+
+import model.config as cfg
+from model.src.model_training.dataset import get_datasets
+from model.src.model_training.model import build_model
+from model.src.model_training.training import initial_train, fine_tune
+from model.src.model_training.evaluate import *
+from shared.paths import MODEL_ARTIFACTS_DIR
 
 
 # ----- MAIN PIPELINE -----
@@ -68,8 +70,8 @@ test_loss, test_acc = model.evaluate(test_ds)
 print("Test accuracy after fine-tuning:", test_acc)
 
 # Save entire model for future use
-cfg.SAVE_PATH.mkdir(parents=True, exist_ok=True)
-model.save(cfg.SAVE_PATH / "final_model.keras")
+MODEL_ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
+model.save(MODEL_ARTIFACTS_DIR / "final_model.keras")
 
 # Extract embeddings
 emb_model = embedding_model(model)
