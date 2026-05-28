@@ -24,6 +24,7 @@ export default function HomePage() {
     };
 
     const graphs = data?.graphs;
+    const genrePrediction = data?.genre_prediction;
 
     return (
         <>
@@ -40,7 +41,7 @@ export default function HomePage() {
                     <InputBox onUploadResult={handleUploadResult} onStatusChange = {setStatus}/>
 
                     <div className="bodyOutput">
-                        <AnalysisSummary status={status}></AnalysisSummary>
+                        <AnalysisSummary status={status} genrePrediction={genrePrediction}></AnalysisSummary>
                         <WaveformSpectrumData waveform={graphs?.waveform} spectrum={graphs?.spectrum} />
                         <MelSpectrogramData spectrogram={graphs?.spectrogram}></MelSpectrogramData>
                     </div>

@@ -1,6 +1,5 @@
-// Takes raw genre object and returns sorted array of [name, value] pairs
-export const prepareGenreData = (data, fileName) => {
-    const genreData = data[fileName] || {};
+// Takes genre prediction dict and returns sorted array of [name, value] pairs
+export const prepareGenreData = (genreData) => {
     return Object.entries(genreData).sort((a, b) => b[1] - a[1]);
 };
 

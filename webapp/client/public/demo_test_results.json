@@ -1,5 +1,5 @@
 {
-    "demo_song.mp3": {
+    "genre_prediction": {
         "blues": 0.006348598748445511,
         "classical": 0.023107042536139488,
         "country": 0.30263304710388184,

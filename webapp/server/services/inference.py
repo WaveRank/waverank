@@ -31,7 +31,7 @@ with open(MODEL_ARTIFACTS_DIR / "class_names.json", "r") as f:
     class_names = json.load(f)
 
 # ----- INFERENCE -----
-def predict_genre(filepath):
+def predict_genre(audio_file, sr):
     """
     Uses pretrained CNN to predict the genres of a given song.
 
@@ -43,7 +43,6 @@ def predict_genre(filepath):
     """
 
     # Load and segment audio into correct length/overlap for model
-    audio_file, sr = load_audio(filepath)
     if audio_file is None:  # Audio file failed to load
         return dict(zip(class_names, [0] * len(class_names)))
     segments = segment_audio(audio_file, sr)

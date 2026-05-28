@@ -20,7 +20,8 @@ from visualizations.spectrogram.spectrogram import generate_spectrogram
 
 def process_audio_file(filepath, filename):
     """
-    Validates audio, generates graphs, and returns response data.
+    Validates audio, generates graphs and genre prediction, and returns
+    response data.
 
     Returns:
         tuple(response_data, status_code)
@@ -55,10 +56,14 @@ def process_audio_file(filepath, filename):
         print("Graph generation failed:", repr(e))
         return {"error": "Error generating graphs"}, 500
 
-    # TODO Get genre prediction from inference pipeline
+    # Get genre prediction from inference pipeline
     # TODO maybe look into handling this asynchronously
-    # genre_prediction = predict_genre(filepath)
-
+    try:
+        genre_prediction = predict_genre(y, sr)
+    except Exception as e:
+        filepath.unlink()
+        print("Genre inference failed:", repr(e))
+        return {"error": "Error generating genre prediction"}, 500
 
     # Cleanup the uploads and graphs older than the age limit
     try:
@@ -78,7 +83,7 @@ def process_audio_file(filepath, filename):
             "spectrum": f"{server_url}/api/graphs/{new_graph_subdir}/{spectrum_filename}",
             "spectrogram": f"{server_url}/api/graphs/{new_graph_subdir}/{spectrogram_filename}",
         },
-        # "genre_prediction": genre_prediction
+        "genre_prediction": genre_prediction
     }
 
     return response_data, 200

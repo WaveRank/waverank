@@ -32,20 +32,22 @@ function GenreBar({ genre, value }) {
 }
 
 // Analysis Summary Box: Contains input song's percentage results for genres
-export function AnalysisSummary({ status }) {
+export function AnalysisSummary({ status, genrePrediction }) {
     const [demoData, setDemoData] = useState(null);
 
+    // Genre bar chart uses demo data on initial load
     useEffect(() => {
         fetch('/demo_test_results.json')
             .then((response) => response.json())
             .then((data) => setDemoData(data));
     }, []);
-
     if (!demoData) {
         return <div className="boxContainer">Loading...</div>;
     }
 
-    const sortedGenres = prepareGenreData(demoData, "demo_song.mp3");
+    // Prepare bar chart data
+    const genreData = genrePrediction || demoData.genre_prediction;
+    const sortedGenres = prepareGenreData(genreData);
 
     return (
         <div className="boxContainer">
@@ -54,15 +56,12 @@ export function AnalysisSummary({ status }) {
 
             {/* Section content */}
             <div className="boxContent">
-                {/* TODO: Status of uploaded song, CURRENTLY STATIC */}
-                {/* <p>Status:</p>
-                <h3>FINISHED</h3> */}
                 <h3>{status.toUpperCase()}</h3>
 
                 <div className="boxDivider"/>
 
-                {/* Genre probability list in bar graph form*/}
-                <p>Genres:</p>
+                {/* Bar chart of genre probabilities */}
+                <p>{genrePrediction ? "Genres:" : "Genres: (example)"}</p>
                 <div className="chartContainer">
                     {sortedGenres.map(([genre, value]) => (
                         <GenreBar key={genre} genre={genre} value={value} />

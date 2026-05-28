@@ -63,3 +63,10 @@ Tensorflow to become unstable.
 python -m model.src.model_training.main
 python -m model.src.model_training.tune
 ```
+### Inference testing
+To run songs through the model and get genre predictions, put the test songs
+in data/test_songs and run the following command. Output will be saved
+as tests/artifacts/inference_test_results.json
+```
+python -m tests.test_inference
+```
