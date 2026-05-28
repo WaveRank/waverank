@@ -18,13 +18,13 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 SCALING = 100
 
-def generate_confusion_matrix(predictions_path, class_names_path, output_path):
+def generate_confusion_matrix(predictions_path, class_names_path, output_dir):
     """
     Load predictions from CSV and generate a labeled confusion matrix plot.
 
     Side effects:
     - Reads from predictions_path and class_names_path
-    - Writes image to output_path
+    - Writes image to output_dir
     """
 
     # Read genre names
@@ -48,7 +48,7 @@ def generate_confusion_matrix(predictions_path, class_names_path, output_path):
     ax.set_title("Confusion Matrix")
     plt.setp(ax.get_xticklabels(), rotation=45)
     plt.tight_layout()
-    plt.savefig(output_path / "confusion_matrix.png")
+    plt.savefig(output_dir / "confusion_matrix.png")
     plt.close(fig)
 
 

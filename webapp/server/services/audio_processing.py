@@ -10,12 +10,10 @@ upload and YouTube endpoints, including:
 from pathlib import Path
 from flask import request
 from werkzeug.utils import secure_filename
-from webapp.server.config import GRAPH_DIR, UPLOAD_DIR
-from webapp.server.services.file_io import (
-    create_unique_dir,
-    delete_old_subdirs,
-)
-from shared.audio_utils import load_audio
+from shared.paths import GRAPH_DIR, UPLOAD_DIR
+from webapp.server.services.file_io import create_unique_dir, delete_old_subdirs
+from webapp.server.services.inference import predict_genre
+from model.src.audio.audio_utils import load_audio
 from visualizations.waveform.waveform import generate_waveform
 from visualizations.spectrum.spectrum import generate_spectrum
 from visualizations.spectrogram.spectrogram import generate_spectrogram
@@ -42,7 +40,7 @@ def process_audio_file(filepath, filename):
     new_graph_subdir = create_unique_dir(GRAPH_DIR)
     output_dir = GRAPH_DIR / new_graph_subdir
     file_basename = Path(secure_filename(filename)).stem
-
+    
     waveform_filename = file_basename + "_waveform.png"
     spectrum_filename = file_basename + "_spectrum.png"
     spectrogram_filename = file_basename + "_spectrogram.png"
@@ -59,6 +57,8 @@ def process_audio_file(filepath, filename):
 
     # TODO Get genre prediction from inference pipeline
     # TODO maybe look into handling this asynchronously
+    # genre_prediction = predict_genre(filepath)
+
 
     # Cleanup the uploads and graphs older than the age limit
     try:
@@ -78,6 +78,7 @@ def process_audio_file(filepath, filename):
             "spectrum": f"{server_url}/api/graphs/{new_graph_subdir}/{spectrum_filename}",
             "spectrogram": f"{server_url}/api/graphs/{new_graph_subdir}/{spectrogram_filename}",
         },
+        # "genre_prediction": genre_prediction
     }
 
     return response_data, 200

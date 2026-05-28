@@ -7,19 +7,12 @@ model architecture, training, evaluation, and tuning scripts.
 """
 
 # ----- IMPORTS -----
-from pathlib import Path
 import os
 import random
 import numpy as np
 import tensorflow as tf
 
-
 # ----- CONFIGURATIONS -----
-# Paths
-BASE_PATH = Path(__file__).resolve().parent.parent
-DATASET_PATH = BASE_PATH / "dataset"
-SAVE_PATH = BASE_PATH / "webapp/server/model"   
-
 # Model
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
