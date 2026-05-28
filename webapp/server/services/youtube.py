@@ -20,8 +20,14 @@ def download_youtube_audio(link):
         filepath, filename (str, str): Path to and title of audio file
     """
 
+    # Set info extraction options
+    ydl_opts = {
+        'quiet': True,
+        'noplaylist': True
+    }
+
     # Check video information to validate
-    with yt_dlp.YoutubeDL() as ydl:
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(link, download=False)
         info = ydl.sanitize_info(info)
 
@@ -35,13 +41,9 @@ def download_youtube_audio(link):
         filename = info['title']
 
     # Set download options
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': str(filepath),
-        'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}],
-        'quiet': True,
-        'noplaylist': True
-    }
+    ydl_opts['format'] = 'bestaudio/best'
+    ydl_opts['outtmpl'] = str(filepath)
+    ydl_opts['postprocessors'] = [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}]
 
     # Actually download audio
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:

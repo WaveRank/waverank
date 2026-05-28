@@ -51,7 +51,7 @@ def handle_large_file(error):
 def serve_audio(audio_path):
     return send_from_directory(UPLOAD_DIR, audio_path)
 
-@app.route("/api/sentLink", methods=["POST"])
+@app.route("/api/youtube/download", methods=["POST"])
 def handle_youtube_link():
     # Extract URL from request
     data = request.get_json()
@@ -60,21 +60,38 @@ def handle_youtube_link():
 
     # Extract audio from youtube, which saves to disk
     try:
-        filepath, filename = download_youtube_audio(data['URL'])
+        filepath, filename = download_youtube_audio(data["URL"])
     except Exception as e:
         print("YouTube download failed:", repr(e))
         return jsonify({"error": str(e)}), 400
-        
+
+    # Build response
+    base_url = request.host_url.rstrip('/')
+    subdir = filepath.parent.name
+    return jsonify(
+        {
+            "subdir": subdir,
+            "filename": filename,
+            "audio": f"{base_url}/api/audio/{filepath.parent.name}/audio.mp3",
+        }
+    )
+
+@app.route("/api/youtube/process", methods=["POST"])
+def handle_youtube_audio():
+    # Extract info from request
+    data = request.get_json()
+    if data == None or "subdir" not in data or "filename" not in data:
+        return jsonify({"error": "Audio file missing"}), 400
+    subdir = data["subdir"]
+    filepath = UPLOAD_DIR / subdir / "audio.mp3"
+    filename = data["filename"]
+    
     # Process the file
     response_data, status = process_audio_file(filepath, filename)
     if status != 200:
         return jsonify(response_data), status
     
     # Complete and return response data
-    response_data["audio"] = (
-        f"{request.host_url.rstrip('/')}/api/audio/{filepath.parent.name}/audio.mp3"
-    )
-
     return jsonify(response_data)
 
 
