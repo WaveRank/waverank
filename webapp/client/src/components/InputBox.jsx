@@ -18,9 +18,9 @@ import { MAX_CONTENT_SIZE, ALLOWED_EXTENSIONS } from "../config/uploadConfig";
 export default function InputBox( {onUploadResult, onStatusChange}) {
     const [selectedFile, setSelectedFile] = useState(null); 
     const [uploadedFile, setUploadedFile] = useState(null);
-    const [sentLink, setSentLink] = useState(null);
     const [filename, setFilename] = useState(null);
     const [filepath, setFilepath] = useState(null);
+    const [sentLink, setSentLink] = useState("");
     const [showUploadPopup, setShowUploadPopup] = useState(false);
     const [showURLPopup, setShowURLPopup] = useState(false);
     const [requestActive, setRequestActive] = useState(false)
@@ -47,12 +47,6 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         // Close popup and disable buttons
         setShowUploadPopup(false);
         setRequestActive(true)
-        // Validate upload
-        if (!canUpload) {
-            setRequestActive(false)
-            setSelectedFile(null);
-            return;
-        }
         onStatusChange("Processing Audio from File Upload")
         const responseData = await uploadFile(selectedFile);
         if (responseData?.error) {
@@ -75,13 +69,6 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         // Close pop up and disable buttons
         setShowURLPopup(false)
         setRequestActive(true)
-        // Validate link is a real YouTube
-        if (!isValidLink) {
-            onStatusChange("Invalid YouTube link!");
-            setRequestActive(false);
-            setSentLink(null);
-            return;
-        }
         // send it to new flask route
         onStatusChange("Processing Audio from Youtube")
         const responseData = await uploadLink(sentLink);
@@ -122,14 +109,20 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
                         <h2>Upload Audio File</h2>
                         <button className="closeButton" onClick={() => {
                             setShowUploadPopup(false); 
-                            setSelectedFile(null);}}>X</button>
+                            setSelectedFile(null);
+                        }}>X</button>
                         <p>
                             Upload an audio clip to classify its top_N music genres using
                             a CNN trained on spectrogram features.
                             Max size {formatMB(MAX_CONTENT_SIZE, 0)}.
                         </p>
                         <input className="fileInput" type="file" accept={ALLOWED_EXTENSIONS.join(',')} onChange={onFileChange} />
-                        {selectedFile && !isValidSize && (
+                        {selectedFile && !isValidType && (
+                            <p className="popupError">
+                                File type not supported. Allowed types are: {ALLOWED_EXTENSIONS.join(',')}
+                            </p>
+                        )}
+                        {selectedFile && !isValidSize && isValidType && (
                             <p className="popupError">
                                 File size {formatMB(selectedFile.size)} exceeds maximum {formatMB(MAX_CONTENT_SIZE, 0)} limit.
                             </p>
@@ -144,9 +137,15 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
                 <div className="popupOverlay">
                     <div className="popupBox">
                         <h2>Paste URL</h2>
-                        <button className="closeButton" onClick={() => setShowURLPopup(false)}>X</button>
+                        <button className="closeButton" onClick={() => {
+                            setShowURLPopup(false);
+                            setSentLink(null);
+                        }}>X</button>
                         <input type="url" id="youtube-url-input" name="youtube-url-input" onChange={onLinkChange}></input>
-                        <button onClick={onPasteLink}>Paste URL</button>
+                        {sentLink && !isValidLink && (
+                            <p className="popupError">Invalid YouTube link!</p>
+                        )}
+                        <button onClick={onPasteLink} disabled={!isValidLink}>Paste URL</button>
                     </div>
                 </div>
             )}

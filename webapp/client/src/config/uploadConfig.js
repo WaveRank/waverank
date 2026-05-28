@@ -16,7 +16,7 @@ const ALLOWED_AUDIO_FORMATS = [
     },
     {
         extension: ".mp4",
-        mime: "audio/mp4"
+        mime: "video/mp4"
     }
 ];
 export const ALLOWED_EXTENSIONS = ALLOWED_AUDIO_FORMATS.map(format => format.extension);
