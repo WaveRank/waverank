@@ -14,7 +14,7 @@ export default function AudioFileDetails( {selectedFile, selectedFilename, selec
         content = 
             <>
                 <p>File Name: Your_File_Here</p>
-                <AudioPlayer audioFile={"/demo_song.mp3"} title={"demo_song.mp3"}/>
+                <AudioPlayer audioFile={null} title={null}/>
             </>
     }
     else if (selectedFile) {

@@ -6,7 +6,7 @@
 
 /* ----- AUDIO PLAYER ----- */
 .audioPlayer {
-    width: 50vw;
+    width: 45vw;
     background-color: #3a3a3a;
     color: white;
     border: 1px solid #6a6a6a;
@@ -17,8 +17,9 @@
 }
 
 .audioTitleContainer {
-    width: 260px;
-    min-width: 260px;
+    width: fit-content;
+    min-width: 0;
+    max-width: 260px;
     white-space: nowrap;
     font-size: 0.95rem;
     overflow: hidden;

@@ -125,7 +125,7 @@ export default function AudioPlayer({ audioFile, title }) {
                     </div>
 
                 {/* Play button to play/pause song */}
-                <button className="playButton" onClick={togglePlay}>
+                <button className="playButton" onClick={togglePlay} disabled={!src}>
                     {isPlaying ? "❚❚" : "▶"}
                 </button>
 
