@@ -79,7 +79,7 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         onStatusChange("Downloading audio from YouTube")
         const downloadData = await downloadYoutubeAudio(sentLink);
         // handle download response
-        if (downloadData) {
+        if (downloadData && !downloadData.error) {
             setFilename(downloadData.filename);
             setFilepath(downloadData.audio);
             setSelectedFile(null);
@@ -90,6 +90,8 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
             if (processData && onUploadResult) {
                 onUploadResult(processData);
             }
+        } else {
+            onUploadResult(downloadData)
         }
         setRequestActive(false);
         setSentLink(null);
