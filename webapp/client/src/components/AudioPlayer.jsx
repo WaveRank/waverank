@@ -33,14 +33,15 @@ export default function AudioPlayer({ audioFile, title }) {
 
     // Checks whether the title is longer than container
     useEffect(() => {
-    setIsLongTitle(false);
-    // Ensure title measure is done after re-render
-    const timer = setTimeout(() => {
-        if (titleContainerRef.current && titleTextRef.current) {
-            setIsLongTitle(
-                titleTextRef.current.scrollWidth > titleContainerRef.current.clientWidth
-            );
-        }}, 80); return () => clearTimeout(timer);
+        setIsLongTitle(false);
+        // Ensure title measure is done after re-render
+        const timer = setTimeout(() => {
+            if (titleContainerRef.current && titleTextRef.current) {
+                setIsLongTitle(
+                    titleTextRef.current.scrollWidth > titleContainerRef.current.clientWidth
+                );
+            }
+        }, 80); return () => clearTimeout(timer);
     }, [title]);
 
     // Gets the length of the scroll animation
