@@ -141,7 +141,7 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
 
             {/* Conditional: Popup for pasting URL */}
             {showURLPopup && (
-                <div className="popupOverlay" onClick={() => setShowUploadPopup(false)}>
+                <div className="popupOverlay" onClick={() => setShowURLPopup(false)}>
                     <div className="popupBox" onClick={(e) => e.stopPropagation()}>
                         <h2>Paste URL</h2>
                         <button className="closeButton" onClick={() => {

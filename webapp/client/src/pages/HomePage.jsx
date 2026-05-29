@@ -13,7 +13,8 @@ export default function HomePage() {
     const [spinnerIndex, setSpinnerIndex] = useState(0);
 
     // Detect processing symbol state
-    const isProcessing = status?.toLowerCase().includes("processing audio");
+    const currStatus = status?.toLowerCase()
+    const isProcessing = currStatus.includes("processing") || currStatus.includes("downloading");
     useEffect(() => {
         if (!isProcessing) return;
         const frames = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"];
