@@ -20,7 +20,7 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
     const [uploadedFile, setUploadedFile] = useState(null);
     const [filename, setFilename] = useState(null);
     const [filepath, setFilepath] = useState(null);
-    const [sentLink, setSentLink] = useState("");
+    const [sentLink, setSentLink] = useState(null);
     const [showUploadPopup, setShowUploadPopup] = useState(false);
     const [showURLPopup, setShowURLPopup] = useState(false);
     const [requestActive, setRequestActive] = useState(false)
@@ -75,6 +75,7 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         const downloadData = await downloadYoutubeAudio(sentLink);
         if (downloadData?.error) {
             onStatusChange(downloadData.error);
+            setRequestActive(false);
             return;
         }
         // handle download response
