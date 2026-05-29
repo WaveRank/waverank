@@ -48,7 +48,7 @@ export default function AudioPlayer({ audioFile, title }) {
         if (!isLongTitle) return;
         if (titleContainerRef.current && titleTextRef.current) {
             const length = titleTextRef.current.scrollWidth - titleContainerRef.current.clientWidth;
-            titleTextRef.current.style.setProperty('--scroll', `-${length}px`);
+            titleTextRef.current.style.setProperty('--X', `-${length}px`);
         }
     }, [isLongTitle]);
 

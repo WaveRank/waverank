@@ -82,6 +82,6 @@
 
 @keyframes scrollTitle {
     0% {transform: translateX(0%);}
-    90% {transform: translateX(var(--scroll));}
+    90% {transform: translateX(var(--X));}
     100% {transform: translateX(0);}
 }
