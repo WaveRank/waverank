@@ -9,6 +9,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 from flask_cors import CORS
 from pathlib import Path
+from yt_dlp.utils import DownloadError
 
 from shared.paths import UPLOAD_DIR, GRAPH_DIR
 from webapp.server.config import PORT, MAX_CONTENT_LENGTH
@@ -62,8 +63,24 @@ def handle_youtube_link():
     try:
         filepath, filename = download_youtube_audio(data['URL'])
     except Exception as e:
-        print("YouTube download failed:", repr(e))
-        return jsonify({"error": str(e)}), 400
+        if isinstance(e, ValueError):
+            error = str(e)
+        elif isinstance(e, KeyError):
+            error = "Livestreams are not supported"
+        elif isinstance(e, DownloadError):
+            msg = str(e)
+            if "Sign in" in msg or "age" in msg.lower():
+                error = "Age-restricted videos are not supported"
+            elif "live event" in msg.lower() or "live stream" in msg.lower():
+                error = "Livestreams are not supported"
+            elif "this video is not available" in msg.lower():
+                error = "Video is not available or has download restrictions"
+            else:
+                error = "Download error: Check URL and try again"
+        else:
+            print("Other Error:", repr(e))
+            error = str(e)
+        return jsonify({"error": error}), 400
         
     # Process the file
     response_data, status = process_audio_file(filepath, filename)
