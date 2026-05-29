@@ -8,7 +8,7 @@ export const MAX_CONTENT_SIZE = 10 * 1024 * 1024;  // 10MB
 const ALLOWED_AUDIO_FORMATS = [
     {
         extension: ".wav",
-        mime: "audio/wav"
+        mime: "audio/x-wav"
     },
     {
         extension: ".mp3",
