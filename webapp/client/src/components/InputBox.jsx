@@ -11,7 +11,7 @@ import { isValidFileType } from "../utils/fileType";
 import { isValidFileSize } from "../utils/fileSize";
 import { isValidYoutubeLink } from "../utils/validLink";
 import { formatMB } from "../utils/fileSize";
-import { uploadFile, uploadLink } from "../services/api";
+import { downloadYoutubeAudio, processYoutubeAudio, uploadFile } from "../services/api";
 import { MAX_CONTENT_SIZE, ALLOWED_EXTENSIONS } from "../config/uploadConfig";
 
 
@@ -69,23 +69,29 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         // Close pop up and disable buttons
         setShowURLPopup(false)
         setRequestActive(true)
-        // send it to new flask route
-        onStatusChange("Processing Audio from Youtube")
-        const responseData = await uploadLink(sentLink);
-        // handle error
-        if (responseData?.error) {
-            onStatusChange(responseData.error);
-            setRequestActive(false);
-            setSentLink(null);
+        
+        // Phase 1: end link to download flask route
+        onStatusChange("Downloading audio from YouTube")
+        const downloadData = await downloadYoutubeAudio(sentLink);
+        if (downloadData?.error) {
+            onStatusChange(downloadData.error);
             return;
         }
-        // handle response
-        if (responseData && onUploadResult) {
-            onUploadResult(responseData);
-            setFilename(responseData.filename);
-            setFilepath(responseData.audio);
+        // handle download response
+        if (downloadData) {
+            setFilename(downloadData.filename);
+            setFilepath(downloadData.audio);
             setSelectedFile(null);
             setUploadedFile(null);
+
+            // Phase 2: process audio file from download
+            onStatusChange("Processing audio from YouTube")
+            const processData = await processYoutubeAudio(downloadData.subdir, downloadData.filename)
+            if (processData && onUploadResult) {
+                onUploadResult(processData);
+            }
+        } else {
+            onUploadResult(downloadData)
         }
         setRequestActive(false);
         setSentLink(null);

@@ -19,30 +19,37 @@ def download_youtube_audio(link):
     Returns:
         filepath, filename (str, str): Path to and title of audio file
     """
-    new_upload_subdir = create_unique_dir(UPLOAD_DIR)
-    filepath = UPLOAD_DIR / new_upload_subdir / "audio" # yt-dlp adds extension
-    
 
-
+    # Set info extraction options
     ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': str(filepath),
-        'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}],
         'quiet': True,
-        'noplaylist': True
+        'noplaylist': True,
     }
 
-
+    # Check video information to validate
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(link, download=False)
         info = ydl.sanitize_info(info)
 
-        # Safeguard against livestreams and long videos
-        if 'duration' not in info:
-            raise ValueError("Livestreams are not supported")
+        # Safeguard against livestreams, non-videos, and long videos
+        if info is None or 'duration' not in info:
+            if info and info.get('is_live'):
+                raise ValueError("Livestreams are not supported")
+            else:
+                raise ValueError("Video not found")
         if info['duration'] > MAX_YOUTUBE_LENGTH:
             raise ValueError(f"Video exceeds maximum duration ({MAX_YOUTUBE_LENGTH // 60} min)")
+        new_upload_subdir = create_unique_dir(UPLOAD_DIR)
+        filepath = UPLOAD_DIR / new_upload_subdir / "audio" # yt-dlp adds extension
         filename = info['title']
+
+    # Set download options
+    ydl_opts['format'] = 'bestaudio/best'
+    ydl_opts['outtmpl'] = str(filepath)
+    ydl_opts['postprocessors'] = [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}]
+
+    # Actually download audio
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([link])
     
     return filepath.with_suffix('.mp3'), filename

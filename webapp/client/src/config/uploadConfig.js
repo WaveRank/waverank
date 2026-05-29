@@ -21,4 +21,4 @@ const ALLOWED_AUDIO_FORMATS = [
 ];
 export const ALLOWED_EXTENSIONS = ALLOWED_AUDIO_FORMATS.map(format => format.extension);
 export const ALLOWED_TYPES =      ALLOWED_AUDIO_FORMATS.map(format => format.mime);
-export const ALLOWED_LINKS = ["youtube.com/watch?v=", "youtu.be/"]
+export const ALLOWED_LINKS = ["youtube.", "youtu.be/"]
