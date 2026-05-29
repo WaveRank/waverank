@@ -46,8 +46,8 @@ def process_audio_file(filepath, filename):
     spectrogram_filename = file_basename + "_spectrogram.png"
 
     try:
-        generate_waveform(y, output_dir / waveform_filename)
-        generate_spectrum(y, output_dir / spectrum_filename)
+        generate_waveform(y, sr, output_dir / waveform_filename)
+        generate_spectrum(y, sr, output_dir / spectrum_filename)
         generate_spectrogram(y, sr, output_dir / spectrogram_filename)
 
     except Exception as e:

@@ -13,6 +13,7 @@ html, body {
     margin: 0;
     padding: 0;
     font-size: 125%;
+    overflow-x: hidden;
 }
 
 /* ----- PAGE LAYOUT ----- */
@@ -69,11 +70,14 @@ html, body {
     gap: 1rem;
     height: 40px;
     transform: translateY(-45%);
+    position: relative;
+    z-index: 2000;
 }
 
 .navBar h2 {
     color: white;
     margin: 0;
+    font-size: clamp(1.1rem, 3vw, 1.8rem);
 }
 
 .navButtons {
@@ -111,9 +115,64 @@ html, body {
     padding: 0.55rem 0.8rem !important;
 }
 
+.homeButton:hover {
+    color: white !important;
+    background-color: #3a3a3a !important;
+    border: 1px solid white;
+}
+
+.homeButton:active {
+    transform: scale(0.97);
+}
+
 .navButton.active {
     color: #bb7ac7;
     text-decoration: underline;
+}
+
+/* ----- NAVIGATION BAR (HAMBURGER FOR MOBILE) ----- */
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: clamp(1.1rem, 3vw, 1.8rem);
+    cursor: pointer;
+    z-index: 2000;
+}
+
+@media (max-width: 997px) {
+    .hamburger {
+        display: block;
+        margin-left: auto;
+    }
+
+    .navButtons {
+        margin: 0 !important;
+        display: none; 
+        flex-direction: column;
+        position: absolute; 
+        top: 58px; 
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% + 2rem);
+        background-color: #1f1f1f;
+        border: 1px solid #444444;
+        padding: 1rem;
+        z-index: 999;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .navButtons.show {
+        display: flex; 
+    }
+
+    .navButtons a {
+        margin: 0.5rem 0 !important;
+        text-align: center;
+        font-size: 0.85rem;
+    }
 }
 
 /* ----- HEADER SECTION ----- */
@@ -126,6 +185,7 @@ html, body {
 
 .headerTitle h1 {
     margin-bottom: 0.5rem;
+    font-size: clamp(1.1rem, 4vw, 2.5rem);
 }
 
 .headerTitle h1:first-child {
@@ -140,4 +200,16 @@ html, body {
     color: #b0b0b0;
     margin-top: 0;
     margin-bottom: 0;
+    font-size: clamp(0.8rem, 2vw, 1.1rem);
+}
+
+/* ----- MOBILE ADJUSTMENTS ----- */
+@media (max-width: 997px) {
+    .page {
+        padding-left: 2vw;
+        padding-right: 2vw;
+    }
+    .frame {
+        padding: 2rem;
+    }
 }
