@@ -55,8 +55,8 @@ def process_audio_file(filepath, filename):
     # Multithread: generate and save three graphs and get genre prediction
     try:
         with ThreadPoolExecutor(max_workers=4) as executor:
-            waveform_future = executor.submit(generate_waveform, y, output_dir / waveform_filename)
-            spectrum_future = executor.submit(generate_spectrum, y, output_dir / spectrum_filename)
+            waveform_future = executor.submit(generate_waveform, y, sr, output_dir / waveform_filename)
+            spectrum_future = executor.submit(generate_spectrum, y, sr, output_dir / spectrum_filename)
             spectrogram_future = executor.submit( generate_spectrogram, y, sr, output_dir / spectrogram_filename)
             prediction_future = executor.submit(predict_genre, y, sr)
 
