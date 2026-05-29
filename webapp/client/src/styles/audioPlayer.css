@@ -1,6 +1,13 @@
+/* 
+*Citations (05/27/26): 
+*   https://www.w3schools.com/CSSref/atrule_keyframes.php
+*   https://www.w3schools.com/CSSref/css3_pr_transform.php
+*   https://www.w3schools.com/cssref/css3_pr_animation-timing-function.php
+*/
+
 /* ----- AUDIO PLAYER ----- */
 .audioPlayer {
-    width: 35vw;
+    width: 45vw;
     background-color: #3a3a3a;
     color: white;
     border: 1px solid #6a6a6a;
@@ -10,13 +17,22 @@
     margin-top: 20px;
 }
 
-.audioTitle {
+.audioTitleContainer {
+    width: fit-content;
     min-width: 0;
-    max-width: 40%;
+    max-width: 260px;
     white-space: nowrap;
     font-size: 0.95rem;
     overflow: hidden;
-    text-overflow: ellipsis;
+}
+
+.audioTitleText {
+    display: inline-flex;
+    white-space: nowrap;
+}
+
+.audioTitleText.scrolling {
+    animation: scrollTitle 10s ease-in-out infinite
 }
 
 .audioRow {
@@ -62,4 +78,10 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+}
+
+@keyframes scrollTitle {
+    0% {transform: translateX(0%);}
+    90% {transform: translateX(var(--X));}
+    100% {transform: translateX(0);}
 }
