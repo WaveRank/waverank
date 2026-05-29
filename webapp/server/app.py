@@ -69,7 +69,7 @@ def handle_youtube_link():
         elif isinstance(e, KeyError):
             error = "Livestreams are not supported"
         elif isinstance(e, DownloadError):
-            if "Sign in" in msg or "age" in msg.lower():
+            if "sign in to confirm your age" in msg.lower():
                 error = "Age-restricted videos are not supported"
             elif "live event" in msg.lower() or "live stream" in msg.lower():
                 error = "Livestreams are not supported"
