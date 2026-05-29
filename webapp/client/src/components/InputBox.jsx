@@ -17,9 +17,10 @@ import { MAX_CONTENT_SIZE, ALLOWED_EXTENSIONS } from "../config/uploadConfig";
 
 export default function InputBox( {onUploadResult, onStatusChange}) {
     const [selectedFile, setSelectedFile] = useState(null); 
-    const [sentLink, setSentLink] = useState(null);
+    const [uploadedFile, setUploadedFile] = useState(null);
     const [filename, setFilename] = useState(null);
     const [filepath, setFilepath] = useState(null);
+    const [sentLink, setSentLink] = useState(null);
     const [showUploadPopup, setShowUploadPopup] = useState(false);
     const [showURLPopup, setShowURLPopup] = useState(false);
     const [requestActive, setRequestActive] = useState(false)
@@ -46,18 +47,18 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         // Close popup and disable buttons
         setShowUploadPopup(false);
         setRequestActive(true)
-        // Validate upload
-        if (!canUpload) {
-            setRequestActive(false)
-            setSelectedFile(null);
-            return;
-        }
         onStatusChange("Processing Audio from File Upload")
         const responseData = await uploadFile(selectedFile);
+        if (responseData?.error) {
+            onStatusChange(responseData.error);
+            setRequestActive(false);
+            return;
+        }
         if (responseData && onUploadResult) {
             onUploadResult(responseData);
             setFilename(responseData.filename);
             setFilepath(null)
+            setUploadedFile(selectedFile)
         }
         setRequestActive(false);
         setUploadComplete(true);
@@ -68,22 +69,30 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         // Close pop up and disable buttons
         setShowURLPopup(false)
         setRequestActive(true)
-        // Validate link is a real YouTube
-        if (!isValidLink) {
-            onStatusChange("Invalid YouTube link!");
+        
+        // Phase 1: end link to download flask route
+        onStatusChange("Downloading audio from YouTube")
+        const downloadData = await downloadYoutubeAudio(sentLink);
+        if (downloadData?.error) {
+            onStatusChange(downloadData.error);
             setRequestActive(false);
-            setSentLink(null);
             return;
         }
-        // send it to new flask route
-        onStatusChange("Processing Audio from Youtube")
-        const responseData = await uploadLink(sentLink);
-        // handle response
-        if (responseData && onUploadResult) {
-            onUploadResult(responseData);
-            setFilename(responseData.filename);
-            setFilepath(responseData.audio);
+        // handle download response
+        if (downloadData) {
+            setFilename(downloadData.filename);
+            setFilepath(downloadData.audio);
             setSelectedFile(null);
+            setUploadedFile(null);
+
+            // Phase 2: process audio file from download
+            onStatusChange("Processing audio from YouTube")
+            const processData = await processYoutubeAudio(downloadData.subdir, downloadData.filename)
+            if (processData && onUploadResult) {
+                onUploadResult(processData);
+            }
+        } else {
+            onUploadResult(downloadData)
         }
         setRequestActive(false);
         setSentLink(null);
@@ -105,13 +114,26 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
                 <div className="popupOverlay" onClick={() => setShowUploadPopup(false)}>
                     <div className="popupBox" onClick={(e) => e.stopPropagation()}>
                         <h2>Upload Audio File</h2>
-                        <button className="closeButton" onClick={() => setShowUploadPopup(false)}>X</button>
+                        <button className="closeButton" onClick={() => {
+                            setShowUploadPopup(false); 
+                            setSelectedFile(null);
+                        }}>X</button>
                         <p>
                             Upload an audio clip to classify its top_N music genres using
                             a CNN trained on spectrogram features.
                             Max size {formatMB(MAX_CONTENT_SIZE, 0)}.
                         </p>
                         <input className="fileInput" type="file" accept={ALLOWED_EXTENSIONS.join(',')} onChange={onFileChange} />
+                        {selectedFile && !isValidType && (
+                            <p className="popupError">
+                                File type not supported. Allowed types are: {ALLOWED_EXTENSIONS.join(',')}
+                            </p>
+                        )}
+                        {selectedFile && !isValidSize && isValidType && (
+                            <p className="popupError">
+                                File size {formatMB(selectedFile.size)} exceeds maximum {formatMB(MAX_CONTENT_SIZE, 0)} limit.
+                            </p>
+                        )}
                         <button className="uploadButton" onClick={onUploadFile} disabled={!canUpload}>Upload!</button>
                     </div>
                 </div>
@@ -122,17 +144,21 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
                 <div className="popupOverlay" onClick={() => setShowUploadPopup(false)}>
                     <div className="popupBox" onClick={(e) => e.stopPropagation()}>
                         <h2>Paste URL</h2>
-                        <button className="closeButton" onClick={() => setShowURLPopup(false)}>X</button>
+                        <button className="closeButton" onClick={() => {
+                            setShowURLPopup(false);
+                            setSentLink(null);
+                        }}>X</button>
                         <p>Paste a URL from YouTube. Does not allow livestreams, age-restricted content, private videos, or videos over 10 minutes.</p>
                         <input className="fileInput" type="url" id="youtube-url-input" name="youtube-url-input" placeholder="Paste URL here" onChange={onLinkChange}></input>
-                        <button className="uploadButton" onClick={onPasteLink}>Paste URL</button>
+                        {sentLink && !isValidLink && (
+                            <p className="popupError">Invalid YouTube link!</p>
+                        )}
+                        <button className="uploadButton" onClick={onPasteLink} disabled={!isValidLink}>Paste URL</button>
                     </div>
                 </div>
             )}
             <AudioFileDetails
-                selectedFile={selectedFile}
-                isValidSize={isValidSize}
-                maxContentSize={MAX_CONTENT_SIZE}
+                selectedFile={uploadedFile}
                 selectedFilename={filename}
                 selectedFilepath={filepath}
             />

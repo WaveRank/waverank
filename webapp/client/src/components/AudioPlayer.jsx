@@ -1,15 +1,26 @@
 import { useRef, useState, useEffect } from "react";
 
 // Citation (4/29/26): https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds
+// Citation (5/28/26): https://www.w3schools.com/jsref/met_win_settimeout.asp
+// https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties#setting_values_in_javascript
+
 export default function AudioPlayer({ audioFile, title }) {
     const audioRef = useRef(null);
+    const titleContainerRef = useRef(null);
+    const titleTextRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [isLongTitle, setIsLongTitle] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
     const [src, setSrc] = useState(null);
 
     // Handle file vs string audioFile
     useEffect(() => {
         if (!audioFile) return;
+
+        setCurrentTime(0);
+        setDuration(0);
+        setIsPlaying(false);
 
         if (audioFile instanceof File) {
             const url = URL.createObjectURL(audioFile);
@@ -20,6 +31,27 @@ export default function AudioPlayer({ audioFile, title }) {
         }
     }, [audioFile]);
 
+    // Checks whether the title is longer than container
+    useEffect(() => {
+        setIsLongTitle(false);
+        // Ensure title measure is done after re-render
+        const timer = setTimeout(() => {
+            if (titleContainerRef.current && titleTextRef.current) {
+                setIsLongTitle(
+                    titleTextRef.current.scrollWidth > titleContainerRef.current.clientWidth
+                );
+            }
+        }, 80); return () => clearTimeout(timer);
+    }, [title]);
+
+    // Gets the length of the scroll animation
+    useEffect(() => {
+        if (!isLongTitle) return;
+        if (titleContainerRef.current && titleTextRef.current) {
+            const length = titleTextRef.current.scrollWidth - titleContainerRef.current.clientWidth;
+            titleTextRef.current.style.setProperty('--X', `-${length}px`);
+        }
+    }, [isLongTitle]);
 
     // Handles play and pause
     const togglePlay = () => {
@@ -39,6 +71,16 @@ export default function AudioPlayer({ audioFile, title }) {
         setCurrentTime(audioRef.current.currentTime);
     };
 
+    const onLoadedMetadata = () => {
+        setDuration(audioRef.current.duration);
+    };
+
+    const onEnded = () => {
+        setIsPlaying(false);
+        setCurrentTime(0);
+        audioRef.current.currentTime = 0;
+    };
+
     // Allows scrubbing of the playback bar
     const onSeek = (e) => {
         const time = Number(e.target.value);
@@ -56,11 +98,24 @@ export default function AudioPlayer({ audioFile, title }) {
 
     return (
         <div className="audioPlayer">
-            <audio ref={audioRef} src={src} onTimeUpdate={onTimeUpdate}/>
+            <audio 
+                ref={audioRef} 
+                src={src} 
+                onTimeUpdate={onTimeUpdate}
+                onLoadedMetadata={onLoadedMetadata}
+                onEnded={onEnded}
+            />
 
                 <div className="audioRow">
-
-                    <div className="audioTitle">{title}</div>
+                    {/* Adds scrolling animation if the title is long */}
+                    <div className="audioTitleContainer" ref={titleContainerRef}> 
+                        <span
+                            className={`audioTitleText ${isLongTitle ? "scrolling" : ""}`}
+                            ref={titleTextRef}
+                        >
+                            {title}
+                        </span>
+                    </div>
 
                     <div className="audioScrubber">
                         {/* Progress slider for song, scrubbable */}
@@ -68,20 +123,20 @@ export default function AudioPlayer({ audioFile, title }) {
                             className="playbackBar"
                             type="range"
                             min="0"
-                            max={audioRef.current?.duration || 0}
+                            max={duration}
                             value={currentTime}
                             onChange={onSeek}
                         />
                         {/* Audio timestamps, shows current time and total length */}
                         <div className="audioTimes">
                             <span>{formatTime(currentTime)}</span>
-                            <span>{formatTime(audioRef.current?.duration)}</span>
+                            <span>{formatTime(duration)}</span>
                         </div>
 
                     </div>
 
                 {/* Play button to play/pause song */}
-                <button className="playButton" onClick={togglePlay}>
+                <button className="playButton" onClick={togglePlay} disabled={!src}>
                     {isPlaying ? "❚❚" : "▶"}
                 </button>
 
