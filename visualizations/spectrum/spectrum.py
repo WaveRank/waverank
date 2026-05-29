@@ -65,5 +65,5 @@ def generate_spectrum(y, sr, output_path):
     style_axes(ax)
     finalize(fig, ax, SPECTRUM_MARGINS)
 
-    fig.savefig(output_path)
+    fig.savefig(output_path, dpi=300, transparent=True)
     plt.close(fig)
