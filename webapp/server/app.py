@@ -63,23 +63,25 @@ def handle_youtube_link():
     try:
         filepath, filename = download_youtube_audio(data["URL"])
     except Exception as e:
+        msg = str(e)
         if isinstance(e, ValueError):
-            error = str(e)
+            error = msg
         elif isinstance(e, KeyError):
             error = "Livestreams are not supported"
         elif isinstance(e, DownloadError):
-            msg = str(e)
             if "Sign in" in msg or "age" in msg.lower():
                 error = "Age-restricted videos are not supported"
             elif "live event" in msg.lower() or "live stream" in msg.lower():
                 error = "Livestreams are not supported"
             elif "this video is not available" in msg.lower():
                 error = "Video is not available or has download restrictions"
+            elif "members-only" in msg.lower():
+                error = "Members-only videos are not supported"
             else:
                 error = "Download error: Check URL and try again"
         else:
             print("Other Error:", repr(e))
-            error = str(e)
+            error = msg
         return jsonify({"error": error}), 400
 
     # Build response

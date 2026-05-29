@@ -31,8 +31,13 @@ def download_youtube_audio(link):
         info = ydl.extract_info(link, download=False)
         info = ydl.sanitize_info(info)
 
-        # Safeguard against long videos
-        if info and info['duration'] > MAX_YOUTUBE_LENGTH:
+        # Safeguard against livestreams, non-videos, and long videos
+        if info is None or 'duration' not in info:
+            if info and info.get('is_live'):
+                raise ValueError("Livestreams are not supported")
+            else:
+                raise ValueError("Video not found")
+        if info['duration'] > MAX_YOUTUBE_LENGTH:
             raise ValueError(f"Video exceeds maximum duration ({MAX_YOUTUBE_LENGTH // 60} min)")
         new_upload_subdir = create_unique_dir(UPLOAD_DIR)
         filepath = UPLOAD_DIR / new_upload_subdir / "audio" # yt-dlp adds extension
