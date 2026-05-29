@@ -10,9 +10,17 @@ const ALLOWED_AUDIO_FORMATS = [
         extension: ".wav",
         mime: "audio/x-wav"
     },
+        {
+        extension: ".wav",
+        mime: "audio/wav"
+    },
     {
         extension: ".mp3",
         mime: "audio/mpeg"
+    },
+    {
+        extension: ".mp4",
+        mime: "audio/mp4"
     },
     {
         extension: ".mp4",
