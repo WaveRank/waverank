@@ -102,8 +102,8 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
 
             {/* Conditional: Popup for uploading audio file */}
             {showUploadPopup && (
-                <div className="popupOverlay">
-                    <div className="popupBox">
+                <div className="popupOverlay" onClick={() => setShowUploadPopup(false)}>
+                    <div className="popupBox" onClick={(e) => e.stopPropagation()}>
                         <h2>Upload Audio File</h2>
                         <button className="closeButton" onClick={() => setShowUploadPopup(false)}>X</button>
                         <p>
@@ -119,12 +119,13 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
 
             {/* Conditional: Popup for pasting URL */}
             {showURLPopup && (
-                <div className="popupOverlay">
-                    <div className="popupBox">
+                <div className="popupOverlay" onClick={() => setShowUploadPopup(false)}>
+                    <div className="popupBox" onClick={(e) => e.stopPropagation()}>
                         <h2>Paste URL</h2>
                         <button className="closeButton" onClick={() => setShowURLPopup(false)}>X</button>
-                        <input type="url" id="youtube-url-input" name="youtube-url-input" onChange={onLinkChange}></input>
-                        <button onClick={onPasteLink}>Paste URL</button>
+                        <p>Paste a URL from YouTube. Does not allow livestreams, age-restricted content, private videos, or videos over 10 minutes.</p>
+                        <input className="fileInput" type="url" id="youtube-url-input" name="youtube-url-input" placeholder="Paste URL here" onChange={onLinkChange}></input>
+                        <button className="uploadButton" onClick={onPasteLink}>Paste URL</button>
                     </div>
                 </div>
             )}

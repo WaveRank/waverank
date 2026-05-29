@@ -13,7 +13,7 @@ export default function AudioFileDetails( {selectedFile, isValidSize, maxContent
     if (!selectedFile && !selectedFilename) {
         content = 
             <>
-                <p>File Name: Your_File_Here</p>
+                {/* <p>File Name: Your_File_Here</p> */}
                 <AudioPlayer audioFile={"/demo_song.mp3"} title={"demo_song.mp3"}/>
             </>
     }
@@ -47,7 +47,6 @@ export default function AudioFileDetails( {selectedFile, isValidSize, maxContent
 
     return (
         <div className="inputAudio">
-            <h2>File Details:</h2>
             {content}
         </div>
     )

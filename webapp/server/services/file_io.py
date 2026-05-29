@@ -27,7 +27,7 @@ def create_unique_dir(dir):
     unique_dir_name = str(uuid.uuid4().hex[:8])
     filepath = dir / unique_dir_name
 
-    filepath.mkdir(exist_ok=True)
+    filepath.mkdir(parents=True, exist_ok=True)
 
     return unique_dir_name
 

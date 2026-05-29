@@ -1,11 +1,12 @@
 /* ----- AUDIO PLAYER ----- */
 .audioPlayer {
-    width: 35vw;
+    width: 92%;
+    max-width: 450px;
     background-color: #3a3a3a;
     color: white;
     border: 1px solid #6a6a6a;
     border-radius: 6px;
-    padding: 0.55rem 0.9rem;
+    padding: clamp(0.5rem, 1.5vw, 0.9rem);
     font-size: 1rem;
     margin-top: 20px;
 }
@@ -14,7 +15,7 @@
     min-width: 0;
     max-width: 40%;
     white-space: nowrap;
-    font-size: 0.95rem;
+    font-size: clamp(0.8rem, 2vw, 0.95rem);
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -23,7 +24,8 @@
     display: flex;
     align-items: center; 
     gap: 0.75rem;
-    height: 45px; 
+    height: 45px;
+    gap: clamp(0.5rem, 1vw, 0.75rem);
 }
 
 .audioScrubber {
@@ -45,15 +47,15 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    font-size: 0.7rem;
+    font-size: clamp(0.6rem, 1.5vw, 0.7rem);
     color: #b3b3b3;
     position: absolute;
     top: 17px; 
 }
 
 .playButton {
-    width: 34px;
-    height: 34px;
+    width: clamp(30px, 4vw, 34px);
+    height: clamp(30px, 4vw, 34px);
     border-radius: 50%;
     background: #1a1a1a;
     color: white;

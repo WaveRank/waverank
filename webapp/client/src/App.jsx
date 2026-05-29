@@ -1,4 +1,5 @@
 import { Routes, Route, NavLink } from "react-router-dom";
+import { useState } from 'react';
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import ContributorsPage from "./pages/ContributorsPage";
@@ -7,6 +8,9 @@ import "./App.css";
 
 
 export default function App() {
+    const [navMenuOpen, setNavMenuOpen] = useState(false);
+    const closeMenu = () => setNavMenuOpen(false);
+    const getNavLinkClass = ({ isActive }) => isActive ? "navButton active" : "navButton";
 
       return (
         <div className="page">
@@ -14,11 +18,16 @@ export default function App() {
                 <div className="navBar">
                     <h2>WaveRank</h2>
 
-                    <div className="navButtons">
-                        <NavLink to="/about" className={({ isActive }) => isActive ? "navButton active" : "navButton"}>About</NavLink>
-                        <NavLink to="/contributors" className={({ isActive }) => isActive ? "navButton active" : "navButton"}>Contributors</NavLink>
-                        <NavLink to="/credits" className={({ isActive }) => isActive ? "navButton active" : "navButton"}>Credits</NavLink>
-                        <NavLink to="/" className="homeButton">Return to Home</NavLink>
+                    {/* Hamburger nav menu (only for mobile) */}
+                    <button className="hamburger" onClick={() => setNavMenuOpen(!navMenuOpen)}>
+                        {navMenuOpen ? '✕' : '☰'}
+                    </button>
+
+                    <div className={`navButtons ${navMenuOpen ? 'show' : ''}`}>
+                        <NavLink to="/about" onClick={closeMenu} className={getNavLinkClass}>About</NavLink>
+                        <NavLink to="/contributors" onClick={closeMenu} className={getNavLinkClass}>Contributors</NavLink>
+                        <NavLink to="/credits" onClick={closeMenu} className={getNavLinkClass}>Credits</NavLink>
+                        <NavLink to="/" onClick={closeMenu} className="homeButton">Return to Home</NavLink>
                     </div>
                 </div>
 
