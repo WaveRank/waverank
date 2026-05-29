@@ -17,7 +17,7 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    flex: 1;
+    flex: 1 1 0;
     min-height: 850px;
     margin-top: 10px;
 }
@@ -25,15 +25,15 @@
 .boxHeader {
     background-color: #3a3a3a;
     margin: 0;
-    padding: 0.55rem 0.9rem;
-    font-size: 1rem;
+    padding: clamp(0.4rem, 1vw, 0.55rem) clamp(0.6rem, 1.5vw, 0.9rem);
+    font-size: clamp(0.9rem, 2vw, 1rem);
     border-bottom: 1px solid #6a6a6a;
 }
 
 /* ----- CONTENT & TYPOGRAPHY ----- */
 .boxContent {
-    padding: 0rem 1rem;
-    font-size: 0.95rem;
+    padding: 0rem clamp(0.5rem, 1.5vw, 1rem);
+    font-size: clamp(0.8rem, 1.5vw, 0.95rem);
 }
 
 .boxContent p {
@@ -41,9 +41,9 @@
 }
 
 .boxContent h3 {
-    font-size: 2rem;
+    font-size: clamp(1rem, 3.5vw, 1.5rem);
     font-weight: 500;
-    margin: -10px 0px;
+    margin: 10px 0px -12px 0px;
     letter-spacing: 0.5px;
 }
 
@@ -54,11 +54,15 @@
     width: calc(100% + 2rem);
 }
 
+.waveformSpectrumDivider {
+    margin: 0.25rem -1rem;
+}
+
 /* ----- GENRE CHART ----- */
 .chartContainer {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: clamp(0.3rem, 1vw, 0.5rem);
     margin-top: 1rem;
     padding-bottom: 2rem;
 }
@@ -70,7 +74,7 @@
 }
 
 .genreLabel {
-    font-size: 0.75rem;
+    font-size: clamp(0.65rem, 1.5vw, 0.75rem);
     color: #b0b0b0;
     text-align: left;
     letter-spacing: 0.5px;
@@ -83,7 +87,7 @@
 
 .barTrack {
     flex: 1;
-    height: 1.4rem;
+    height: clamp(1rem, 2vw, 1.4rem);
     background-color: #2a2a2a;
     border-radius: 2px;
     overflow: hidden;
@@ -94,9 +98,9 @@
 }
 
 .percentageColumn {
-    width: 3.5rem;
+    width: clamp(3rem, 5vw, 3.5rem);
     text-align: right;
-    font-size: 0.8rem;
+    font-size: clamp(0.7rem, 1.5vw, 0.8rem);
     color: white;
 }
 
@@ -104,11 +108,12 @@
 .boxSection {
     display: flex;
     flex-direction: column;
+    gap: 0.35rem;
 }
 
 .boxLabel {
     text-align: center;
-    margin: -20px;
+    margin: 0 0 -1rem 0;
     letter-spacing: 0.5px;
 }
 
@@ -121,4 +126,19 @@
 
 .boxImage {
     width: 100%;
+}
+
+/* ----- MOBILE ADJUSTMENTS ----- */
+@media (max-width: 997px) {
+    .bodyOutput {
+        flex-direction: column;
+        align-items: stretch; 
+        gap: 1rem;            
+    }
+
+    .boxContainer {
+        min-height: auto;     
+        flex: none;           
+        margin-top: 0;        
+    }
 }

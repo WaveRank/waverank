@@ -22,8 +22,8 @@
 .contributorsHeader {
     background-color: #3a3a3a;
     margin: 0;
-    padding: 0.55rem 0.9rem;
-    font-size: 1rem;
+    padding: clamp(0.4rem, 1vw, 0.55rem) clamp(0.6rem, 1.5vw, 0.9rem);
+    font-size: clamp(0.9rem, 2vw, 1rem);
     border-bottom: 1px solid #6a6a6a;
     text-align: center;
 }
@@ -36,8 +36,8 @@
 
 /* ----- CONTENT & TYPOGRAPHY ----- */
 .contributorsContent {
-    padding: 0rem 1rem;
-    font-size: 0.95rem;
+    padding: 0rem clamp(0.5rem, 1.5vw, 1rem);
+    font-size: clamp(0.8rem, 1.5vw, 0.95rem);
 }
 
 .contributorsContent p {
@@ -45,7 +45,7 @@
 }
 
 .contributorsContent h3 {
-    font-size: 2rem;
+    font-size: clamp(1rem, 3.5vw, 1.5rem);
     font-weight: 500;
     margin: -10px 0px;
     letter-spacing: 0.5px;
@@ -71,7 +71,7 @@
 .contributorRole {
     text-align: center;
     margin: 0.25rem 0 0.75rem 0;
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 1.5vw, 1rem);
     letter-spacing: 0.4px;
 }
 
@@ -79,7 +79,7 @@
     margin-top: 0.75rem;
     line-height: 1.5;
     color: #b0b0b0;
-
+    font-size: clamp(0.8rem, 1.5vw, 1rem);
 }
 
 .contributorLinks {
@@ -93,13 +93,20 @@
 .contributorLink {
     color: #bb7ac7;
     text-decoration: none;
-    font-size: 0.85rem;
+    font-size: clamp(0.7rem, 1.5vw, 0.85rem);
     padding: 6px 0px;
     border-radius: 4px;
     border: 1px solid transparent;
     text-decoration: underline;
+    margin-top: -15px;
 }
 
 .contributorLink:hover {
     color: #d64992;
+}
+
+@media (max-width: 997px) {
+    .contributorsGrid {
+        grid-template-columns: repeat(1, 1fr);
+    }
 }

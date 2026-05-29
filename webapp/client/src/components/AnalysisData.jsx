@@ -91,11 +91,11 @@ export function WaveformSpectrumData({ waveform, spectrum }) {
                     </div>
                 </div>
 
-                <div className="boxDivider"/>
+                <div className="boxDivider waveformSpectrumDivider"/>
 
                 {/* Frequency spectrum data */}
                 <div className="boxSection">
-                    <p className="boxLabel">FREQUENCY SPECTRUM</p>
+                    <p className="boxLabel frequencySpectrum">FREQUENCY SPECTRUM</p>
                     <div className="boxGraph">
                         <img className="boxImage" src={spectrum || '/demo_frequency_spectrum.png'}></img>
                     </div>
@@ -110,7 +110,7 @@ export function MelSpectrogramData({ spectrogram }) {
     return (
         <div className="boxContainer">
             {/* Section header */}
-            <h2 className="boxHeader">MEL SPECTROGRAM & ???</h2>
+            <h2 className="boxHeader">MEL SPECTROGRAM</h2>
 
             {/* Section content */}
             <div className="boxContent">

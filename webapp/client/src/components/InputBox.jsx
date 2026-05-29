@@ -68,30 +68,22 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
         // Close pop up and disable buttons
         setShowURLPopup(false)
         setRequestActive(true)
-        // Validate link is a real YouTube link
+        // Validate link is a real YouTube
         if (!isValidLink) {
             onStatusChange("Invalid YouTube link!");
             setRequestActive(false);
             setSentLink(null);
             return;
         }
-        // Phase 1: end link to download flask route
-        onStatusChange("Downloading audio from YouTube")
-        const downloadData = await downloadYoutubeAudio(sentLink);
-        // handle download response
-        if (downloadData && !downloadData.error) {
-            setFilename(downloadData.filename);
-            setFilepath(downloadData.audio);
+        // send it to new flask route
+        onStatusChange("Processing Audio from Youtube")
+        const responseData = await uploadLink(sentLink);
+        // handle response
+        if (responseData && onUploadResult) {
+            onUploadResult(responseData);
+            setFilename(responseData.filename);
+            setFilepath(responseData.audio);
             setSelectedFile(null);
-
-            // Phase 2: process audio file from download
-            onStatusChange("Processing audio from YouTube")
-            const processData = await processYoutubeAudio(downloadData.subdir, downloadData.filename)
-            if (processData && onUploadResult) {
-                onUploadResult(processData);
-            }
-        } else {
-            onUploadResult(downloadData)
         }
         setRequestActive(false);
         setSentLink(null);
@@ -110,8 +102,8 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
 
             {/* Conditional: Popup for uploading audio file */}
             {showUploadPopup && (
-                <div className="popupOverlay">
-                    <div className="popupBox">
+                <div className="popupOverlay" onClick={() => setShowUploadPopup(false)}>
+                    <div className="popupBox" onClick={(e) => e.stopPropagation()}>
                         <h2>Upload Audio File</h2>
                         <button className="closeButton" onClick={() => setShowUploadPopup(false)}>X</button>
                         <p>
@@ -127,12 +119,13 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
 
             {/* Conditional: Popup for pasting URL */}
             {showURLPopup && (
-                <div className="popupOverlay">
-                    <div className="popupBox">
+                <div className="popupOverlay" onClick={() => setShowUploadPopup(false)}>
+                    <div className="popupBox" onClick={(e) => e.stopPropagation()}>
                         <h2>Paste URL</h2>
                         <button className="closeButton" onClick={() => setShowURLPopup(false)}>X</button>
-                        <input type="url" id="youtube-url-input" name="youtube-url-input" onChange={onLinkChange}></input>
-                        <button onClick={onPasteLink}>Paste URL</button>
+                        <p>Paste a URL from YouTube. Does not allow livestreams, age-restricted content, private videos, or videos over 10 minutes.</p>
+                        <input className="fileInput" type="url" id="youtube-url-input" name="youtube-url-input" placeholder="Paste URL here" onChange={onLinkChange}></input>
+                        <button className="uploadButton" onClick={onPasteLink}>Paste URL</button>
                     </div>
                 </div>
             )}
@@ -144,7 +137,5 @@ export default function InputBox( {onUploadResult, onStatusChange}) {
                 selectedFilepath={filepath}
             />
         </>
-
-
     )
 }
