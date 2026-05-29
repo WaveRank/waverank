@@ -1,6 +1,7 @@
 # Configuration for waveform, spectrum, and spectrograph visualizations
 
-GRAPH_COLOR = "mediumvioletred"
+GRAPH_COLOR_WF = "#b73779"
+GRAPH_COLOR_FS = "#721f81"
 
 WAVEFORM_DOWNSAMPLE_FACTOR = 1000
 

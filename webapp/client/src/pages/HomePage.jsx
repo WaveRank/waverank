@@ -5,11 +5,25 @@ import "../styles/inputBox.css";
 import "../styles/audioPlayer.css";
 import "../styles/popup.css";
 import "../styles/analysisBoxes.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function HomePage() {
     const [status, setStatus] = useState('Awaiting file')
     const [data, setData] = useState(null)
+    const [spinnerIndex, setSpinnerIndex] = useState(0);
+
+    // Detect processing symbol state
+    const currStatus = status?.toLowerCase()
+    const isProcessing = currStatus.includes("processing") || currStatus.includes("downloading");
+    useEffect(() => {
+        if (!isProcessing) return;
+        const frames = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"];
+        const interval = setInterval(() => {
+            setSpinnerIndex(prev => (prev + 1) % frames.length);
+        }, 120);
+        return () => clearInterval(interval);
+    }, [isProcessing]);
+    const spinner = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"][spinnerIndex];
 
     // Set status depending on response from Flask backend
     // TODO: set graphs and prediction result too
@@ -41,7 +55,10 @@ export default function HomePage() {
                     <InputBox onUploadResult={handleUploadResult} onStatusChange = {setStatus}/>
 
                     <div className="bodyOutput">
-                        <AnalysisSummary status={status} genrePrediction={genrePrediction}></AnalysisSummary>
+                        <AnalysisSummary 
+                            status={isProcessing ? `${status} ${spinner}` : status} 
+                            genrePrediction={genrePrediction}>
+                        </AnalysisSummary>
                         <WaveformSpectrumData waveform={graphs?.waveform} spectrum={graphs?.spectrum} />
                         <MelSpectrogramData spectrogram={graphs?.spectrogram}></MelSpectrogramData>
                     </div>

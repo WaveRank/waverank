@@ -35,7 +35,6 @@ export default function AudioFileDetails( {selectedFile, selectedFilename, selec
 
     return (
         <div className="inputAudio">
-            <h2>File Details:</h2>
             {content}
         </div>
     )
