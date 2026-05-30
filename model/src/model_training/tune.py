@@ -80,6 +80,7 @@ def optimize_config(trials):
     trials.set_user_attr("val_accuracy", val_acc) 
     trials.set_user_attr("test_accuracy", test_acc)
 
+    # Return average accuracy score
     return (val_acc + test_acc) / 2
 
 
