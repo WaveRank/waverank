@@ -74,6 +74,10 @@ env\Scripts\activate
 python -m scripts.run_server
 ```
 
+### Navigate to web app
+
+Once both the frontend and backend are running, open your browser and navigate to [http://localhost:5173](http://localhost:5173)
+
 ---
 
 ## Server Testing
