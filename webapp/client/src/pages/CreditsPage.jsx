@@ -3,14 +3,23 @@ import "../styles/credits.css";
 export default function CreditsPage() {
     const credits = [
         {
+            category: "Datasets & Training Data",
+            items: [
+                { 
+                    name: "GTZAN Music Genre Classification Dataset", 
+                    url: "https://www.kaggle.com/datasets/andradaolteanu/gtzan-dataset-music-genre-classification" 
+                }
+            ]
+        },
+        {
             category: "Deep Learning & AI",
             items: [
                 { name: "TensorFlow & Keras API", url: "https://www.tensorflow.org/api_docs" },
                 { name: "ResNet50 & Transfer Learning", url: "https://www.tensorflow.org/guide/keras/transfer_learning" },
                 { name: "Keras Functional API", url: "https://www.tensorflow.org/guide/keras/functional_api" },
                 { name: "Data Performance Guide", url: "https://www.tensorflow.org/guide/data_performance" },
-                { name: "Keras Tuner (Bayesian Optimization)", url: "https://keras.io/keras_tuner/api/tuners/bayesian/" },
-                { name: "Model Saving & Loading", url: "https://www.geeksforgeeks.org/machine-learning/save-and-load-models-in-tensorflow/" }
+                { name: "Model Saving & Loading", url: "https://www.geeksforgeeks.org/machine-learning/save-and-load-models-in-tensorflow/" },
+                { name: "Optuna", url: "https://optuna.readthedocs.io/en/stable/" }
             ]
         },
         {
