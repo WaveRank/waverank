@@ -175,7 +175,7 @@ WaveRank was built with the help of the following tools, libraries, and resource
   <tbody>
     <tr>
       <td>Dataset</td>
-      <td><a href="https://www.tensorflow.org/datasets/catalog/gtzan">GTZAN Genre Collection</a></td>
+      <td><a href="https://www.kaggle.com/datasets/andradaolteanu/gtzan-dataset-music-genre-classification/data">GTZAN Genre Collection</a></td>
     </tr>
     <tr>
       <td rowspan="3">Deep Learning & AI</td>
