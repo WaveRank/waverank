@@ -12,7 +12,7 @@ from pathlib import Path
 import time
 import uuid
 from shared.paths import UPLOAD_DIR, GRAPH_DIR
-from webapp.server.config import HOURS_TO_LIVE
+from webapp.server.config import MINUTES_TO_LIVE
 
 
 def create_unique_dir(dir):
@@ -32,7 +32,7 @@ def create_unique_dir(dir):
     return unique_dir_name
 
 
-def delete_old_subdirs(dir, hours_to_live=HOURS_TO_LIVE):
+def delete_old_subdirs(dir, minutes_to_live=MINUTES_TO_LIVE):
     """
     Delete subdirectories older than the configured lifetime.
     Non-directory files are ignored.
@@ -41,7 +41,7 @@ def delete_old_subdirs(dir, hours_to_live=HOURS_TO_LIVE):
         dir (Path): directory containing generated subdirectories
         hours_to_live (number): maximum allowed age of subdirectories, in hours
     """
-    SEC_IN_HOUR = 3600
+    SEC_IN_MINUTE = 60
     list_of_contents = dir.iterdir()
     current_time = time.time()
 
@@ -49,6 +49,6 @@ def delete_old_subdirs(dir, hours_to_live=HOURS_TO_LIVE):
         filepath = dir / filename
         last_modified = filepath.stat().st_mtime
 
-        if (current_time - last_modified > hours_to_live * SEC_IN_HOUR):
+        if (current_time - last_modified > minutes_to_live * SEC_IN_MINUTE):
             if filepath.is_dir():
                 shutil.rmtree(filepath)

@@ -55,10 +55,10 @@ def process_audio_file(filepath, filename):
     # Multithread: generate and save three graphs and get genre prediction
     try:
         with ThreadPoolExecutor(max_workers=4) as executor:
+            prediction_future = executor.submit(predict_genre, y, sr)
             waveform_future = executor.submit(generate_waveform, y, sr, output_dir / waveform_filename)
             spectrum_future = executor.submit(generate_spectrum, y, sr, output_dir / spectrum_filename)
             spectrogram_future = executor.submit( generate_spectrogram, y, sr, output_dir / spectrogram_filename)
-            prediction_future = executor.submit(predict_genre, y, sr)
 
             waveform_future.result()
             spectrum_future.result()
@@ -79,7 +79,7 @@ def process_audio_file(filepath, filename):
     except Exception as e:
         print("Cleanup failed:", repr(e))
 
-    # Build partial response
+    # Build response
     server_url = request.host_url.rstrip("/")
 
     response_data = {

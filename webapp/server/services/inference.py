@@ -55,35 +55,30 @@ def predict_genre(audio_file, sr):
     batch_size = 8
 
     # Load and segment audio into correct length/overlap for model
-    if audio_file is None:  # Audio file failed to load
-        return dict(zip(class_names, [0] * len(class_names)))
     segments = segment_audio(audio_file, sr)
     if not segments:        # Song clip is too short to segment
         return dict(zip(class_names, [0] * len(class_names)))
 
-    # Get predictions for the audio segments, in batches
+    # Get predictions for the audio segments, in batches to reduce memory usage
     sums = None
     count = 0
 
-    with ThreadPoolExecutor(max_workers = min(4, os.cpu_count())) as pool:
-        for i in range(0, len(segments), batch_size):
-            batch_segments = segments[i: i+batch_size]
+    for i in range(0, len(segments), batch_size):
+        # Convert segments to spectrograms
+        batch_segments = segments[i: i+batch_size]
+        batch_imgs = [preprocess(segment, sr) for segment in batch_segments]
 
-            # Convert segments to spectrograms, with multithreading for slight speed
-            batch_imgs = []
-            batch_imgs = list(pool.map(lambda s: preprocess(s, sr), batch_segments))
+        # Feed spectrograms to model and collect output confidences
+        batch_arr = np.stack(batch_imgs)
 
-            # Feed spectrograms to model and collect output confidences
-            batch_arr = np.stack(batch_imgs)
+        with model_lock:  # Guard against Tensorflow race conditions
+            batch_predictions = loaded_model.predict(batch_arr, verbose=0)
 
-            with model_lock:  # Guard against Tensorflow race conditions
-                batch_predictions = loaded_model.predict(batch_arr, verbose=0)
-
-            if sums is None:
-                sums = np.sum(batch_predictions, axis=0)
-            else:
-                sums += np.sum(batch_predictions, axis=0)
-            count += len(batch_predictions)
+        if sums is None:
+            sums = np.sum(batch_predictions, axis=0)
+        else:
+            sums += np.sum(batch_predictions, axis=0)
+        count += len(batch_predictions)
 
     # Do averaging on output for final combined predictions and return
     model_results = (sums / count).tolist()
