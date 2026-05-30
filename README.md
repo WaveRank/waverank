@@ -147,10 +147,10 @@ Output will be saved to `tests/artifacts/inference_test_results.json`.
  
 | Name | GitHub | Role |
 |------|--------|------|
-| Emily Huntley | <!-- @github --> | <!-- Role --> |
-| Kevin Klein | <!-- @github --> | <!-- Role --> |
-| Madeline Rachow | <!-- @github --> | <!-- Role --> |
-| Angela Shin | <!-- @github --> | <!-- Role --> |
+| Emily Huntley | [emilyfhuntley](https://github.com/emilyfhuntley) | <!-- Role --> |
+| Kevin Klein | [KevKlein](https://github.com/KevKlein)  | <!-- Role --> |
+| Madeline Rachow | [MadelineRachow](https://github.com/MadelineRachow)  | <!-- Role --> |
+| Angela Shin | [angshin](https://github.com/angshin)  | <!-- Role --> |
  
 ---
  
