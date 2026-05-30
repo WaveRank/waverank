@@ -7,6 +7,11 @@ explore and adaptively select the best hyperparameter combinations per trial.
 
 The tunable parameters include the initial LR, fine-tune LR, dropout rate,
 depth, spec augmentation masking widths, cutmix probability...
+
+Citations (05/08/26):
+https://dzlab.github.io/dltips/en/tensorflow/hyperoptim-optuna/
+https://optuna.org/
+https://github.com/optuna/optuna-examples/blob/main/tensorflow/tensorflow_eager_simple.py
 """
 import os
 os.environ["TF_DETERMINISTIC_OPS"] = "1"
