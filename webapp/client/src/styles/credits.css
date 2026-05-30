@@ -1,0 +1,32 @@
+/* ----- CREDITS CORE ----- */
+.creditsOutput {
+    display: grid;
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.creditsOutput h3 {
+    margin: 0;
+    margin-bottom: -10px;
+    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+}
+
+.creditsOutput ul {
+    margin: 0;
+}
+
+.creditsOutput a {
+    color: #6692bb;
+    text-decoration: none;
+    font-size:clamp(0.7rem, 1.5vw, 1rem);
+}
+
+.creditsOutput a:hover {
+    color: #1d5faf;
+    text-decoration: underline;
+}
+
+.creditsOutput li {
+    margin-bottom: 0.25rem;
+}
