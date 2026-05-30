@@ -12,6 +12,10 @@ Citations (05/08/26):
 https://dzlab.github.io/dltips/en/tensorflow/hyperoptim-optuna/
 https://optuna.org/
 https://github.com/optuna/optuna-examples/blob/main/tensorflow/tensorflow_eager_simple.py
+
+Citations (05/28/26):
+https://optuna.readthedocs.io/en/stable/tutorial/20_recipes/003_attributes.html
+https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html
 """
 import os
 os.environ["TF_DETERMINISTIC_OPS"] = "1"
