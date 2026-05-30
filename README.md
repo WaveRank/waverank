@@ -185,7 +185,7 @@ WaveRank was built with the help of the following tools, libraries, and resource
       <td><a href="https://www.tensorflow.org/guide/keras/transfer_learning">ResNet50 & Transfer Learning</a></td>
     </tr>
     <tr>
-      <td><a href="https://keras.io/keras_tuner/api/tuners/bayesian/">Keras Tuner (Bayesian Optimization)</a></td>
+      <td><a href="https://optuna.readthedocs.io/en/stable/reference/samplers/index.html">Optuna Sampler</a></td>
     </tr>
     <tr>
       <td rowspan="3">Audio Processing</td>

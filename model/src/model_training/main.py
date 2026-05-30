@@ -19,7 +19,7 @@ Citation (4/21/26):
 https://keras.io/examples/vision/cutmix/
 
 Citation (5/06/26):
-https://keras.io/keras_tuner/api/tuners/bayesian/
+https://optuna.readthedocs.io/en/stable/reference/samplers/index.html
 
 Things to try to improve the model:
 - Add data augmentation
