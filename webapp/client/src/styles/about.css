@@ -59,6 +59,15 @@
     width: calc(100% + 2rem);
 }
 
+.modelDiagram {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    object-fit: contain;
+}
+
 /* ----- MOBILE ADJUSTMENTS ----- */
 @media (max-width: 997px) {
     .aboutOutput {

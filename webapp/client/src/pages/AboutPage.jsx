@@ -62,9 +62,9 @@ export default function AboutPage() {
                         </div>
 
                         <div className="aboutContainer modelBox">
-                            <h2 className="aboutHeader">MODEL</h2>
+                            <h2 className="aboutHeader">SYSTEM ARCHITECTURE</h2>
                             <div className="aboutContent">
-                                <p>insert</p>
+                                <img src="/diagram.png" alt="Model Diagram" className="modelDiagram"/>
                             </div>
                         </div>
 

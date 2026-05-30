@@ -13,7 +13,7 @@ export default function AudioFileDetails( {selectedFile, selectedFilename, selec
     if (!selectedFile && !selectedFilename) {
         content = 
             <>
-                <p>File Name: Your_File_Here</p>
+                <p className="inputFileName">File Name: Once uploaded, your file name will appear here.</p>
                 <AudioPlayer audioFile={null} title={null}/>
             </>
     }
@@ -27,7 +27,7 @@ export default function AudioFileDetails( {selectedFile, selectedFilename, selec
     } else {
         content =  (
             <>
-                <p>File Name: {selectedFilename}</p>
+                <p className="inputFileName">File Name: {selectedFilename}</p>
                 <AudioPlayer audioFile={selectedFilepath} title={selectedFilename}/>
             </>
         );
