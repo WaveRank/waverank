@@ -48,7 +48,7 @@ def tuning_pipeline():
     _, val_acc = model.evaluate(val_ds)
     print("Val accuracy:", val_acc)
 
-    return val_acc
+    return val_acc, test_acc
 
 
 def optimize_config(trials):
@@ -66,12 +66,16 @@ def optimize_config(trials):
     tf.keras.backend.clear_session()
 
     # Configure sample float/int values on a given range per trial
-    cfg.INITIAL_LEARNING_RATE = trials.suggest_float("initial_lr", 1e-4, 5e-4, log=True)
-    cfg.FINE_LEARNING_RATE = trials.suggest_float("fine_lr", 1e-5, 1e-4, log=True)
-    cfg.DROPOUT_RATE = trials.suggest_float("dropout", 0.4, 0.7, step=0.1)
-    cfg.DEPTH = trials.suggest_int("depth", 60, 100)
+    cfg.INITIAL_LEARNING_RATE = trials.suggest_float("initial_lr", 1e-4, 2e-4, log=True)
+    cfg.FINE_LEARNING_RATE = trials.suggest_float("fine_lr", 5e-5, 1e-4, log=True)
+    cfg.DROPOUT_RATE = trials.suggest_float("dropout", 0.4, 0.5, step=0.1)
+    cfg.DEPTH = trials.suggest_int("depth", 140, 170)
 
-    return tuning_pipeline()
+    val_acc, test_acc = tuning_pipeline()
+    trials.set_user_attr("val_accuracy", val_acc) 
+    trials.set_user_attr("test_accuracy", test_acc)
+
+    return (val_acc + test_acc) / 2
 
 
 def optimization():
@@ -86,17 +90,19 @@ def optimization():
 
     # Best trial stats
     print("\nBEST TRIAL RUN:")
-    print(f"VAL ACCURACY          = {study.best_trial.value}")
+    print(f"AVG ACCURACY          = {study.best_trial.value}")
     print(f"INITIAL_LEARNING_RATE = {study.best_trial.params['initial_lr']}")
     print(f"FINE_LEARNING_RATE    = {study.best_trial.params['fine_lr']}")
     print(f"DROPOUT_RATE          = {study.best_trial.params['dropout']}")
     print(f"DEPTH                 = {study.best_trial.params['depth']}")
 
-    # Top 5 trial stats
-    trials = sorted(study.trials, key=lambda t: t.value, reverse=True)[:5]
+    # Top 10 trial stats
+    trials = sorted(study.trials, key=lambda t: t.value, reverse=True)[:10]
     for i, trial in enumerate(trials):
         print(f"\nRank {i+1} (Trial {trial.number}):")
-        print(f"  VAL ACCURACY: {trial.value}")
+        print(f"  AVG ACCURACY: {trial.value}")
+        print(f"  VAL ACCURACY: {trial.user_attrs['val_accuracy']}")
+        print(f"  TEST ACCURACY: {trial.user_attrs['test_accuracy']}")
         for key, value in trial.params.items():
             print(f"  {key}: {value}")
 
