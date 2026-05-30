@@ -10,6 +10,10 @@ from werkzeug.exceptions import RequestEntityTooLarge
 from flask_cors import CORS
 from pathlib import Path
 from yt_dlp.utils import DownloadError
+import os
+# Suppress Tensorflow startup warnings
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
 from shared.paths import UPLOAD_DIR, GRAPH_DIR
 from webapp.server.config import PORT, MAX_CONTENT_LENGTH

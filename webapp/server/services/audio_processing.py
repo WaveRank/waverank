@@ -5,11 +5,17 @@ upload and YouTube endpoints, including:
 - waveform/spectrum/spectrogram generation
 - file cleanup
 - response metadata generation
+
+Citation (5/28):
+https://www.geeksforgeeks.org/python/multithreading-python-set-1/
 """
 
 from pathlib import Path
 from flask import request
 from werkzeug.utils import secure_filename
+from concurrent.futures import ThreadPoolExecutor
+import gc
+
 from shared.paths import GRAPH_DIR, UPLOAD_DIR
 from webapp.server.services.file_io import create_unique_dir, delete_old_subdirs
 from webapp.server.services.inference import predict_genre
@@ -20,7 +26,8 @@ from visualizations.spectrogram.spectrogram import generate_spectrogram
 
 def process_audio_file(filepath, filename):
     """
-    Validates audio, generates graphs, and returns response data.
+    Validates audio, generates graphs and genre prediction, and returns
+    response data.
 
     Returns:
         tuple(response_data, status_code)
@@ -36,7 +43,7 @@ def process_audio_file(filepath, filename):
 
     print(f'received file: "{filename}"')
 
-    # Generate graphs and save to disk
+    # Prepare filepaths for graphs, which client will fetch
     new_graph_subdir = create_unique_dir(GRAPH_DIR)
     output_dir = GRAPH_DIR / new_graph_subdir
     file_basename = Path(secure_filename(filename)).stem
@@ -45,29 +52,34 @@ def process_audio_file(filepath, filename):
     spectrum_filename = file_basename + "_spectrum.png"
     spectrogram_filename = file_basename + "_spectrogram.png"
 
+    # Multithread: generate and save three graphs and get genre prediction
     try:
-        generate_waveform(y, sr, output_dir / waveform_filename)
-        generate_spectrum(y, sr, output_dir / spectrum_filename)
-        generate_spectrogram(y, sr, output_dir / spectrogram_filename)
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            prediction_future = executor.submit(predict_genre, y, sr)
+            waveform_future = executor.submit(generate_waveform, y, sr, output_dir / waveform_filename)
+            spectrum_future = executor.submit(generate_spectrum, y, sr, output_dir / spectrum_filename)
+            spectrogram_future = executor.submit( generate_spectrogram, y, sr, output_dir / spectrogram_filename)
+
+            waveform_future.result()
+            spectrum_future.result()
+            spectrogram_future.result()
+            genre_prediction = prediction_future.result()
 
     except Exception as e:
         filepath.unlink()
-        print("Graph generation failed:", repr(e))
-        return {"error": "Error generating graphs"}, 500
+        print("Processing failed:", repr(e))
+        return {"error": "Audio processing failed"}, 500
 
-    # TODO Get genre prediction from inference pipeline
-    # TODO maybe look into handling this asynchronously
-    # genre_prediction = predict_genre(filepath)
-
-
-    # Cleanup the uploads and graphs older than the age limit
+    # Cleanup uploads and graphs older than the age limit, garbage collect
     try:
         delete_old_subdirs(GRAPH_DIR)
         delete_old_subdirs(UPLOAD_DIR)
+        gc.collect()
+
     except Exception as e:
         print("Cleanup failed:", repr(e))
 
-    # Build partial response
+    # Build response
     server_url = request.host_url.rstrip("/")
 
     response_data = {
@@ -78,7 +90,7 @@ def process_audio_file(filepath, filename):
             "spectrum": f"{server_url}/api/graphs/{new_graph_subdir}/{spectrum_filename}",
             "spectrogram": f"{server_url}/api/graphs/{new_graph_subdir}/{spectrogram_filename}",
         },
-        # "genre_prediction": genre_prediction
+        "genre_prediction": genre_prediction
     }
 
     return response_data, 200
