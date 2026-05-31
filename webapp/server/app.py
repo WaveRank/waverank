@@ -29,7 +29,7 @@ from visualizations.spectrogram.spectrogram import generate_spectrogram
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
-CORS(app)
+CORS(app, origins=["https://waverank.vercel.app"])
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 GRAPH_DIR.mkdir(parents=True, exist_ok=True)
