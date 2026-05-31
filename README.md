@@ -76,13 +76,15 @@ python -m scripts.run_server
 
 ### Navigate to web app
 
-Once both the frontend and backend are running, open your browser and navigate to [http://localhost:5173](http://localhost:5173)
+Once both the frontend and backend are running, open your browser and navigate 
+to [http://localhost:5173](http://localhost:5173)
 
 ---
 
 ## Server Testing
-Automated testing of the server API. Three collections run in parallel to simulate simultaneous requests.
-Requires Newman (`npm install -g newman`). Run from the project root with the server already running.
+Automated testing of the server API. Three collections run in parallel to 
+simulate simultaneous requests. Requires Newman (`npm install -g newman`).
+ Run from the project root with the server already running.
 
 **Parallel (faster):**
 ```
@@ -98,8 +100,12 @@ wait
 newman run tests/postman/WaveRank-sequential.postman_collection.json -e tests/postman/WaveRank-Local.postman_environment.json
 ```
 
+---
+
 ## Building the model from source data
-> **Note:** A pre-trained model is already included in the repository. This section is only necessary if you want to retrain the model from scratch, which is *NOT* needed to run the web app!
+> **Note:** A pre-trained model is already included in the repository. 
+This section is only necessary if you want to retrain the model from scratch, 
+which is *NOT* needed to run the web app!
 
 ### Prepare Raw Data
 Sort source `.wav` audio files into directories named after each genre, and 
@@ -110,14 +116,15 @@ This dataset is already sorted into genres. Copy the 'genres_original' directory
 into 'data/' so you have 'data/genres_original', with all the genre subdirectories
 inside.
 
-Alternatively, any sorted dataset will work — place genre subdirectories inside `data/genres_original`.
-This should work with any number or type of genres.
-Combining multiple datasets is technically possible but you would ideally want to
-control for duplicate songs, overlapping genres, etc.
+Alternatively, any sorted dataset will work — place genre subdirectories 
+inside `data/genres_original`. This should work with any number or type of
+genres. Combining multiple datasets is technically possible but you would
+ideally want to control for duplicate songs, overlapping genres, etc.
 
 ### Preprocessing
-Split the dataset into training, validation, and test directories, 
-segment the original `.wav` files, and convert the segments to spectrograms. Wait for each command to finish before running the next.
+Split the dataset into training, validation, and test directories, segment the 
+original `.wav` files, and convert the segments to spectrograms. Wait for each 
+command to finish before running the next.
 ```
 python -m model.src.preprocessing.1_distribute_dataset
 python -m model.src.preprocessing.2_segment_dataset
@@ -125,13 +132,14 @@ python -m model.src.preprocessing.3_wav_to_spectrogram
 ```
 ### Training
 Training the model can take a very long time! Utilizing a GPU, e.g. via 
-`tensorflow-with-cuda`, can greatly speed up this process. You will need to install
-the appropriate package and export it to python's env path to enable it.
+`tensorflow-with-cuda`, can greatly speed up this process. You will need to 
+install the appropriate package and export it to python's env path to enable it.
 With an Nvidia GPU, it might be something like:
 ```
 export LD_LIBRARY_PATH=$(find $VIRTUAL_ENV/lib/python3.10/site-packages/nvidia -type d -name lib | tr "\n" ":"):$LD_LIBRARY_PATH
 ```
-> For GPU setup instructions specific to your system, see the [TensorFlow GPU guide](https://www.tensorflow.org/install/pip#gpu).
+> For GPU setup instructions specific to your system, see the 
+[TensorFlow GPU guide](https://www.tensorflow.org/install/pip#gpu).
 
 You can verify your GPU is working with: 
 ```
@@ -142,7 +150,8 @@ If you see a GPU listed at the end, you know it is working, e.g.:
 [PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')]
 ```
 
-> **Note:** Do not run other intensive tasks while training — this may cause TensorFlow to become unstable.
+> **Note:** Do not run other intensive tasks while training - this may cause 
+TensorFlow to become unstable.
 
 Use these commands to build the trained model from the spectrogram images. The
 model will be saved as `model/artifacts/final_model.keras`.
@@ -150,15 +159,19 @@ model will be saved as `model/artifacts/final_model.keras`.
 python -m model.src.model_training.main
 ```
 
-#### Optionally, run hyperparameter tuning via Optuna:
-Hyperparameter tuning uses Optuna's Bayesian optimization (TPE sampler) to search for the best 
-combination of learning rates, dropout rate, and model depth across N trials. Run this *before* `main.py` 
-to find optimal hyperparameters, then update `model/config.py` with the best results before running the full training pipeline.
+### Hyperparameter Tuning (Optional)
+Hyperparameter tuning uses Optuna's Bayesian optimization (TPE sampler) to
+search for the best combination of learning rates, dropout rate, and model
+depth across N trials. Run this *before* `main.py` to find optimal
+hyperparameters, then update `model/config.py` with the best results before
+running the full training pipeline. The current saved version of the model has
+done this already!
 ```
 python -m model.src.model_training.tune
 ```
-> Note: performing some other tasks with your pc while this is running may cause
-Tensorflow to become unstable. Training time can also be decreased by lowering `TRAINING_EPOCHS` and `FINE_TUNE_EPOCHS` in `model/config.py`.
+> Note: Performing some other tasks with your pc while this is running may cause
+Tensorflow to become unstable. Training time can also be decreased by lowering 
+`TRAINING_EPOCHS` and `FINE_TUNE_EPOCHS` in `model/config.py`.
 
 ### Inference Testing
 Place test songs in `data/test_songs` and run:
@@ -174,10 +187,10 @@ Alternatively, the web app uses the same inference pipeline.
  
 | Name | GitHub | Role |
 |------|--------|------|
-| Emily Huntley | [emilyfhuntley](https://github.com/emilyfhuntley) | <!-- Role --> |
-| Kevin Klein | [KevKlein](https://github.com/KevKlein)  | <!-- Role --> |
-| Madeline Rachow | [MadelineRachow](https://github.com/MadelineRachow)  | <!-- Role --> |
-| Angela Shin | [angshin](https://github.com/angshin)  | <!-- Role --> |
+| Emily Huntley | [emilyfhuntley](https://github.com/emilyfhuntley) | YouTube Integration Engineer & Assistant ML Trainer |
+| Kevin Klein | [KevKlein](https://github.com/KevKlein)  | Backend Engineer |
+| Madeline Rachow | [MadelineRachow](https://github.com/MadelineRachow)  | Frontend Engineer |
+| Angela Shin | [angshin](https://github.com/angshin)  | Head ML Engineer |
  
 ---
  
