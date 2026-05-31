@@ -1,1 +1,1 @@
-web: cd webapp/server && gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+web: pip install -r requirements-deploy.txt && gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
