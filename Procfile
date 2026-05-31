@@ -1,1 +1,1 @@
-web: curl -fsSL https://deno.land/install.sh | sh && export PATH="$HOME/.deno/bin:$PATH" && cd webapp/server && PYTHONPATH=/app gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+web: cd webapp/server && PYTHONPATH=/app gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
