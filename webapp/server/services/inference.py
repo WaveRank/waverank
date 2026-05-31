@@ -49,12 +49,13 @@ def _load_model():
             cache_dir="/tmp/model_cache",
             token=os.getenv("HF_TOKEN")
         )
-        hf_hub_download(
+        cookies_path = hf_hub_download(
             repo_id="emilyfhuntley/waverank",
             filename="youtube_cookies.txt",
             cache_dir="/tmp/model_cache",
             token=os.getenv("HF_TOKEN")
         )
+        os.environ["COOKIES_PATH"] = cookies_path
 
     else:
         # Local: load from repo as usual

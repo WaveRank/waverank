@@ -17,7 +17,12 @@ def get_cookies_path():
     Returns the path to the youtube cookies file from Hugging Face.
     """
     if os.getenv("RAILWAY_ENVIRONMENT"):
-        return "/tmp/model_cache/youtube_cookies.txt"
+        path = os.getenv("COOKIES_PATH")
+        print(
+            f"Cookies path: {path}, exists: {os.path.exists(path) if path else False}",
+            flush=True,
+        )
+        return path
     return None
 
 def download_youtube_audio(link):
