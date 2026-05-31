@@ -3,13 +3,23 @@ WaveRank is a web app that classifies the top music genres of an audio file usin
 
 <!-- SCREENSHOT: Homepage with example results -->
 
-## Using the Hosted Website
-WaveRank is hosted at **[HOSTED URL HERE]**. No login required.
+## Using the Website
+WaveRank is hosted at **[waverank.vercel.app](https://waverank.vercel.app)**.
+No login required.
+
+> Note: The hosted demo may take up to 2 minutes to load after a period of 
+inactivity due to serverless sleep mode.
  
-1. Click **Upload Audio File** to upload a `.wav`, `.mp3`, or `.mp4` file (max 10MB), or click **Paste URL** to enter a YouTube link.
+1. Click **Upload Audio File** to upload a `.wav`, `.mp3`, or `.mp4` file (max 
+10MB), or click **Paste URL** to enter a YouTube link.
 2. Wait for the audio to process, this may take a few seconds.
-3. View your genre predictions and audio visualizations while you listen to your song on the built-in audio player.
-> Note: YouTube URL uploads do not support livestreams, age-restricted content, private videos, or videos over 10 minutes.
+3. View your genre predictions and audio visualizations while you listen to 
+your song on the built-in audio player.
+> Note: YouTube URL uploads do not support livestreams, age-restricted content,
+private videos, or videos over 10 minutes. **YouTube URL uploads are 
+unavailable in the hosted demo due to YouTube's bot detection blocking 
+requests from cloud hosting providers - this feature only works when running
+locally.**
  
 <!-- SCREENSHOT: Upload popups -->
 <!-- SCREENSHOT: Results with genre bars and graphs -->
@@ -195,15 +205,26 @@ Alternatively, the web app uses the same inference pipeline.
 ---
  
 ## Known Issues
- 
-<!-- TODO: Add known issues before final submission -->
+- Only trained on 10 genres that don't fully reflect modern listening habits
+- Small dataset results in higher overfitting and lower accuracy than desired
+- YouTube integration is unavailable in the hosted demo due to YouTube's bot 
+detection blocking cloud server IP addresses, works fully in local development
+
+---
+
+## Future Development
+- Expand training dataset: more songs and more genres
+- Resolve YouTube integration for hosted deployment: potential approaches
+include residential proxy services or a dedicated non-cloud server
+- Integrate additional music platforms (Spotify, Apple Music, etc.)
  
 ---
 
 
 ## Acknowledgements
 
-WaveRank was built with the help of the following tools, libraries, and resources. See the website for even more details.
+WaveRank was built with the help of the following tools, libraries, and 
+resources. See the website for even more details.
 
 <table>
   <thead>
