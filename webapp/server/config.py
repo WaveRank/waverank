@@ -12,4 +12,4 @@ MAX_YOUTUBE_LENGTH = 600        # 10 minutes in seconds
 ALLOWED_EXTENSIONS = {'wav', 'mp3', 'mp4'}
 
 # Graph and upload subdir age limit
-MINUTES_TO_LIVE = 15
+MINUTES_TO_LIVE = 5

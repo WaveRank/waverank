@@ -40,13 +40,22 @@ def _load_model():
         model_path = hf_hub_download(
             repo_id="emilyfhuntley/waverank",
             filename="final_model.keras",
-            cache_dir="/tmp/model_cache"
+            cache_dir="/tmp/model_cache",
+            token=os.getenv("HF_TOKEN")
         )
         class_names_path = hf_hub_download(
             repo_id="emilyfhuntley/waverank",
             filename="class_names.json",
-            cache_dir="/tmp/model_cache"
+            cache_dir="/tmp/model_cache",
+            token=os.getenv("HF_TOKEN")
         )
+        hf_hub_download(
+            repo_id="emilyfhuntley/waverank",
+            filename="youtube_cookies.txt",
+            cache_dir="/tmp/model_cache",
+            token=os.getenv("HF_TOKEN")
+        )
+
     else:
         # Local: load from repo as usual
         model_path = model_artifacts_dir / "final_model.keras"

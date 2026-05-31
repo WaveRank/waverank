@@ -7,9 +7,18 @@ Citations (5/20):
 https://github.com/yt-dlp/yt-dlp
 """
 import yt_dlp
+import os
 from shared.paths import UPLOAD_DIR
 from webapp.server.config import MAX_YOUTUBE_LENGTH
 from webapp.server.services.file_io import create_unique_dir
+
+def get_cookies_path():
+    """
+    Returns the path to the youtube cookies file from Hugging Face.
+    """
+    if os.getenv("RAILWAY_ENVIRONMENT"):
+        return "/tmp/model_cache/youtube_cookies.txt"
+    return None
 
 def download_youtube_audio(link):
     """
@@ -24,6 +33,7 @@ def download_youtube_audio(link):
     ydl_opts = {
         'quiet': True,
         'noplaylist': True,
+        'cookiefile': get_cookies_path(),
     }
 
     # Check video information to validate
