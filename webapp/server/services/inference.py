@@ -11,6 +11,9 @@ https://www.geeksforgeeks.org/machine-learning/save-and-load-models-in-tensorflo
 https://www.geeksforgeeks.org/deep-learning/tf-keras-models-load_model-in-tensorflow/
 https://docs.github.com/en/repositories/working-with-files/managing-large-files
 https://stackoverflow.com/questions/32231892/typeerror-with-int-for-jsonify-from-flask
+
+Citation (5/30/26):
+https://huggingface.co/docs/huggingface_hub/guides/download
 """
 
 # ----- IMPORTS -----
@@ -28,10 +31,34 @@ from shared.paths import MODEL_ARTIFACTS_DIR
 
 # ----- MODEL LOADING -----
 # Load the model and class names
+def _load_model():
+    model_artifacts_dir = MODEL_ARTIFACTS_DIR
+
+    if os.getenv("RAILWAY_ENVIRONMENT"):
+        # Production: download from Hugging Face
+        from huggingface_hub import hf_hub_download
+        model_path = hf_hub_download(
+            repo_id="emilyfhuntley/waverank",
+            filename="final_model.keras",
+            cache_dir="/tmp/model_cache"
+        )
+        class_names_path = hf_hub_download(
+            repo_id="emilyfhuntley/waverank",
+            filename="class_names.json",
+            cache_dir="/tmp/model_cache"
+        )
+    else:
+        # Local: load from repo as usual
+        model_path = model_artifacts_dir / "final_model.keras"
+        class_names_path = model_artifacts_dir / "class_names.json"
+
+    _model = tf.keras.models.load_model(model_path)
+    with open(class_names_path, "r") as f:
+        _class_names = json.load(f)
+    return _model, _class_names
+
 model_lock = threading.Lock()
-loaded_model = tf.keras.models.load_model(MODEL_ARTIFACTS_DIR / "final_model.keras")
-with open(MODEL_ARTIFACTS_DIR / "class_names.json", "r") as f:
-    class_names = json.load(f)
+loaded_model, class_names = _load_model()
 
 # ----- INFERENCE -----
 def preprocess(segment, sr):
