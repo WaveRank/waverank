@@ -66,6 +66,7 @@
     display: block;
     margin: 0 auto;
     object-fit: contain;
+    cursor: zoom-in;
 }
 
 /* ----- MOBILE ADJUSTMENTS ----- */
@@ -87,4 +88,44 @@
         flex: none;           
         margin-top: 0;        
     }
+}
+
+/* ----- SYSTEM ARCHITECTURE DIAGRAM POPUP ----- */
+.diagramPopupBox {
+    position: relative;
+    width: min(95vw, 1400px);
+    max-height: 90vh;
+    padding: clamp(1.25rem, 2.5vw, 2rem);
+    border-radius: 20px;
+    background: #1a1a1a;
+    border: 1px solid #444444;
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+.diagramPopupBox h2 {
+    margin: 0 0 1rem;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    letter-spacing: -0.02em;
+}
+
+.expandedDiagram {
+    width: 90%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.diagramPopupBox::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.diagramPopupBox::-webkit-scrollbar-thumb {
+    background: #721f81;
+    border: 2px solid #1a1a1a;
+}
+
+.diagramPopupBox::-webkit-scrollbar-thumb:hover {
+    background: #a147b1;
 }

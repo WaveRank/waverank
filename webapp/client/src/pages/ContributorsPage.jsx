@@ -20,7 +20,12 @@ const contributors = [
         name: "Kevin Klein",
         image: "/Kevin.jpg",
         role: "Backend Engineer",
-        description: "Brief description of you/your interests/idk/etc.",
+        description: [
+            "Kevin is completing the Oregon State University Post-Baccalaureate Computer Science program and will continue his studies through Georgia Tech's Online Master of Science in Computer Science program. ",
+            "His interests include backend or full-stack development, systems programming, and performance-oriented software engineering. On this project, Kevin focused primarily on backend development, ",
+            "including API design, file processing and verification, visualization generation, and inference pipeline integration. Outside of software engineering, Kevin lives in Taiwan, where he works as an ",
+            "English teacher and enjoys exploring the countryside by scooter. He is seeking software engineering internship opportunities and welcomes professional connections."
+        ],
         linkedin: "#",
         github: "https://github.com/KevKlein",
     },
@@ -39,11 +44,16 @@ const contributors = [
     },
     {
         name: "Angela Shin",
-        image: "/contributor.png",
+        image: "/Angie.png",
         role: "Head ML Engineer",
-        description: "Brief description of you/your interests/idk/etc.",
+        description: [
+            "Angela is completing the Oregon State University Post-Baccalaureate Computer Science program where she was able to develop skills in full-stack development, systems programming, machine learning, ",
+            "and mobile development. As part of this project, she primarily focused on model training and development, conducting experiments to improve model accuracy and generalization alongside some backend development ",
+            "work. She is particularly interested in model optimization, training strategies, and deep learning theory. In her free time, she loves to go on hikes and is an avid reader. She plans to pursue graduate studies ",
+            "in machine learning and is open to software engineering and ML engineer roles."
+        ],
         linkedin: "#",
-        github: "#",
+        github: "https://github.com/angshin",
     },
 ];
 
