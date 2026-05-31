@@ -91,15 +91,25 @@ wait
 
 **Single-threaded:**
 ```
-newman run tests/postman/WaveRank-single-threaded.postman_collection.json -e tests/postman/WaveRank-Local.postman_environment.json
+newman run tests/postman/WaveRank-sequential.postman_collection.json -e tests/postman/WaveRank-Local.postman_environment.json
 ```
 
 ## Building the model from source data
 > **Note:** A pre-trained model is already included in the repository. This section is only necessary if you want to retrain the model from scratch, which is *NOT* needed to run the web app!
 
-### Prepare raw data
+### Prepare Raw Data
 Sort source `.wav` audio files into directories named after each genre, and 
 place them within `data/genres_original`.
+You can get the GTZAN dataset we used from 
+[Kaggle](https://www.kaggle.com/datasets/andradaolteanu/gtzan-dataset-music-genre-classification).
+This dataset is already sorted into genres. Copy the 'genres_original' directory
+into 'data/' so you have 'data/genres_original', with all the genre subdirectories
+inside.
+
+Alternatively, any sorted dataset will work — place genre subdirectories inside `data/genres_original`.
+This should work with any number or type of genres.
+Combining multiple datasets is technically possible but you would ideally want to
+control for duplicate songs, overlapping genres, etc.
 
 ### Preprocessing
 Split the dataset into training, validation, and test directories, 
@@ -119,20 +129,32 @@ export LD_LIBRARY_PATH=$(find $VIRTUAL_ENV/lib/python3.10/site-packages/nvidia -
 ```
 > For GPU setup instructions specific to your system, see the [TensorFlow GPU guide](https://www.tensorflow.org/install/pip#gpu).
 
+You can verify your GPU is working with: 
+```
+python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
+```
+If you see a GPU listed at the end, you know it is working, e.g.:
+```
+[PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')]
+```
+
 > **Note:** Do not run other intensive tasks while training — this may cause TensorFlow to become unstable.
 
-Train the CNN model using the spectrogram dataset:
+Use these commands to build the trained model from the spectrogram images. The
+model will be saved as `model/artifacts/final_model.keras`.
 ```
 python -m model.src.model_training.main
 ```
 
-Optionally, run hyperparameter tuning via Optuna:
-<!-- TODO: Get more information from Angie about what tune.py does and recommended order of operations -->
+#### Optionally, run hyperparameter tuning via Optuna:
+Hyperparameter tuning uses Optuna's Bayesian optimization (TPE sampler) to search for the best 
+combination of learning rates, dropout rate, and model depth across N trials. Run this *before* `main.py` 
+to find optimal hyperparameters, then update `model/config.py` with the best results before running the full training pipeline.
 ```
 python -m model.src.model_training.tune
 ```
 > Note: performing some other tasks with your pc while this is running may cause
-Tensorflow to become unstable.
+Tensorflow to become unstable. Training time can also be decreased by lowering `TRAINING_EPOCHS` and `FINE_TUNE_EPOCHS` in `model/config.py`.
 
 ### Inference Testing
 Place test songs in `data/test_songs` and run:
@@ -140,6 +162,7 @@ Place test songs in `data/test_songs` and run:
 python -m tests.test_inference
 ```
 Output will be saved to `tests/artifacts/inference_test_results.json`.
+Alternatively, the web app uses the same inference pipeline.
 
 ---
  
