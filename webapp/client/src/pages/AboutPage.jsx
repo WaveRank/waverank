@@ -1,6 +1,10 @@
+import { useState } from "react";
 import "../styles/about.css";
+import "../styles/popup.css";
 
 export default function AboutPage() {
+    const [expanded, setExpanded] = useState(false);
+
     return (
         <>
             <div className="header">
@@ -62,11 +66,21 @@ export default function AboutPage() {
                         </div>
 
                         <div className="aboutContainer modelBox">
-                            <h2 className="aboutHeader">MODEL</h2>
+                            <h2 className="aboutHeader">SYSTEM ARCHITECTURE</h2>
                             <div className="aboutContent">
-                                <p>insert</p>
+                                <img src="/diagram.png" alt="Model Diagram" className="modelDiagram" onClick={() => setExpanded(true)}/>
                             </div>
                         </div>
+
+                        {expanded && (
+                            <div className="popupOverlay" onClick={() => setExpanded(false)}>
+                                <div className="diagramPopupBox" onClick={(e) => e.stopPropagation()}>
+                                    <button className="closeButton" onClick={() => setExpanded(false)}>X</button>
+                                    <h2>System Architecture</h2>
+                                    <img src="/diagram.png" alt="Model Diagram" className="expandedDiagram"/>
+                                </div>
+                            </div>
+                        )}
 
                     </div>
                 </div>

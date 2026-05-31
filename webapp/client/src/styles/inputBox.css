@@ -36,3 +36,7 @@
     padding: 0;
     cursor: pointer;
 }
+
+.inputFileName {
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
+}
