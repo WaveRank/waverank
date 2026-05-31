@@ -1,6 +1,8 @@
-const API_PREDICT_PATH = "/api/predict"
-const API_LINK_PATH = "/api/youtube/download"
-const API_PROCESS_PATH = "/api/youtube/process"
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
+const API_PREDICT_PATH = `${API_BASE_URL}/api/predict`
+const API_LINK_PATH = `${API_BASE_URL}/api/youtube/download`
+const API_PROCESS_PATH = `${API_BASE_URL}/api/youtube/process`
 
 
 /**
