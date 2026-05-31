@@ -81,6 +81,8 @@ def handle_youtube_link():
                 error = "Video is not available or has download restrictions"
             elif "members-only" in msg.lower():
                 error = "Members-only videos are not supported"
+            elif "sign in to confirm you’re not a bot" in msg.lower():
+                error = "YouTube cookies issue on hosted demo, upload a file directly instead"
             else:
                 error = "Download error: Check URL and try again"
         else:
