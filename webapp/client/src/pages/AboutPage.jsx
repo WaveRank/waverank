@@ -58,7 +58,7 @@ export default function AboutPage() {
                                 <div className="aboutContent">
                                     <p className="aboutLabel">Current performance metrics:</p>
                                     <div className="aboutDivider"/>
-                                    <p><strong>Accuracy:</strong> [Insert Accuracy %] on [validation/test] set.</p>
+                                    <p><strong>Accuracy:</strong> 80% on the test set.</p>
                                     <p><strong>Genres:</strong> Supports 10 genres: Blues, Classical, Country, Disco, Hiphop, Jazz, Metal, Pop, Reggae, and Rock.</p>
                                     <p><strong>Limitations:</strong> Best suited for standard track lengths; high background noise may reduce confidence scores.</p>
                                 </div>
