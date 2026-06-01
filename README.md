@@ -1,11 +1,13 @@
 # WaveRank
 WaveRank is a web app that classifies the top music genres of an audio file using a CNN trained on mel-scaled spectrogram features. Upload an audio file or paste a YouTube URL to get genre predictions along with waveform, frequency spectrum, and mel spectrogram visualizations.
 
-<!-- SCREENSHOT: Homepage with example results -->
+![WaveRank homepage showing the audio classifier interface with example genre predictions](docs/screenshots/results.png)
 
 ## Using the Website
 WaveRank is hosted at **[waverank.vercel.app](https://waverank.vercel.app)**.
 No login required.
+
+Alternatively, you can run the web app locally (see: [Local Development Setup](#local-development-setup))
 
 > Note: The hosted demo may take up to 2 minutes to load after a period of 
 inactivity due to serverless sleep mode.
@@ -21,8 +23,17 @@ unavailable in the hosted demo due to YouTube's bot detection blocking
 requests from cloud hosting providers - this feature only works when running
 locally.**
  
-<!-- SCREENSHOT: Upload popups -->
-<!-- SCREENSHOT: Results with genre bars and graphs -->
+**Upload Audio File:**
+
+![Upload audio file popup](docs/screenshots/upload_popup.png)
+
+**Upload Via YouTube URL:**
+
+![Paste URL popup](docs/screenshots/url_popup.png)
+
+**Example Results:**
+
+![Example results for Chopin](docs/screenshots/results_2.png)
  
 ---
 
