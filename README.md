@@ -40,8 +40,8 @@ locally.**
 ## Local Development Setup
  
 ### Prerequisites
-- Python 3.10.12 
-- Node.js v20.20.2
+- Python 3.11+
+- Node.js v20.20+
 - ffmpeg (see below)
 
 #### Installing ffmpeg
@@ -157,7 +157,7 @@ Training the model can take a very long time! Utilizing a GPU, e.g. via
 install the appropriate package and export it to python's env path to enable it.
 With an Nvidia GPU, it might be something like:
 ```
-export LD_LIBRARY_PATH=$(find $VIRTUAL_ENV/lib/python3.10/site-packages/nvidia -type d -name lib | tr "\n" ":"):$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$(find $VIRTUAL_ENV/lib/python3.11/site-packages/nvidia -type d -name lib | tr "\n" ":"):$LD_LIBRARY_PATH
 ```
 > For GPU setup instructions specific to your system, see the 
 [TensorFlow GPU guide](https://www.tensorflow.org/install/pip#gpu).
