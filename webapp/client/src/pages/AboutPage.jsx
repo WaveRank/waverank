@@ -1,6 +1,10 @@
+import { useState } from "react";
 import "../styles/about.css";
+import "../styles/popup.css";
 
 export default function AboutPage() {
+    const [expanded, setExpanded] = useState(false);
+
     return (
         <>
             <div className="header">
@@ -54,7 +58,7 @@ export default function AboutPage() {
                                 <div className="aboutContent">
                                     <p className="aboutLabel">Current performance metrics:</p>
                                     <div className="aboutDivider"/>
-                                    <p><strong>Accuracy:</strong> [Insert Accuracy %] on [validation/test] set.</p>
+                                    <p><strong>Accuracy:</strong> 80% on the test set.</p>
                                     <p><strong>Genres:</strong> Supports 10 genres: Blues, Classical, Country, Disco, Hiphop, Jazz, Metal, Pop, Reggae, and Rock.</p>
                                     <p><strong>Limitations:</strong> Best suited for standard track lengths; high background noise may reduce confidence scores.</p>
                                 </div>
@@ -62,11 +66,21 @@ export default function AboutPage() {
                         </div>
 
                         <div className="aboutContainer modelBox">
-                            <h2 className="aboutHeader">MODEL</h2>
+                            <h2 className="aboutHeader">SYSTEM ARCHITECTURE</h2>
                             <div className="aboutContent">
-                                <p>insert</p>
+                                <img src="/diagram.png" alt="Model Diagram" className="modelDiagram" onClick={() => setExpanded(true)}/>
                             </div>
                         </div>
+
+                        {expanded && (
+                            <div className="popupOverlay" onClick={() => setExpanded(false)}>
+                                <div className="diagramPopupBox" onClick={(e) => e.stopPropagation()}>
+                                    <button className="closeButton" onClick={() => setExpanded(false)}>X</button>
+                                    <h2>System Architecture</h2>
+                                    <img src="/diagram.png" alt="Model Diagram" className="expandedDiagram"/>
+                                </div>
+                            </div>
+                        )}
 
                     </div>
                 </div>

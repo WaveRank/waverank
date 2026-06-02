@@ -1,29 +1,113 @@
 # WaveRank
+WaveRank is a web app that classifies the top music genres of an audio file using a CNN trained on mel-scaled spectrogram features. Upload an audio file or paste a YouTube URL to get genre predictions along with waveform, frequency spectrum, and mel spectrogram visualizations.
 
-## How to run web app
-Installation lines (commented out) should be run once
+![WaveRank homepage showing the audio classifier interface with example genre predictions](docs/screenshots/results.png)
 
-### linux
+## Using the Website
+WaveRank is hosted at **[waverank.vercel.app](https://waverank.vercel.app)**.
+No login required.
 
-#### frontend
+Alternatively, you can run the web app locally (see: [Local Development Setup](#local-development-setup))
+
+> Note: The hosted demo may take up to 2 minutes to load after a period of 
+inactivity due to serverless sleep mode.
+ 
+1. Click **Upload Audio File** to upload a `.wav`, `.mp3`, or `.mp4` file (max 
+10MB), or click **Paste URL** to enter a YouTube link.
+2. Wait for the audio to process, this may take a few seconds.
+3. View your genre predictions and audio visualizations while you listen to 
+your song on the built-in audio player.
+> Note: YouTube URL uploads do not support livestreams, age-restricted content,
+private videos, or videos over 10 minutes. **YouTube URL uploads are 
+unavailable in the hosted demo due to YouTube's bot detection blocking 
+requests from cloud hosting providers - this feature only works when running
+locally.**
+ 
+**Upload Audio File:**
+
+![Upload audio file popup](docs/screenshots/upload_popup.png)
+
+**Upload Via YouTube URL:**
+
+![Paste URL popup](docs/screenshots/url_popup.png)
+
+**Example Results:**
+
+![Example results for Chopin](docs/screenshots/results_2.png)
+ 
+---
+
+## Local Development Setup
+ 
+### Prerequisites
+- Python 3.10.12 
+- Node.js v20.20.2
+- ffmpeg (see below)
+
+#### Installing ffmpeg
+ffmpeg is required for YouTube audio downloads.
+ 
+**Linux (Ubuntu/Debian):**
+```
+sudo apt update
+sudo apt install ffmpeg
+```
+ 
+**Mac:**
+```
+brew install ffmpeg
+```
+ 
+**Windows:**
+1. Download ffmpeg from https://ffmpeg.org/download.html
+2. Extract the zip and copy `ffmpeg.exe` from the `bin` folder
+3. Add the folder containing `ffmpeg.exe` to your system PATH
+
+**Verify installation:**
+```
+ffmpeg -version
+```
+ 
+---
+ 
+### Frontend
 ```
 cd webapp/client
-# npm install
+# npm install  (run once)
 npm run dev
 ```
-
-#### backend
+ 
+### Backend
+ 
+**Linux/Mac:**
 ```
 python3 -m venv env
 source env/bin/activate
-# pip install -r webapp/server/requirements.txt
+# pip install -r requirements.txt  (run once)
+python -m scripts.run_server
+```
+ 
+**Windows:**
+```
+python -m venv env
+env\Scripts\activate
+# pip install -r requirements.txt  (run once)
 python -m scripts.run_server
 ```
 
-## Server testing
-Automated testing of server API surface. 
-Three scripts run in parallel to simulate simultaneous requests (and finish faster).
-Needs to be run from project root, with server running.
+### Navigate to web app
+
+Once both the frontend and backend are running, open your browser and navigate 
+to [http://localhost:5173](http://localhost:5173)
+
+---
+
+## Server Testing
+Automated testing of the server API. Three collections run in parallel to 
+simulate simultaneous requests. Requires Newman (`npm install -g newman`).
+ Run from the project root with the server already running.
+
+**Parallel (faster):**
 ```
 newman run tests/postman/WaveRank-1.postman_collection.json -e tests/postman/WaveRank-Local.postman_environment.json &
 newman run tests/postman/WaveRank-2.postman_collection.json -e tests/postman/WaveRank-Local.postman_environment.json &
@@ -31,49 +115,54 @@ newman run tests/postman/WaveRank-3.postman_collection.json -e tests/postman/Wav
 wait
 
 ```
-Non-simultaneous use version:
+
+**Single-threaded:**
 ```
 newman run tests/postman/WaveRank-sequential.postman_collection.json -e tests/postman/WaveRank-Local.postman_environment.json
 ```
 
+---
+
 ## Building the model from source data
-Set up virtual environment and dependencies.
-```
-python3 -m venv env
-source env/bin/activate
-# pip install -r requirements.txt
-```
-Acquire source audio files.
-You can get the dataset we used from 
-https://www.kaggle.com/datasets/andradaolteanu/gtzan-dataset-music-genre-classification
+> **Note:** A pre-trained model is already included in the repository. 
+This section is only necessary if you want to retrain the model from scratch, 
+which is *NOT* needed to run the web app!
+
+### Prepare Raw Data
+Sort source `.wav` audio files into directories named after each genre, and 
+place them within `data/genres_original`.
+You can get the GTZAN dataset we used from 
+[Kaggle](https://www.kaggle.com/datasets/andradaolteanu/gtzan-dataset-music-genre-classification).
 This dataset is already sorted into genres. Copy the 'genres_original' directory
 into 'data/' so you have 'data/genres_original', with all the genre subdirectories
 inside.
 
-Alternatively, you could use any other sorted dataset by instead placing that one's
-genres in 'data/genres_original'. This should work with any number or type of genres.
-Combining multiple datasets is technically possible but you would ideally want to
-control for duplicate songs, overlapping genres, etc.
+Alternatively, any sorted dataset will work — place genre subdirectories 
+inside `data/genres_original`. This should work with any number or type of
+genres. Combining multiple datasets is technically possible but you would
+ideally want to control for duplicate songs, overlapping genres, etc.
 
 ### Preprocessing
-Split the dataset into training, validation, and test directories, 
-segment the original .wav files, and convert the segments to spectrograms.
+Split the dataset into training, validation, and test directories, segment the 
+original `.wav` files, and convert the segments to spectrograms. Wait for each 
+command to finish before running the next.
 ```
 python -m model.src.preprocessing.1_distribute_dataset
 python -m model.src.preprocessing.2_segment_dataset
 python -m model.src.preprocessing.3_wav_to_spectrogram
 ```
 ### Training
-#### Enabling GPU usage
-Note: Training the model can take a very long time. Utilizing a GPU, e.g. via 
-tensorflow-with-cuda, can speed up this process. You will need to install
-the appropriate package and export it to python's env path to enable it.
-With an Nvida GPU, it might be something like:
+Training the model can take a very long time! Utilizing a GPU, e.g. via 
+`tensorflow-with-cuda`, can greatly speed up this process. You will need to 
+install the appropriate package and export it to python's env path to enable it.
+With an Nvidia GPU, it might be something like:
 ```
 export LD_LIBRARY_PATH=$(find $VIRTUAL_ENV/lib/python3.10/site-packages/nvidia -type d -name lib | tr "\n" ":"):$LD_LIBRARY_PATH
 ```
-You can test that your GPU is working with Tensorflor with this command. 
+> For GPU setup instructions specific to your system, see the 
+[TensorFlow GPU guide](https://www.tensorflow.org/install/pip#gpu).
 
+You can verify your GPU is working with: 
 ```
 python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
 ```
@@ -82,23 +171,117 @@ If you see a GPU listed at the end, you know it is working, e.g.:
 [PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')]
 ```
 
-#### Building the trained CNN model
+> **Note:** Do not run other intensive tasks while training - this may cause 
+TensorFlow to become unstable.
+
 Use these commands to build the trained model from the spectrogram images. The
-model will be saved as 'model/artifacts/final_model.keras'.
+model will be saved as `model/artifacts/final_model.keras`.
 ```
 python -m model.src.model_training.main
+```
+
+### Hyperparameter Tuning (Optional)
+Hyperparameter tuning uses Optuna's Bayesian optimization (TPE sampler) to
+search for the best combination of learning rates, dropout rate, and model
+depth across N trials. Run this *before* `main.py` to find optimal
+hyperparameters, then update `model/config.py` with the best results before
+running the full training pipeline. The current saved version of the model has
+done this already!
+```
 python -m model.src.model_training.tune
 ```
-Note: performing some other tasks with your pc while this is running may cause
-Tensorflow to become unstable.
-Note: training time can be decreased by lowering the number of training epochs
-and fine tuning epochs in model/src/config.py.
+> Note: Performing some other tasks with your pc while this is running may cause
+Tensorflow to become unstable. Training time can also be decreased by lowering 
+`TRAINING_EPOCHS` and `FINE_TUNE_EPOCHS` in `model/config.py`.
 
-### Inference testing
-To test the inference pipeline and get genre predictions on any number of songs,
-place them in data/test_songs and run the following command. Output will be saved
-as tests/artifacts/inference_test_results.json.
+### Inference Testing
+Place test songs in `data/test_songs` and run:
 ```
 python -m tests.test_inference
 ```
+Output will be saved to `tests/artifacts/inference_test_results.json`.
 Alternatively, the web app uses the same inference pipeline.
+
+---
+ 
+## Contributors
+ 
+| Name | GitHub | Role |
+|------|--------|------|
+| Emily Huntley | [emilyfhuntley](https://github.com/emilyfhuntley) | YouTube Integration Engineer & Assistant ML Trainer |
+| Kevin Klein | [KevKlein](https://github.com/KevKlein)  | Backend Engineer |
+| Madeline Rachow | [MadelineRachow](https://github.com/MadelineRachow)  | Frontend Engineer |
+| Angela Shin | [angshin](https://github.com/angshin)  | Head ML Engineer |
+ 
+---
+ 
+## Known Issues
+- Only trained on 10 genres that don't fully reflect modern listening habits
+- Small dataset results in higher overfitting and lower accuracy than desired
+- YouTube integration is unavailable in the hosted demo due to YouTube's bot 
+detection blocking cloud server IP addresses, works fully in local development
+
+---
+
+## Future Development
+- Expand training dataset: more songs and more genres
+- Resolve YouTube integration for hosted deployment: potential approaches
+include residential proxy services or a dedicated non-cloud server
+- Integrate additional music platforms (Spotify, Apple Music, etc.)
+ 
+---
+
+
+## Acknowledgements
+
+WaveRank was built with the help of the following tools, libraries, and 
+resources. See the website for even more details.
+
+<table>
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th>Resource</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Dataset</td>
+      <td><a href="https://www.kaggle.com/datasets/andradaolteanu/gtzan-dataset-music-genre-classification/data">GTZAN Genre Collection</a></td>
+    </tr>
+    <tr>
+      <td rowspan="3">Deep Learning & AI</td>
+      <td><a href="https://www.tensorflow.org/api_docs">TensorFlow & Keras</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.tensorflow.org/guide/keras/transfer_learning">ResNet50 & Transfer Learning</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://optuna.readthedocs.io/en/stable/reference/samplers/index.html">Optuna Sampler</a></td>
+    </tr>
+    <tr>
+      <td rowspan="3">Audio Processing</td>
+      <td><a href="https://librosa.org/doc/main/generated/librosa.feature.melspectrogram.html">Librosa</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://medium.com/analytics-vidhya/understanding-the-mel-spectrogram-fca2afa2ce53">Understanding Mel Spectrograms</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a></td>
+    </tr>
+    <tr>
+      <td rowspan="2">Metrics & Visualization</td>
+      <td><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html">Scikit-Learn</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.legend.html">Matplotlib</a></td>
+    </tr>
+    <tr>
+      <td rowspan="2">Frontend & Web</td>
+      <td><a href="https://react.dev/">React</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://flask.palletsprojects.com/">Flask</a></td>
+    </tr>
+  </tbody>
+</table>
