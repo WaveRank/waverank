@@ -15,7 +15,6 @@ visualizations/*/output/
 visualizations/output/
 visualizations/*/*.png
 webapp/server/artifacts/
-model/artifacts/*.csv
 model/artifacts/*.png
 tests/artifacts/
 
