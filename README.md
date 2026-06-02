@@ -54,8 +54,8 @@ included. You must clone the repository using Git:
 ### Prerequisites
 - Python 3.11+
 - Node.js v20.20+
-- Git LFS (see below)
-- ffmpeg (see below)
+- Git LFS
+- ffmpeg
 
 #### Installing Python 3.11
 On Ubuntu/Debian, Python 3.11 may not be the default. Install it and required tools with:
