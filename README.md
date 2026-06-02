@@ -14,10 +14,11 @@ inactivity due to serverless sleep mode.
  
 1. Click **Upload Audio File** to upload a `.wav`, `.mp3`, or `.mp4` file (max 
 10MB), or click **Paste URL** to enter a YouTube link.
+    > Don't have an audio file handy? Download a sample from our [test audio files](https://drive.google.com/drive/folders/1BpH3PP8-jUCh-4cKUH3o7pxAgcRvHPmF?usp=sharing).
 2. Wait for the audio to process, this may take a few seconds.
 3. View your genre predictions and audio visualizations while you listen to 
 your song on the built-in audio player.
-> Note: YouTube URL uploads do not support livestreams, age-restricted content,
+    > Note: YouTube URL uploads do not support livestreams, age-restricted content,
 private videos, or videos over 10 minutes. **YouTube URL uploads are 
 unavailable in the hosted demo due to YouTube's bot detection blocking 
 requests from cloud hosting providers - this feature only works when running
@@ -39,61 +40,84 @@ locally.**
 
 ## Local Development Setup
  
+> **Note:** Local development is recommended on **Linux or macOS**. Windows is
+not officially supported.
+ 
+> **Note:** This repository uses [Git LFS](https://git-lfs.com/) to store the
+trained model file. **Do not download as a ZIP!** The model will not be
+included. You must clone the repository using Git:
+> ```
+> git clone https://github.com/WaveRank/waverank.git
+> ```
+> For help with cloning, see [GitHub's cloning instructions](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
+ 
 ### Prerequisites
 - Python 3.11+
 - Node.js v20.20+
+- Git LFS (see below)
 - ffmpeg (see below)
+
+#### Installing Python 3.11
+On Ubuntu/Debian, Python 3.11 may not be the default. Install it and required tools with:
+```
+sudo apt install python3.11 python3.11-venv python3-pip
+```
+#### Installing Node.js
+Download and install from [nodejs.org](https://nodejs.org/) or use your system's package manager.
+
+#### Installing Git LFS
+```
+sudo apt install git-lfs
+git lfs install
+```
 
 #### Installing ffmpeg
 ffmpeg is required for YouTube audio downloads.
- 
-**Linux (Ubuntu/Debian):**
-```
-sudo apt update
-sudo apt install ffmpeg
-```
- 
-**Mac:**
-```
-brew install ffmpeg
-```
- 
-**Windows:**
-1. Download ffmpeg from https://ffmpeg.org/download.html
-2. Extract the zip and copy `ffmpeg.exe` from the `bin` folder
-3. Add the folder containing `ffmpeg.exe` to your system PATH
 
-**Verify installation:**
-```
-ffmpeg -version
-```
+- **Linux (Ubuntu/Debian):**
+  ```
+  sudo apt update
+  sudo apt install ffmpeg
+  ```
+ 
+- **Mac:**
+  ```
+  brew install ffmpeg
+  ```
+
+- **Verify installation:**
+  ```
+  ffmpeg -version
+  ```
  
 ---
  
 ### Frontend
+Navigate to the project root, then open a new terminal and run:
 ```
 cd webapp/client
-# npm install  (run once)
+npm install
 npm run dev
 ```
+> Note: `npm install` only needs to be run once, or after pulling changes that update `package.json`.
  
 ### Backend
+Navigate to the project root, then open a new terminal and run:
  
 **Linux/Mac:**
 ```
-python3 -m venv env
+python3.11 -m venv env
 source env/bin/activate
-# pip install -r requirements.txt  (run once)
-python -m scripts.run_server
+pip install -r requirements.txt
+python3 -m scripts.run_server
 ```
- 
-**Windows:**
-```
-python -m venv env
-env\Scripts\activate
-# pip install -r requirements.txt  (run once)
-python -m scripts.run_server
-```
+> Note: `pip install -r requirements.txt` only needs to be run once, or after
+pulling changes that update `requirements.txt`.
+
+> Note: If predictions are taking more than 5-10 seconds per file, your GPU
+may not be in use. See the [TensorFlow GPU guide](https://www.tensorflow.org/install/pip#gpu)
+for setup instructions specific to your system.
+
 
 ### Navigate to web app
 
@@ -147,9 +171,9 @@ Split the dataset into training, validation, and test directories, segment the
 original `.wav` files, and convert the segments to spectrograms. Wait for each 
 command to finish before running the next.
 ```
-python -m model.src.preprocessing.1_distribute_dataset
-python -m model.src.preprocessing.2_segment_dataset
-python -m model.src.preprocessing.3_wav_to_spectrogram
+python3 -m model.src.preprocessing.1_distribute_dataset
+python3 -m model.src.preprocessing.2_segment_dataset
+python3 -m model.src.preprocessing.3_wav_to_spectrogram
 ```
 ### Training
 Training the model can take a very long time! Utilizing a GPU, e.g. via 
@@ -164,7 +188,7 @@ export LD_LIBRARY_PATH=$(find $VIRTUAL_ENV/lib/python3.11/site-packages/nvidia -
 
 You can verify your GPU is working with: 
 ```
-python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
+python3 -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
 ```
 If you see a GPU listed at the end, you know it is working, e.g.:
 ```
@@ -177,7 +201,7 @@ TensorFlow to become unstable.
 Use these commands to build the trained model from the spectrogram images. The
 model will be saved as `model/artifacts/final_model.keras`.
 ```
-python -m model.src.model_training.main
+python3 -m model.src.model_training.main
 ```
 
 ### Hyperparameter Tuning (Optional)
@@ -188,7 +212,7 @@ hyperparameters, then update `model/config.py` with the best results before
 running the full training pipeline. The current saved version of the model has
 done this already!
 ```
-python -m model.src.model_training.tune
+python3 -m model.src.model_training.tune
 ```
 > Note: Performing some other tasks with your pc while this is running may cause
 Tensorflow to become unstable. Training time can also be decreased by lowering 
@@ -197,7 +221,7 @@ Tensorflow to become unstable. Training time can also be decreased by lowering
 ### Inference Testing
 Place test songs in `data/test_songs` and run:
 ```
-python -m tests.test_inference
+python3 -m tests.test_inference
 ```
 Output will be saved to `tests/artifacts/inference_test_results.json`.
 Alternatively, the web app uses the same inference pipeline.
